@@ -1,0 +1,10 @@
+{
+  "name": "luma-anesthesia-tools",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@base44/sdk": "^0.1.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
