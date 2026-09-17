@@ -17,20 +17,12 @@ class LumaAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 52,
-      leadingWidth: 88,
-      leading: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.menu, size: 20),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, size: 16),
-            onPressed: () {},
-          ),
-        ],
+      leadingWidth: 48,
+      leading: IconButton(
+        icon: const Icon(Icons.menu, size: 20),
+        onPressed: () {},
       ),
+      automaticallyImplyLeading: false,
       title: Text(title, style: lumaDisplay(size: 15, weight: FontWeight.w600)),
       actions: [
         IconButton(

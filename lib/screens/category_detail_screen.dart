@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import '../data/medication_repository.dart';
 import '../models/medication.dart';
 import '../theme/luma_theme.dart';
+import 'drug_detail_screen.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
   /// Pass null for the "All Medications" view.
@@ -222,14 +223,18 @@ class _DrugRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 44, 12),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: LumaColors.divider, width: 0.5),
-        ),
+    return InkWell(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => DrugDetailScreen(med: med)),
       ),
-      child: Row(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 44, 12),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: LumaColors.divider, width: 0.5),
+          ),
+        ),
+        child: Row(
         children: [
           Expanded(
             child: Column(
@@ -266,6 +271,7 @@ class _DrugRow extends StatelessWidget {
             _FlagChip(med.deaLabel, LumaColors.caution),
           ],
         ],
+      ),
       ),
     );
   }
