@@ -338,7 +338,12 @@ class _Section extends StatelessWidget {
           initiallyExpanded: initiallyExpanded,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          title: Text(title, style: lumaDisplay(size: 18, weight: FontWeight.w600)),
+          expandedAlignment: Alignment.topLeft,
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          title: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(title, style: lumaDisplay(size: 18, weight: FontWeight.w600)),
+          ),
           iconColor: LumaColors.inkNavy,
           collapsedIconColor: LumaColors.inkMuted,
           children: populated,
@@ -367,23 +372,36 @@ class _Text extends StatelessWidget {
   Widget build(BuildContext context) {
     if (value == null || value!.trim().isEmpty) return const _Empty();
     final t = Theme.of(context).textTheme;
-    return Padding(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.only(top: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           if (label != null)
-            Text(
-              label!,
-              style: TextStyle(
-                color: LumaColors.inkMuted,
-                fontSize: 11,
-                letterSpacing: 1.0,
-                fontWeight: FontWeight.w600,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                label!,
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: LumaColors.inkMuted,
+                  fontSize: 11,
+                  letterSpacing: 1.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           if (label != null) const SizedBox(height: 4),
-          Text(value!, style: t.bodyMedium?.copyWith(height: 1.5)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value!,
+              textAlign: TextAlign.left,
+              style: t.bodyMedium?.copyWith(height: 1.5),
+            ),
+          ),
         ],
       ),
     );
