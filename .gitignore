@@ -28,3 +28,10 @@ supabase/.temp/
 # Node (for the import tool only)
 node_modules/
 package-lock.json
+
+# Node deps for tools/
+tools/node_modules/
+tools/package-lock.json
+
+# Large data exports (imported to Supabase instead)
+assets/data/medications-full.json

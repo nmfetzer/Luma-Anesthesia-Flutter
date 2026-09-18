@@ -1,110 +1,302 @@
 // -----------------------------------------------------------------------------
-// DrugDetailScreen — full-page view for one medication.
+// DrugDetailScreen — full clinical reference view for a single medication.
 //
-// Layout matches Luma's editorial style:
-//   • Back arrow + "Drug" toolbar label
-//   • Optional black-box warning banner at the very top (critical safety info)
-//   • Fraunces H1 drug name, brand names beneath, class as tertiary line
-//   • Row of subtle flag chips (High Alert / DEA schedule)
-//   • Info sections: Dose, Onset & Duration
-//     Each section: Fraunces heading, thin divider, mono numbers, body prose
+// Renders every field from the Base44 Medication entity when present.
+// Fields are grouped into collapsible sections; empty fields are hidden so
+// each drug's page only shows the content that's actually populated.
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/medication.dart';
 import '../theme/luma_theme.dart';
+import '../widgets/luma_app_bar.dart';
 
 class DrugDetailScreen extends StatelessWidget {
-  final Medication med;
-  const DrugDetailScreen({super.key, required this.med});
+  const DrugDetailScreen({super.key, required this.medication});
+
+  final Medication medication;
 
   @override
   Widget build(BuildContext context) {
+    final m = medication;
     return Scaffold(
       backgroundColor: LumaColors.cream,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text('Drug', style: lumaBody(size: 14, weight: FontWeight.w500)),
-      ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          if (med.blackBoxWarning != null) _BlackBoxBanner(text: med.blackBoxWarning!),
-          _Header(med: med),
-          if (med.adultDose != null || med.pedsDose != null)
-            _Section(
-              title: 'Dose',
-              children: [
-                if (med.adultDose != null)
-                  _LabeledBlock(label: 'Adult', body: med.adultDose!),
-                if (med.pedsDose != null)
-                  _LabeledBlock(label: 'Pediatric', body: med.pedsDose!),
-              ],
-            ),
-          if (med.onsetDuration != null)
-            _Section(
-              title: 'Onset & Duration',
-              children: [
-                _LabeledBlock(label: '', body: med.onsetDuration!),
-              ],
-            ),
-          _Section(
-            title: 'Classification',
+      appBar: const LumaAppBar(title: 'Drug'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _LabeledBlock(label: 'Category', body: med.category),
-              if (med.classShort != null)
-                _LabeledBlock(label: 'Drug class', body: med.classShort!),
-              if (med.isScheduled)
-                _LabeledBlock(label: 'DEA schedule', body: med.deaLabel),
+              _Header(medication: m),
+              const SizedBox(height: 20),
+              _WarningBanners(medication: m),
+              _Section(
+                title: 'Overview',
+                children: [
+                  _Text(label: 'INDICATIONS', value: m.indications),
+                  _Text(label: 'MECHANISM OF ACTION', value: m.mechanism),
+                  _Text(label: 'CLASSIFICATION', value: m.classification),
+                ],
+              ),
+              _Section(
+                title: 'Dosing',
+                children: [
+                  _Text(label: 'ADULT', value: m.adultDose),
+                  _Text(label: 'PEDIATRIC', value: m.pedsDose),
+                  if (m.doseMgPerKgMin != null || m.doseMgPerKgMax != null)
+                    _Text(
+                      label: 'CALCULATOR RANGE',
+                      value:
+                          '${m.doseMgPerKgMin ?? '?'}–${m.doseMgPerKgMax ?? '?'} ${m.doseUnit ?? 'mg'}/kg',
+                    ),
+                  if (m.isInfusion)
+                    const _Chip(label: 'Typically continuous infusion'),
+                  _Text(label: 'ROUTES', value: m.routes),
+                  _Text(label: 'DOSAGE FORMS', value: m.dosageForms),
+                  _Text(label: 'COMMON CONCENTRATIONS', value: m.commonConcentrations),
+                ],
+              ),
+              _Section(
+                title: 'Concentration & Mixing',
+                children: [
+                  _Text(label: 'MIXING', value: m.concentrationMixing),
+                  if (m.requiresDilution)
+                    const _Chip(label: 'Requires dilution before administration'),
+                  _Text(label: 'TARGET CONCENTRATION', value: m.targetConcentration),
+                  _Text(label: 'STANDARD RECIPE', value: m.standardRecipe),
+                  if (m.finalVolumeMl != null)
+                    _Text(label: 'FINAL VOLUME', value: '${m.finalVolumeMl} mL'),
+                  _Text(label: 'DILUENT', value: m.diluent),
+                  _Text(label: 'ALTERNATIVE CONCENTRATIONS', value: m.alternativeConcentrations),
+                  if (m.stabilityHoursRoomTemp != null)
+                    _Text(
+                      label: 'STABILITY (ROOM TEMP)',
+                      value: '${m.stabilityHoursRoomTemp} hours',
+                    ),
+                  if (m.stabilityHoursRefrigerated != null)
+                    _Text(
+                      label: 'STABILITY (REFRIGERATED)',
+                      value: '${m.stabilityHoursRefrigerated} hours',
+                    ),
+                  _Text(label: 'MIXING PEARLS', value: m.mixingPearls),
+                  _Text(label: 'NOTES', value: m.notes),
+                ],
+              ),
+              _Section(
+                title: 'Pharmacokinetics',
+                children: [
+                  _Text(label: 'ONSET & DURATION', value: m.onsetDuration),
+                  if (m.onsetMinutes != null)
+                    _Text(label: 'ONSET (MIN)', value: '${m.onsetMinutes}'),
+                  if (m.durationMinutes != null)
+                    _Text(label: 'DURATION (MIN)', value: '${m.durationMinutes}'),
+                  _Text(label: 'PHARMACOKINETICS', value: m.pharmacokinetics),
+                ],
+              ),
+              _Section(
+                title: 'Warnings & Safety',
+                children: [
+                  _Text(label: 'CONTRAINDICATIONS', value: m.contraindications),
+                  _Text(label: 'WARNINGS & PRECAUTIONS', value: m.warningsPrecautions),
+                  _Text(label: 'SIDE EFFECTS', value: m.sideEffects),
+                  _Text(label: 'SERIOUS ADVERSE EFFECTS', value: m.seriousEffects),
+                  _Text(label: 'DRUG INTERACTIONS', value: m.drugInteractions),
+                  if (m.interactionsCritical.isNotEmpty)
+                    _ChipList(
+                      label: 'CRITICAL INTERACTIONS',
+                      items: m.interactionsCritical,
+                      color: LumaColors.highAlert,
+                    ),
+                  _Text(label: 'ANTIDOTE / REVERSAL', value: m.antidoteReversal),
+                ],
+              ),
+              _Section(
+                title: 'Administration',
+                children: [
+                  _Text(label: 'ADMINISTRATION DETAILS', value: m.administrationDetails),
+                  _Text(label: 'SPECIAL POPULATIONS', value: m.specialPopulations),
+                  _Text(label: 'PREGNANCY & LACTATION', value: m.pregnancyLactation),
+                ],
+              ),
+              _Section(
+                title: 'Monitoring',
+                children: [
+                  if (m.monitoringParameters.isNotEmpty)
+                    _ChipList(
+                      label: 'KEY LABS, VITALS & CHECKS',
+                      items: m.monitoringParameters,
+                      color: LumaColors.caution,
+                    ),
+                ],
+              ),
+              _Section(
+                title: 'Clinical Pearls',
+                children: [
+                  _Text(label: 'PEARLS', value: m.clinicalPearls),
+                  _Text(label: 'SPECIAL CONSIDERATIONS', value: m.specialConsiderations),
+                ],
+              ),
+              _Section(
+                title: 'Deep Dive',
+                initiallyExpanded: false,
+                children: [
+                  _Text(value: m.deepDiveContent),
+                ],
+              ),
+              _Section(
+                title: 'Sources',
+                initiallyExpanded: false,
+                children: [
+                  for (final s in m.sources) _SourceRow(source: s),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _ReviewFooter(medication: m),
+              const SizedBox(height: 16),
+              _Disclaimer(),
             ],
           ),
-          const _Disclaimer(),
-          const SizedBox(height: 40),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _BlackBoxBanner extends StatelessWidget {
-  final String text;
-  const _BlackBoxBanner({required this.text});
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+
+class _Header extends StatelessWidget {
+  const _Header({required this.medication});
+  final Medication medication;
+
+  @override
+  Widget build(BuildContext context) {
+    final m = medication;
+    final t = Theme.of(context).textTheme;
+    final badges = <Widget>[];
+    if (m.highAlert) {
+      badges.add(_Badge(label: 'HIGH ALERT', color: LumaColors.highAlert));
+    }
+    if (m.isScheduled) {
+      badges.add(_Badge(label: m.deaLabel, color: LumaColors.inkNavy));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(m.name, style: lumaDisplay(size: 32, weight: FontWeight.w700)),
+        if (m.brandName != null) ...[
+          const SizedBox(height: 2),
+          Text(m.brandName!, style: t.bodyMedium?.copyWith(color: LumaColors.inkMuted)),
+        ],
+        if (m.classShort != null) ...[
+          const SizedBox(height: 6),
+          Text(m.classShort!, style: t.bodyLarge?.copyWith(color: LumaColors.inkNavy)),
+        ],
+        if (badges.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(spacing: 8, runSpacing: 8, children: badges),
+        ],
+      ],
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.label, required this.color});
+  final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          letterSpacing: 1.0,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Warning banners (Boxed + LASA)
+// ---------------------------------------------------------------------------
+
+class _WarningBanners extends StatelessWidget {
+  const _WarningBanners({required this.medication});
+  final Medication medication;
+
+  @override
+  Widget build(BuildContext context) {
+    final banners = <Widget>[];
+    if (medication.blackBoxWarning != null) {
+      banners.add(_WarningCard(
+        label: 'FDA BOXED WARNING',
+        text: medication.blackBoxWarning!,
+        color: LumaColors.highAlert,
+      ));
+    }
+    if (medication.lasaWarning != null) {
+      banners.add(_WarningCard(
+        label: 'LOOK-ALIKE / SOUND-ALIKE',
+        text: medication.lasaWarning!,
+        color: LumaColors.caution,
+      ));
+    }
+    if (banners.isEmpty) return const SizedBox.shrink();
+    return Column(
+      children: [
+        for (final b in banners) Padding(padding: const EdgeInsets.only(bottom: 12), child: b),
+      ],
+    );
+  }
+}
+
+class _WarningCard extends StatelessWidget {
+  const _WarningCard({required this.label, required this.text, required this.color});
+  final String label;
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: LumaColors.highAlert.withValues(alpha: 0.08),
-        border: Border.all(color: LumaColors.highAlert, width: 1.2),
-        borderRadius: BorderRadius.circular(LumaRadius.sm),
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border(left: BorderSide(color: color, width: 4)),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded,
-              size: 18, color: LumaColors.highAlert),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Black Box Warning',
-                    style: lumaBody(
-                      size: 11,
-                      weight: FontWeight.w700,
-                      color: LumaColors.highAlert,
-                    ).copyWith(letterSpacing: 0.08)),
-                const SizedBox(height: 4),
-                Text(text,
-                    style: lumaBody(size: 13, color: LumaColors.inkPrimary)),
-              ],
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              letterSpacing: 1.0,
+              fontWeight: FontWeight.w700,
             ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            text,
+            style: TextStyle(color: LumaColors.inkNavy, fontSize: 14, height: 1.4),
           ),
         ],
       ),
@@ -112,139 +304,273 @@ class _BlackBoxBanner extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  final Medication med;
-  const _Header({required this.med});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(med.name, style: lumaDisplay(size: 28, weight: FontWeight.w600)),
-          if (med.brandName != null) ...[
-            const SizedBox(height: 4),
-            Text(med.brandName!,
-                style: lumaBody(size: 14, color: LumaColors.inkMuted)),
-          ],
-          if (med.classShort != null) ...[
-            const SizedBox(height: 8),
-            Text(med.classShort!,
-                style: lumaBody(size: 14, color: LumaColors.inkSecondary)),
-          ],
-          if (med.highAlert || med.isScheduled) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                if (med.highAlert)
-                  _FlagChip('HIGH ALERT', LumaColors.highAlert),
-                if (med.highAlert && med.isScheduled) const SizedBox(width: 6),
-                if (med.isScheduled)
-                  _FlagChip('DEA ${med.deaLabel}', LumaColors.caution),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _FlagChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _FlagChip(this.label, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(label,
-          style: lumaMono(
-            size: 10.5,
-            weight: FontWeight.w600,
-            color: color,
-          ).copyWith(letterSpacing: 0.06)),
-    );
-  }
-}
+// ---------------------------------------------------------------------------
+// Collapsible section
+// ---------------------------------------------------------------------------
 
 class _Section extends StatelessWidget {
+  const _Section({
+    required this.title,
+    required this.children,
+    this.initiallyExpanded = true,
+  });
   final String title;
   final List<Widget> children;
-  const _Section({required this.title, required this.children});
+  final bool initiallyExpanded;
 
   @override
   Widget build(BuildContext context) {
+    // Filter out empty children (nulls come through as SizedBox.shrink())
+    final populated = children.where((c) => c is! _Empty).toList();
+    if (populated.isEmpty) return const SizedBox.shrink();
+
+    final t = Theme.of(context).textTheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: LumaColors.creamElevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: LumaColors.divider),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Text(title, style: lumaDisplay(size: 18, weight: FontWeight.w600)),
+          iconColor: LumaColors.inkNavy,
+          collapsedIconColor: LumaColors.inkMuted,
+          children: populated,
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Field renderer — hides itself if value is empty
+// ---------------------------------------------------------------------------
+
+class _Empty extends StatelessWidget {
+  const _Empty();
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+class _Text extends StatelessWidget {
+  const _Text({this.label, this.value});
+  final String? label;
+  final String? value;
+
+  @override
+  Widget build(BuildContext context) {
+    if (value == null || value!.trim().isEmpty) return const _Empty();
+    final t = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
+      padding: const EdgeInsets.only(top: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: lumaDisplay(size: 15, weight: FontWeight.w600)),
-          const SizedBox(height: 10),
-          Container(height: 0.5, color: LumaColors.divider),
-          const SizedBox(height: 8),
-          ...children,
+          if (label != null)
+            Text(
+              label!,
+              style: TextStyle(
+                color: LumaColors.inkMuted,
+                fontSize: 11,
+                letterSpacing: 1.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          if (label != null) const SizedBox(height: 4),
+          Text(value!, style: t.bodyMedium?.copyWith(height: 1.5)),
         ],
       ),
     );
   }
 }
 
-class _LabeledBlock extends StatelessWidget {
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label});
   final String label;
-  final String body;
-  const _LabeledBlock({required this.label, required this.body});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 6),
+      padding: const EdgeInsets.only(top: 12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: LumaColors.haloGold.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: LumaColors.inkNavy,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChipList extends StatelessWidget {
+  const _ChipList({required this.label, required this.items, required this.color});
+  final String label;
+  final List<String> items;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) return const _Empty();
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (label.isNotEmpty)
-            Text(label.toUpperCase(),
-                style: lumaBody(
-                  size: 10.5,
-                  weight: FontWeight.w600,
-                  color: LumaColors.inkMuted,
-                ).copyWith(letterSpacing: 0.08)),
-          if (label.isNotEmpty) const SizedBox(height: 4),
-          Text(body,
-              style: lumaBody(size: 14, height: 1.55).copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
-              )),
+          Text(
+            label,
+            style: TextStyle(
+              color: LumaColors.inkMuted,
+              fontSize: 11,
+              letterSpacing: 1.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final item in items)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: color.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    item,
+                    style: TextStyle(color: LumaColors.inkNavy, fontSize: 12),
+                  ),
+                ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _SourceRow extends StatelessWidget {
+  const _SourceRow({required this.source});
+  final MedicationSource source;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final s = source;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (s.number != null)
+                Text(
+                  '${s.number}.  ',
+                  style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              Expanded(
+                child: Text(
+                  s.citation ?? '(no citation text)',
+                  style: t.bodyMedium?.copyWith(height: 1.4),
+                ),
+              ),
+            ],
+          ),
+          if (s.tier != null || s.type != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 20),
+              child: Text(
+                [
+                  if (s.tier != null) s.tier!.toUpperCase(),
+                  if (s.type != null) s.type!.replaceAll('_', ' ').toUpperCase(),
+                ].join(' · '),
+                style: TextStyle(color: LumaColors.inkMuted, fontSize: 11, letterSpacing: 0.5),
+              ),
+            ),
+          if (s.url != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 20),
+              child: InkWell(
+                onTap: () async {
+                  final uri = Uri.tryParse(s.url!);
+                  if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                },
+                child: Text(
+                  s.url!,
+                  style: TextStyle(
+                    color: LumaColors.haloGold,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewFooter extends StatelessWidget {
+  const _ReviewFooter({required this.medication});
+  final Medication medication;
+
+  @override
+  Widget build(BuildContext context) {
+    final m = medication;
+    if (m.lastReviewed == null && m.clinicalReviewer == null) {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: LumaColors.divider.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        [
+          if (m.lastReviewed != null) 'Last reviewed ${m.lastReviewed}',
+          if (m.clinicalReviewer != null) 'by ${m.clinicalReviewer}',
+        ].join(' '),
+        style: TextStyle(color: LumaColors.inkMuted, fontSize: 12),
       ),
     );
   }
 }
 
 class _Disclaimer extends StatelessWidget {
-  const _Disclaimer();
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: LumaColors.haloGoldLight.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(LumaRadius.sm),
-        ),
-        child: Text(
-          'For clinical reference only. Verify all doses and indications against institutional protocols and current prescribing information before administration.',
-          style: lumaBody(size: 12, color: LumaColors.inkSecondary, height: 1.5),
-        ),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: LumaColors.divider.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        'For clinical reference only. Verify all doses and indications against '
+        'institutional protocols and current prescribing information before '
+        'administration.',
+        style: TextStyle(color: LumaColors.inkMuted, fontSize: 12, height: 1.4),
       ),
     );
   }

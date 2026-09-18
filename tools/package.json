@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@base44/sdk": "^0.1.0",
+    "@base44/sdk": "^0.8.48",
     "@supabase/supabase-js": "^2.45.0"
   }
 }
