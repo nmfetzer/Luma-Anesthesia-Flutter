@@ -225,7 +225,7 @@ class _DrugRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => DrugDetailScreen(med: med)),
+        MaterialPageRoute(builder: (_) => DrugDetailScreen(medication: med)),
       ),
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 44, 12),
