@@ -42,11 +42,18 @@ class MedicationRepository {
   }
 
   /// Category name → medications, sorted A-Z by name.
+  /// Includes drugs whose PRIMARY category matches, PLUS drugs cross-listed
+  /// via secondary_categories (so, e.g., Norepinephrine appears in both
+  /// 'Cardiac & Hemodynamics' and 'Emergency & Crisis drugs').
   Future<Map<String, List<Medication>>> byCategory() async {
     final meds = await all();
     final map = <String, List<Medication>>{};
     for (final m in meds) {
       map.putIfAbsent(m.category, () => []).add(m);
+      for (final sc in m.secondaryCategories) {
+        if (sc == m.category) continue; // avoid double-adding
+        map.putIfAbsent(sc, () => []).add(m);
+      }
     }
     for (final list in map.values) {
       list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -54,9 +61,13 @@ class MedicationRepository {
     return map;
   }
 
+  /// All drugs matching a category (primary OR secondary).
   Future<List<Medication>> inCategory(String category) async {
     final meds = await all();
-    final list = meds.where((m) => m.category == category).toList();
+    final list = meds
+        .where((m) =>
+            m.category == category || m.secondaryCategories.contains(category))
+        .toList();
     list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return list;
   }
