@@ -32,8 +32,6 @@ const List<String> kLumaCategoryOrder = [
   'Cardiac & Hemodynamics',
   'Neuromuscular Blockades',
   'Airway & Pulmonary Medications',
-  'Neuro-Anesthesia',
-  'Cardiac Anesthesia',
   'OB anesthesia',
   'Pediatric anesthesia',
   'Pre-op Medication Considerations',
@@ -52,8 +50,8 @@ const List<String> kLumaCategoryOrder = [
   'Sedatives & Hypnotics',
 ];
 
-/// Categories rendered bold in the list (first 13 = priority section).
-const int kPrioritySectionCount = 13;
+/// Categories rendered bold in the list (first 11 = priority section).
+const int kPrioritySectionCount = 11;
 
 class DrugsCategoriesScreen extends StatefulWidget {
   const DrugsCategoriesScreen({super.key});
