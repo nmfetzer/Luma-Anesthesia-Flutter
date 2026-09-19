@@ -89,10 +89,9 @@ class DrugDetailScreen extends StatelessWidget {
                 title: 'Pharmacokinetics',
                 children: [
                   _Text(label: 'ONSET & DURATION', value: m.onsetDuration),
-                  if (m.onsetMinutes != null)
-                    _Text(label: 'ONSET (MIN)', value: '${m.onsetMinutes}'),
-                  if (m.durationMinutes != null)
-                    _Text(label: 'DURATION (MIN)', value: '${m.durationMinutes}'),
+                  // ONSET (MIN) and DURATION (MIN) are calculator-only fields;
+                  // never display raw minutes to the user — the ONSET & DURATION
+                  // narrative above always tells the story better.
                   _Text(label: 'PHARMACOKINETICS', value: m.pharmacokinetics),
                 ],
               ),
