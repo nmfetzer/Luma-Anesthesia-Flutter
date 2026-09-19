@@ -335,14 +335,17 @@ class _Section extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
+      child: Material(
         color: LumaColors.creamElevated,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: LumaColors.divider),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: LumaColors.divider),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -354,7 +357,8 @@ class _Section extends StatelessWidget {
           ),
           iconColor: LumaColors.inkNavy,
           collapsedIconColor: LumaColors.inkMuted,
-          children: populated,
+            children: populated,
+          ),
         ),
       ),
     );
