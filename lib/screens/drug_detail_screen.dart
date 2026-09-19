@@ -337,7 +337,6 @@ class _Section extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
         color: LumaColors.creamElevated,
-        borderRadius: BorderRadius.circular(10),
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
