@@ -1,0 +1,278 @@
+[
+  {
+    "group": "ace inhibitors",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef3d",
+    "keep_name": "ACE Inhibitors — Class (lisinopril, enalapril, ramipril, benazepril) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b745dc807b7929dfcfa8"
+    ],
+    "delete_names": [
+      "ACE Inhibitors (lisinopril, enalapril, ramipril) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "sevoflurane",
+    "category": "Anesthetics — Inhalational",
+    "keep_id": "6aaa805e5da5b22c17c9efe3",
+    "keep_name": "Sevoflurane (Ultane / Sojourn)",
+    "delete_ids": [
+      "6aa7b2d6056ffccae948269f"
+    ],
+    "delete_names": [
+      "Sevoflurane (Ultane)"
+    ]
+  },
+  {
+    "group": "beta blockers",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef3f",
+    "keep_name": "Beta Blockers (chronic) — Class (metoprolol, atenolol, carvedilol, bisoprolol, propranolol) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b745dc807b7929dfcfaa"
+    ],
+    "delete_names": [
+      "Beta Blockers (metoprolol, atenolol, carvedilol, bisoprolol) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "calcium channel blockers",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef40",
+    "keep_name": "Calcium Channel Blockers — Class (amlodipine, diltiazem, verapamil, nifedipine) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b745dc807b7929dfcfab"
+    ],
+    "delete_names": [
+      "Calcium Channel Blockers (amlodipine, diltiazem, verapamil) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "diuretics",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef41",
+    "keep_name": "Diuretics — Class (furosemide, HCTZ, spironolactone, torsemide) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b77fff321e9fb7d027f8"
+    ],
+    "delete_names": [
+      "Diuretics (furosemide, HCTZ, spironolactone) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "nitrates",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef43",
+    "keep_name": "Nitrates (isosorbide mononitrate / dinitrate, nitroglycerin) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b77fff321e9fb7d027fb"
+    ],
+    "delete_names": [
+      "Nitrates (isosorbide, nitroglycerin) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "statins",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef44",
+    "keep_name": "Statins — Class (atorvastatin, rosuvastatin, simvastatin, pravastatin) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b77fff321e9fb7d027fc"
+    ],
+    "delete_names": [
+      "Statins (atorvastatin, rosuvastatin, simvastatin) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "enoxaparin lmwh",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef4d",
+    "keep_name": "Enoxaparin / LMWH (therapeutic dose) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b818375eaef7fccd6d23"
+    ],
+    "delete_names": [
+      "Enoxaparin / LMWH (therapeutic) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "unfractionated heparin",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef4f",
+    "keep_name": "Unfractionated Heparin (SubQ prophylaxis) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b818375eaef7fccd6d25"
+    ],
+    "delete_names": [
+      "Unfractionated Heparin (SubQ prophylaxis / IV therapeutic) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "sulfonylureas",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef57",
+    "keep_name": "Sulfonylureas — Class (glipizide, glyburide, glimepiride) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b8a2558ee629cb4fb544"
+    ],
+    "delete_names": [
+      "Sulfonylureas (glipizide, glyburide, glimepiride) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "dpp4 inhibitors",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef5a",
+    "keep_name": "DPP-4 Inhibitors — Class (sitagliptin, linagliptin, saxagliptin, alogliptin) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b8a2558ee629cb4fb547"
+    ],
+    "delete_names": [
+      "DPP-4 Inhibitors (sitagliptin, linagliptin, saxagliptin) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "sglt2 inhibitors",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef5b",
+    "keep_name": "SGLT-2 Inhibitors — Class (empagliflozin, dapagliflozin, canagliflozin, ertugliflozin) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b8a2558ee629cb4fb548"
+    ],
+    "delete_names": [
+      "SGLT-2 Inhibitors (empagliflozin, dapagliflozin, canagliflozin) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "pcsk9 inhibitors",
+    "category": "Pre-op Medication Considerations",
+    "keep_id": "6aaa805c5da5b22c17c9ef48",
+    "keep_name": "PCSK9 Inhibitors (evolocumab, alirocumab, inclisiran) — Perioperative Management",
+    "delete_ids": [
+      "6aa7b938b43d8ac58c6b85f5"
+    ],
+    "delete_names": [
+      "PCSK9 Inhibitors (evolocumab, alirocumab) — Perioperative Management"
+    ]
+  },
+  {
+    "group": "methylergonovine",
+    "category": "OB & Women's Health",
+    "keep_id": "6aaa8065c92c14141e6a21e3",
+    "keep_name": "Methylergonovine",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9efeb"
+    ],
+    "delete_names": [
+      "Methylergonovine (Methergine) — Postpartum Hemorrhage"
+    ]
+  },
+  {
+    "group": "carboprost",
+    "category": "OB & Women's Health",
+    "keep_id": "6aaa8065c92c14141e6a21dd",
+    "keep_name": "Carboprost (Hemabate)",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9efec"
+    ],
+    "delete_names": [
+      "Carboprost (Hemabate; 15-methyl PGF2α) — Postpartum Hemorrhage"
+    ]
+  },
+  {
+    "group": "misoprostol",
+    "category": "OB & Women's Health",
+    "keep_id": "6aaa8065c92c14141e6a21e4",
+    "keep_name": "Misoprostol",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9efed"
+    ],
+    "delete_names": [
+      "Misoprostol (Cytotec) — Obstetric Use"
+    ]
+  },
+  {
+    "group": "terbutaline",
+    "category": "OB & Women's Health",
+    "keep_id": "6aaa8065c92c14141e6a21e6",
+    "keep_name": "Terbutaline (Tocolytic)",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9efee"
+    ],
+    "delete_names": [
+      "Terbutaline (Brethine) — Obstetric Tocolysis"
+    ]
+  },
+  {
+    "group": "racemic epinephrine",
+    "category": "Airway & Respiratory",
+    "keep_id": "6aaa807bb81b981e8d29f91b",
+    "keep_name": "Racemic Epinephrine",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9eff5"
+    ],
+    "delete_names": [
+      "Racemic Epinephrine (Nebulized) — Post-Extubation Stridor / Croup"
+    ]
+  },
+  {
+    "group": "tacrolimus",
+    "category": "Immunosuppressants & Transplant Medications",
+    "keep_id": "6aaa8064c92c14141e6a2133",
+    "keep_name": "Tacrolimus",
+    "delete_ids": [
+      "6aaa805e5da5b22c17c9effb"
+    ],
+    "delete_names": [
+      "Tacrolimus (Prograf) — Transplant Calcineurin Inhibitor"
+    ]
+  },
+  {
+    "group": "cyclosporine",
+    "category": "Immunosuppressants & Transplant Medications",
+    "keep_id": "6aaa805e5da5b22c17c9effc",
+    "keep_name": "Cyclosporine (Neoral, Sandimmune, Gengraf) — Transplant Calcineurin Inhibitor",
+    "delete_ids": [
+      "6aaa8064c92c14141e6a2130"
+    ],
+    "delete_names": [
+      "Cyclosporine"
+    ]
+  },
+  {
+    "group": "mycophenolate mofetil",
+    "category": "Immunosuppressants & Transplant Medications",
+    "keep_id": "6aaa805e5da5b22c17c9effd",
+    "keep_name": "Mycophenolate Mofetil (CellCept, Myfortic) — Antimetabolite Immunosuppressant",
+    "delete_ids": [
+      "6aaa8064c92c14141e6a2131"
+    ],
+    "delete_names": [
+      "Mycophenolate Mofetil"
+    ]
+  },
+  {
+    "group": "azathioprine",
+    "category": "Immunosuppressants & Transplant Medications",
+    "keep_id": "6aaa805e5da5b22c17c9efff",
+    "keep_name": "Azathioprine (Imuran) — Purine Synthesis Inhibitor",
+    "delete_ids": [
+      "6aaa8064c92c14141e6a212f"
+    ],
+    "delete_names": [
+      "Azathioprine"
+    ]
+  },
+  {
+    "group": "dexmedetomidine",
+    "category": "Anesthetics — IV Induction",
+    "keep_id": "6aaa8064c92c14141e6a2136",
+    "keep_name": "Dexmedetomidine (Low-Dose IV Bolus — 4–50 mcg)",
+    "delete_ids": [
+      "6aaa8064c92c14141e6a2137"
+    ],
+    "delete_names": [
+      "Dexmedetomidine (Precedex — ICU Sedation)"
+    ]
+  }
+]

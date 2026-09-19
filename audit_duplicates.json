@@ -1,0 +1,388 @@
+[
+  {
+    "normalized": "sevoflurane",
+    "drugs": [
+      {
+        "id": "6aa7b2d6056ffccae948269f",
+        "name": "Sevoflurane (Ultane)",
+        "category": "Anesthetics — Inhalational",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805e5da5b22c17c9efe3",
+        "name": "Sevoflurane (Ultane / Sojourn)",
+        "category": "Anesthetics — Inhalational",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "clonidine perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b77fff321e9fb7d027f9",
+        "name": "Clonidine — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef42",
+        "name": "Clonidine (chronic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "hydralazine perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b77fff321e9fb7d027fa",
+        "name": "Hydralazine — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805e5da5b22c17c9efe2",
+        "name": "Hydralazine (Chronic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "nitrates perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b77fff321e9fb7d027fb",
+        "name": "Nitrates (isosorbide, nitroglycerin) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef43",
+        "name": "Nitrates (isosorbide mononitrate / dinitrate, nitroglycerin) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "enoxaparin lmwh perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b818375eaef7fccd6d23",
+        "name": "Enoxaparin / LMWH (therapeutic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef4d",
+        "name": "Enoxaparin / LMWH (therapeutic dose) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "fondaparinux perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b818375eaef7fccd6d24",
+        "name": "Fondaparinux — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef4e",
+        "name": "Fondaparinux (Arixtra) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "unfractionated heparin perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b818375eaef7fccd6d25",
+        "name": "Unfractionated Heparin (SubQ prophylaxis / IV therapeutic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef4f",
+        "name": "Unfractionated Heparin (SubQ prophylaxis) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "aspirin perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b818375eaef7fccd6d26",
+        "name": "Aspirin (primary vs secondary prevention) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef50",
+        "name": "Aspirin (chronic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "insulin perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b8e97ec0a1b7b1f77d4e",
+        "name": "Insulin (short/rapid-acting basal-bolus) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef5c",
+        "name": "Insulin (short/rapid-acting, basal-bolus regimen) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "pcsk9 inhibitors perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b938b43d8ac58c6b85f5",
+        "name": "PCSK9 Inhibitors (evolocumab, alirocumab) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef48",
+        "name": "PCSK9 Inhibitors (evolocumab, alirocumab, inclisiran) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "digoxin perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b938b43d8ac58c6b85f6",
+        "name": "Digoxin — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef45",
+        "name": "Digoxin (chronic) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "buprenorphine perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b97ed859fd61c66d9159",
+        "name": "Buprenorphine (Suboxone, Subutex, Sublocade) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805e5da5b22c17c9efd2",
+        "name": "Buprenorphine (Suboxone, Subutex, Sublocade, Belbuca, Butrans) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "methadone perioperative management",
+    "drugs": [
+      {
+        "id": "6aa7b97ed859fd61c66d915a",
+        "name": "Methadone (chronic pain) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805e5da5b22c17c9efd3",
+        "name": "Methadone (Dolophine, Methadose) — Perioperative Management",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "diphenhydramine",
+    "drugs": [
+      {
+        "id": "6aaa805a5da5b22c17c9ee7e",
+        "name": "Diphenhydramine (Benadryl)",
+        "category": "Respiratory Medications",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa805c5da5b22c17c9ef11",
+        "name": "Diphenhydramine (Benadryl — EPS/Dystonia)",
+        "category": "Emergency & Reversal",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8062c92c14141e6a2089",
+        "name": "Diphenhydramine (IV — Acute Overdose)",
+        "category": "Crisis Management",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8064c92c14141e6a2152",
+        "name": "Diphenhydramine (Sleep)",
+        "category": "Neurologic",
+        "filledScore": 8
+      }
+    ]
+  },
+  {
+    "normalized": "hydrocortisone",
+    "drugs": [
+      {
+        "id": "6aaa805a5da5b22c17c9ee87",
+        "name": "Hydrocortisone",
+        "category": "Respiratory Medications",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8062c92c14141e6a2068",
+        "name": "Hydrocortisone (Contrast Pre-medication)",
+        "category": "Diagnostics, Dyes & Contrast",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "methylene blue",
+    "drugs": [
+      {
+        "id": "6aaa805c5da5b22c17c9ef1d",
+        "name": "Methylene Blue (Methemoglobinemia)",
+        "category": "Emergency & Reversal",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8062c92c14141e6a2071",
+        "name": "Methylene Blue",
+        "category": "Diagnostics, Dyes & Contrast",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "lidocaine",
+    "drugs": [
+      {
+        "id": "6aaa8062c92c14141e6a2045",
+        "name": "Lidocaine",
+        "category": "Cardiac & Hemodynamics",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa807bb81b981e8d29f961",
+        "name": "Lidocaine (Local Anesthetic — Injectable)",
+        "category": "Anesthetics — Local",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "cosyntropin",
+    "drugs": [
+      {
+        "id": "6aaa8062c92c14141e6a205b",
+        "name": "Cosyntropin (Cortrosyn)",
+        "category": "Diagnostics, Dyes & Contrast",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8064c92c14141e6a2103",
+        "name": "Cosyntropin",
+        "category": "Endocrine & Metabolic",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "dipyridamole",
+    "drugs": [
+      {
+        "id": "6aaa8062c92c14141e6a205d",
+        "name": "Dipyridamole",
+        "category": "Diagnostics, Dyes & Contrast",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa807cb81b981e8d29fa06",
+        "name": "Dipyridamole (Persantine)",
+        "category": "Anticoagulation & Blood Products",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "methylprednisolone",
+    "drugs": [
+      {
+        "id": "6aaa8062c92c14141e6a2072",
+        "name": "Methylprednisolone (Contrast Pre-medication)",
+        "category": "Diagnostics, Dyes & Contrast",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8064c92c14141e6a211e",
+        "name": "Methylprednisolone",
+        "category": "Endocrine & Metabolic",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "dexmedetomidine",
+    "drugs": [
+      {
+        "id": "6aaa8064c92c14141e6a2136",
+        "name": "Dexmedetomidine (Low-Dose IV Bolus — 4–50 mcg)",
+        "category": "Anesthetics — IV Induction",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8064c92c14141e6a2137",
+        "name": "Dexmedetomidine (Precedex — ICU Sedation)",
+        "category": "Anesthetics — IV Induction",
+        "filledScore": 10
+      }
+    ]
+  },
+  {
+    "normalized": "insulin",
+    "drugs": [
+      {
+        "id": "6aaa8065c92c14141e6a21ef",
+        "name": "Insulin (Regular — Pediatric — IV and SC)",
+        "category": "Pediatric Anesthesia",
+        "filledScore": 10
+      },
+      {
+        "id": "6aaa8065c92c14141e6a21fa",
+        "name": "Insulin (long-acting home dose)",
+        "category": "Pre-op Medication Considerations",
+        "filledScore": 8
+      }
+    ]
+  }
+]
