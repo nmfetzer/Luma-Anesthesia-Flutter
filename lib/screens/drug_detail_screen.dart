@@ -320,8 +320,16 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Filter out empty children (nulls come through as SizedBox.shrink())
-    final populated = children.where((c) => c is! _Empty).toList();
+    // Filter out empty children:
+    //   - _Empty widgets (explicit empties)
+    //   - _Text widgets whose value is null/blank (they'd render as _Empty)
+    //   - _ChipList widgets with no items (they render nothing meaningful)
+    final populated = children.where((c) {
+      if (c is _Empty) return false;
+      if (c is _Text) return c.hasContent;
+      if (c is _ChipList) return c.items.isNotEmpty;
+      return true;
+    }).toList();
     if (populated.isEmpty) return const SizedBox.shrink();
 
     final t = Theme.of(context).textTheme;
@@ -368,9 +376,11 @@ class _Text extends StatelessWidget {
   final String? label;
   final String? value;
 
+  bool get hasContent => value != null && value!.trim().isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
-    if (value == null || value!.trim().isEmpty) return const _Empty();
+    if (!hasContent) return const _Empty();
     final t = Theme.of(context).textTheme;
     return Container(
       width: double.infinity,
