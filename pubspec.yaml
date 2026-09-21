@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
+  google_fonts: ^8.2.1
   # Supabase — real backend. Wire up your project URL + anon key in lib/config.dart
   supabase_flutter: ^2.5.6
   # For tapping source URLs in Drug Detail
@@ -25,3 +25,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/data/medications.json
+    - assets/branding/luma_icon.png

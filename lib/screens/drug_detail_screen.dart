@@ -52,8 +52,6 @@ class DrugDetailScreen extends StatelessWidget {
                       value:
                           '${m.doseMgPerKgMin ?? '?'}–${m.doseMgPerKgMax ?? '?'} ${m.doseUnit ?? 'mg'}/kg',
                     ),
-                  if (m.isInfusion)
-                    const _Chip(label: 'Typically continuous infusion'),
                   _Text(label: 'ROUTES', value: m.routes),
                   _Text(label: 'DOSAGE FORMS', value: m.dosageForms),
                   _Text(label: 'COMMON CONCENTRATIONS', value: m.commonConcentrations),

@@ -3,14 +3,23 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
+import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'theme/luma_theme.dart';
+import 'vasopressors/vasopressors_screen.dart';
+import 'welcome/welcome_carousel.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+  ));
 
   if (LumaConfig.supabaseConfigured) {
     await Supabase.initialize(
@@ -31,7 +40,37 @@ class LumaApp extends StatelessWidget {
       title: 'Luma Anesthesia',
       debugShowCheckedModeBanner: false,
       theme: buildLumaTheme(),
-      home: const DrugsCategoriesScreen(),
+      navigatorKey: _navKey,
+      home: WelcomeCarousel(
+        onFinish: () {
+          final navigator = _navKey.currentState;
+          navigator?.pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        },
+      ),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/drug-library') {
+          return MaterialPageRoute(builder: (_) => const DrugsCategoriesScreen());
+        }
+        if (settings.name == '/vasopressors-infusions') {
+          return MaterialPageRoute(builder: (_) => const VasopressorsScreen());
+        }
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            appBar: AppBar(title: Text(settings.name ?? 'Coming soon')),
+            body: Center(
+              child: Text(
+                '${settings.name}\n\nComing soon',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
+
+final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
