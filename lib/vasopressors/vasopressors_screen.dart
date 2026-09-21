@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../shared/luma_theme_tokens.dart';
 import '../blood_products/blood_products_view.dart';
+import 'drug_detail_screen.dart';
 
 /// Vasopressors, Infusions & Transfusions.
 ///
@@ -49,11 +50,25 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
       final rows = await Supabase.instance.client
           .from('medication')
           .select(
-              'id, name, brand_name, class_short, category, high_alert, hemodynamic_tags, vasoactive_role, adult_dose, indications, mechanism, clinical_pearls, contraindications, warnings_precautions')
+              'id, name, brand_name, class_short, category, high_alert, hemodynamic_tags, vasoactive_role, '
+              'adult_dose, peds_dose, indications, mechanism, clinical_pearls, contraindications, '
+              'warnings_precautions, side_effects, serious_effects, drug_interactions, interactions_critical, '
+              'administration_details, special_populations, pregnancy_lactation, monitoring_parameters, '
+              'black_box_warning, lasa_warning, dea_schedule, onset_duration, onset_minutes, duration_minutes, '
+              'pharmacokinetics, antidote_reversal, concentration_mixing, requires_dilution, target_concentration, '
+              'standard_recipe, final_volume_ml, diluent, alternative_concentrations, mixing_pearls, '
+              'stability_hours_room_temp, stability_hours_refrigerated, deep_dive_content, sources')
           .not('vasoactive_role', 'is', null)
           .order('name');
 
       final list = List<Map<String, dynamic>>.from(rows as List);
+      // Normalize sort key: strip leading non-letters so 'Adenosine' sorts by 'A',
+      // regardless of brand parentheticals or IV suffixes in the name.
+      String sortKey(Map<String, dynamic> r) {
+        final n = (r['name'] ?? '').toString().trim().toLowerCase();
+        return n.replaceAll(RegExp(r'[^a-z0-9].*$'), '');
+      }
+      list.sort((a, b) => sortKey(a).compareTo(sortKey(b)));
       final v = list.where((r) => r['vasoactive_role'] == 'vasopressor').toList();
       final i = list.where((r) => r['vasoactive_role'] == 'infusion').toList();
 
@@ -363,77 +378,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
 
   void _openDrugDetail(Map<String, dynamic> drug) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => _DrugDetailScreen(drug: drug)),
-    );
-  }
-}
-
-class _DrugDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> drug;
-  const _DrugDetailScreen({required this.drug});
-
-  @override
-  Widget build(BuildContext context) {
-    final highAlert = drug['high_alert'] == true;
-    return Scaffold(
-      backgroundColor: LumaTokens.creamSoft,
-      appBar: AppBar(
-        backgroundColor: LumaTokens.creamSoft,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: LumaTokens.textPrimary),
-        title: Text('DRUG DETAIL', style: LumaTokens.eyebrow),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (highAlert) ...[
-              Text('HIGH-ALERT MEDICATION', style: LumaTokens.highAlertLabel),
-              const SizedBox(height: 8),
-            ],
-            Text(drug['name'] ?? '', style: LumaTokens.drugTitle),
-            if ((drug['brand_name'] ?? '').toString().isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(drug['brand_name'],
-                  style: LumaTokens.drugTitle.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: LumaTokens.goldDeep,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  )),
-            ],
-            if ((drug['class_short'] ?? '').toString().isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(drug['class_short'].toString().toUpperCase(),
-                  style: LumaTokens.classLabel),
-            ],
-            const SizedBox(height: 20),
-            _section('Indications', drug['indications']),
-            _section('Adult Dosing', drug['adult_dose']),
-            _section('Mechanism', drug['mechanism']),
-            _section('Clinical Pearls', drug['clinical_pearls']),
-            _section('Contraindications', drug['contraindications']),
-            _section('Warnings', drug['warnings_precautions']),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _section(String label, dynamic value) {
-    final text = (value ?? '').toString();
-    if (text.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LumaSectionHeader(label),
-          Text(text, style: LumaTokens.body),
-        ],
-      ),
+      MaterialPageRoute(builder: (_) => DrugDetailScreen(drug: drug)),
     );
   }
 }
