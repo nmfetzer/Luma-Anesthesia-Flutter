@@ -1,22 +1,32 @@
 # Luma Anesthesia: Special Considerations migration
 
-The existing Base44-prepared content has been imported into Supabase. Flutter now has a connected Special Considerations library, category browsing, keyword search and a structured detail screen. Authentication setup was intentionally left for later.
+The existing Base44-prepared content has been imported into Supabase, and the remaining category drafts have been added. Flutter now has a connected 240-entry Special Considerations library, static category tiles, keyword search and a structured detail screen. Authentication setup was intentionally left for later.
 
 ## Imported content
 
 | Category | Entries |
 |---|---:|
-| Cardiac | 10 |
+| Cardiac | 20 |
 | Endocrine & Metabolic | 20 |
 | Hematology & Coagulation | 20 |
 | Neuromuscular & Neuro | 20 |
 | Syndromic / Congenital | 20 |
-| Total | 90 |
+| Pulmonary | 20 |
+| Renal & Hepatic | 20 |
+| GI & Nutrition | 20 |
+| Positioning & Physiologic | 20 |
+| Allergy & Reactive | 20 |
+| Special Populations | 20 |
+| Ethical & Situational | 20 |
+| Total | 240 |
 
 - **Source preservation:** The 80 JSON records were retained unchanged in a private archival table. The 10 adult Cardiac Markdown records were structurally converted; their clinical sections were not rewritten. Both original source files are retained in the private project files.
 - **Citation cleanup:** The earlier exporter included 32 author-checklist items as citations with empty URLs. They remain in the archived originals but are excluded from the app-facing reference lists. No replacement citations were invented.
 - **Review status:** All basic entries and deep dives are `needs_review`. Earlier source review claims were archived, not treated as evidence of a new clinical review. Some deep dives remain outlines.
 - **Publication:** Titles and categories are browsable now. The clinical prose remains server-side until explicitly reviewed and released. Importing these records did not publish them as medical guidance.
+- **New draft coverage:** Added the remaining 10 adult Cardiac entries and 20 entries in each of seven unfinished categories, for 150 new records. Each contains eight basic sections, a written deep dive, inline references and reviewer notes. The original 90 records were not rewritten.
+- **Evidence safeguards:** New drafts were prepared from fetched references and screened automatically for evidence consistency. This is not independent clinical validation. Unresolved scope, source-age, case-report and management questions remain flagged for a qualified reviewer.
+- **Completion boundary:** All planned category slots now have content drafts. Clinical release is not complete, and some deep dives in the original 90 still remain outlines.
 
 ## Live Supabase structure
 
@@ -24,10 +34,10 @@ Project: `xuckkusbbcxplpqclbxt`. The additive migration `special_considerations_
 
 | Table | Purpose | Imported rows |
 |---|---|---:|
-| `special_consideration_catalog` | Titles, categories, tags, review and preview flags | 90 |
-| `special_considerations` | Eight basic clinical sections and references | 90 |
-| `special_consideration_deep_dives` | Separately protected extended content | 90 |
-| `special_consideration_imports` | Private originals and checksums | 90 |
+| `special_consideration_catalog` | Titles, categories, tags, review and preview flags | 240 |
+| `special_considerations` | Eight basic clinical sections and references | 240 |
+| `special_consideration_deep_dives` | Separately protected extended content | 240 |
+| `special_consideration_imports` | Private originals and checksums | 240 |
 | `luma_content_entitlements` | Server-managed clinical subscription authority | No real entitlements created |
 
 No medication records were changed. Import batches are insert-only and skip existing slugs rather than overwriting clinician edits.
@@ -35,7 +45,9 @@ No medication records were changed. Import batches are insert-only and skip exis
 ## Flutter implementation
 
 - **Navigation:** The existing home and drawer destination `/special-considerations` now opens the connected library.
-- **Library:** Alphabetical categories and conditions, category counts, title/category/tag search, clear and back controls, no-match state, loading state and retry.
+- **Library:** Twelve categories in the original plan order, with static tiles rather than scrolling pills. The grid uses two mobile columns, three tablet columns and four desktop columns, falling back to one column for enlarged text. Conditions remain alphabetical.
+- **Search and navigation:** Title/category/tag search composes with category selection. Clear and back controls, no-match state, loading state and retry are implemented. Selecting a category returns the list to its top.
+- **Pagination:** The live 240-entry catalog loads over two requests of 200 and 40 records.
 - **Detail:** Draft notice before release. Published entries render Markdown, collapsible clinical sections, references and related crisis-topic labels.
 - **Brand:** Existing cream/navy/gold theme and Fraunces headings are retained.
 - **Deep dives:** Separate, on-demand request. They are not included in the catalog or basic content response, and sign-out clears loaded protected content.
@@ -56,20 +68,21 @@ The schema allows at most one guest preview per category. None has been selected
 
 ## Verification completed
 
-- **Content read-back:** All 90 archived records, checksums, titles, categories, clinical sections, deep dives and normalized tags matched the import source.
+- **Content read-back:** All 240 archived records, checksums, titles, categories, clinical sections, deep dives and normalized tags matched their import sources. The original 90 were unchanged.
+- **Source integrity:** Every inline reference URL in the new 150 records matches a fetched source. This verifies citation destinations, not independent truth of every clinical claim.
 - **Repeat import:** Rerunning a batch left the stored records unchanged.
 - **Database access tests:** Guest, anonymous-auth, registered account, premium, expired and revoked entitlement cases passed. Draft exclusion and client write protection passed. Test fixtures were rolled back.
-- **Flutter tests:** 12 tests passed, covering search, category/draft navigation, error retry, empty state, basic denial, published rendering with synthetic fixtures, lazy deep-dive loading, unavailable deep dives, sign-out clearing, large text on a small screen and existing welcome startup.
+- **Flutter tests:** 13 tests passed, covering the full 240-entry fixture, combined category search, category/draft navigation, error retry, empty state, basic denial, published rendering with synthetic fixtures, lazy deep-dive loading, unavailable deep dives, sign-out clearing, large text on a small screen and existing welcome startup.
 - **Static checks:** No analyzer issues in `lib/special_considerations`.
 - **Build:** Release web build succeeded with Flutter 3.47.5 / Dart 3.13.4.
-- **Browser checks:** The live catalog and actual Supabase counts rendered at desktop and mobile sizes. Category selection, an initial keyword search and draft-detail navigation were exercised. Browser automation of repeated text-entry/clear cycles was inconclusive; the corresponding Flutter widget coverage passed. No claim of exhaustive browser validation is made.
+- **Browser checks:** The actual 240-row Supabase catalog rendered at desktop and mobile sizes, including the second page. Category selection, keyword search, draft-detail navigation, back navigation, clear search and the no-match state were exercised with browser storage blocked. No browser page errors were observed. The final mobile/desktop layouts were inspected for clipping, broken word wrapping and overflow. No claim of exhaustive browser validation is made.
 
 This is migration and implementation verification, not a new clinical-content review. iOS/Android device builds, store signing and purchase flows were not tested.
 
 ## Remaining steps
 
-- **Repository delivery:** The source changes are saved privately. No public GitHub push has been made without approval.
-- **Clinical review:** Review the existing basic content and outlines, resolve incomplete references/content, and record the actual reviewer and date before changing publication status.
+- **Repository delivery:** The user authorized a code-only push after completing these categories. The public code changes exclude clinical drafts, research extracts, private import data and review packages.
+- **Clinical review:** Review all clinical content, including the original outlines and the new records' flagged questions, against applicable current evidence and local policies. Record the actual reviewer and date before changing publication status. No guest preview or deep dive has been published.
 - **Account and subscriptions:** Connect the optional sign-in and subscription callbacks when that work resumes. Billing must update entitlements through a trusted server.
 - **Crisis navigation:** Topic labels are preserved. Connect the optional callback only when the matching Crisis Hub destinations exist.
 

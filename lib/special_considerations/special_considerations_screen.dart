@@ -6,6 +6,21 @@ import 'special_consideration.dart';
 import 'special_consideration_detail_screen.dart';
 import 'special_consideration_repository.dart';
 
+const specialConsiderationCategoryOrder = [
+  'Hematology & Coagulation',
+  'Syndromic / Congenital',
+  'Neuromuscular & Neuro',
+  'Endocrine & Metabolic',
+  'Cardiac',
+  'Pulmonary',
+  'Renal & Hepatic',
+  'GI & Nutrition',
+  'Positioning & Physiologic',
+  'Allergy & Reactive',
+  'Special Populations',
+  'Ethical & Situational',
+];
+
 /// Uses the existing home and drawer route. No authentication required to browse.
 class SpecialConsiderationsScreen extends StatefulWidget {
   const SpecialConsiderationsScreen({
@@ -30,6 +45,7 @@ class _SpecialConsiderationsScreenState
   SpecialConsiderationDataSource? _repository;
   late Future<List<SpecialConsiderationEntry>> _catalog;
   final _search = TextEditingController();
+  final _scroll = ScrollController();
   String? _category;
 
   @override
@@ -48,7 +64,13 @@ class _SpecialConsiderationsScreenState
   @override
   void dispose() {
     _search.dispose();
+    _scroll.dispose();
     super.dispose();
+  }
+
+  void _selectCategory(String? category) {
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+    setState(() => _category = category);
   }
 
   @override
@@ -83,7 +105,13 @@ class _SpecialConsiderationsScreenState
                     );
                   }
                   final categories = all.map((e) => e.category).toSet().toList()
-                    ..sort();
+                    ..sort((a, b) {
+                      final ai = specialConsiderationCategoryOrder.indexOf(a);
+                      final bi = specialConsiderationCategoryOrder.indexOf(b);
+                      final ar = ai < 0 ? 999 : ai;
+                      final br = bi < 0 ? 999 : bi;
+                      return ar == br ? a.compareTo(b) : ar.compareTo(br);
+                    });
                   final searching = _search.text.trim().isNotEmpty;
                   final entries = all
                       .where(
@@ -93,6 +121,7 @@ class _SpecialConsiderationsScreenState
                       )
                       .toList();
                   return CustomScrollView(
+                    controller: _scroll,
                     slivers: [
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
@@ -111,6 +140,14 @@ class _SpecialConsiderationsScreenState
                                 style: lumaBody(color: LumaColors.inkSecondary),
                               ),
                               const SizedBox(height: 20),
+                              Text(
+                                '${all.length} entries · ${categories.length} categories',
+                                style: lumaBody(
+                                  size: 13,
+                                  color: LumaColors.inkMuted,
+                                ),
+                              ),
+                              const SizedBox(height: 14),
                               TextField(
                                 controller: _search,
                                 onChanged: (_) => setState(() {}),
@@ -130,8 +167,7 @@ class _SpecialConsiderationsScreenState
                               ),
                               if (_category != null)
                                 TextButton.icon(
-                                  onPressed: () =>
-                                      setState(() => _category = null),
+                                  onPressed: () => _selectCategory(null),
                                   icon: const Icon(Icons.arrow_back, size: 18),
                                   label: const Text('All categories'),
                                 ),
@@ -146,7 +182,7 @@ class _SpecialConsiderationsScreenState
                               const SizedBox(height: 6),
                               if (all.any((e) => !e.isPublished))
                                 Text(
-                                  'Imported drafts are listed for visibility. '
+                                  'Draft entries are listed for visibility. '
                                   'Their clinical content stays unavailable '
                                   'until reviewed.',
                                   style: lumaBody(
@@ -161,20 +197,44 @@ class _SpecialConsiderationsScreenState
                       if (_category == null && !searching)
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
-                          sliver: SliverList.list(
-                            children: categories.map((category) {
-                              final group =
-                                  all.where((e) => e.category == category);
-                              final ready =
-                                  group.where((e) => e.isPublished).length;
-                              return _LibraryRow(
-                                title: category,
-                                subtitle: '${group.length} entries · '
-                                    '$ready reviewed',
-                                onTap: () =>
-                                    setState(() => _category = category),
-                              );
-                            }).toList(),
+                          sliver: SliverToBoxAdapter(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final largeText =
+                                    MediaQuery.textScalerOf(context).scale(16) >
+                                        22;
+                                final columns = largeText
+                                    ? 1
+                                    : constraints.maxWidth >= 800
+                                        ? 4
+                                        : constraints.maxWidth >= 550
+                                            ? 3
+                                            : 2;
+                                final width = (constraints.maxWidth -
+                                        12 * (columns - 1)) /
+                                    columns;
+                                return Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children: categories.map((category) {
+                                    final group = all
+                                        .where((e) => e.category == category);
+                                    final ready = group
+                                        .where((e) => e.isPublished)
+                                        .length;
+                                    return SizedBox(
+                                      width: width,
+                                      child: _CategoryTile(
+                                        title: category,
+                                        subtitle: '${group.length} entries · '
+                                            '$ready reviewed',
+                                        onTap: () => _selectCategory(category),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              },
+                            ),
                           ),
                         )
                       else if (entries.isEmpty)
@@ -217,6 +277,54 @@ class _SpecialConsiderationsScreenState
                     ],
                   );
                 },
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+class _CategoryTile extends StatelessWidget {
+  const _CategoryTile({
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: LumaColors.divider),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 166),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.menu_book_outlined,
+                    size: 20,
+                    color: LumaColors.inkMuted,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(title, style: lumaDisplay(size: 16)),
+                  const SizedBox(height: 10),
+                  Text(
+                    subtitle,
+                    style: lumaBody(size: 12, color: LumaColors.inkMuted),
+                  ),
+                ],
               ),
             ),
           ),

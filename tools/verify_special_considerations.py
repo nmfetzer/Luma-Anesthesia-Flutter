@@ -23,8 +23,11 @@ JOIN public.special_consideration_imports i USING(slug)
 ORDER BY c.slug;
 """
 actual = unwrap_rows(tool("execute_sql", {"project_id": PROJECT, "query": query}))
-assert len(actual) == len(expected) == 90
-for row in actual:
+# Later additive batches may exist. Verify this original source set without
+# requiring the complete catalog to remain frozen at its first 90 records.
+selected = [row for row in actual if row["slug"] in expected]
+assert len(selected) == len(expected) == 90
+for row in selected:
     source = expected[row["slug"]]
     assert row["original"] == source, row["slug"]
     assert row["source_sha256"] == hashlib.sha256(
@@ -61,7 +64,7 @@ SELECT jsonb_build_object(
 ROLLBACK;
 """
 access = unwrap_rows(tool("execute_sql", {"project_id": PROJECT, "query": access_query}))
-assert access[0]["counts"] == {"catalog": 90, "basic": 0, "deep": 0}
+assert access[0]["counts"] == {"catalog": len(actual), "basic": 0, "deep": 0}
 report = {
     "records_verified": 90,
     "originals_match": True,

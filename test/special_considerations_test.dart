@@ -91,6 +91,51 @@ void main() {
     expect(entry.searchTags, isEmpty);
   });
 
+  testWidgets(
+      'full twelve-category catalog remains searchable beyond 200 entries',
+      (tester) async {
+    final repo = FakeRepository()
+      ..entries = [
+        for (final category in specialConsiderationCategoryOrder)
+          for (var i = 0; i < 20; i++)
+            SpecialConsiderationEntry(
+              slug: '$category-$i',
+              title: '$category example $i',
+              category: category,
+              searchTags: [i == 19 ? 'last entry' : 'fixture'],
+            ),
+      ];
+    addTearDown(repo.controller.close);
+    await tester.pumpWidget(MaterialApp(
+      home: SpecialConsiderationsScreen(repository: repo),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('240 entries · 12 categories'), findsOneWidget);
+    expect(find.byType(Wrap), findsOneWidget);
+    await tester.enterText(
+      find.byType(TextField),
+      'Ethical & Situational example 19',
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.widgetWithText(ListTile, 'Ethical & Situational example 19'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Review pending'), findsOneWidget);
+    await tester.tap(find.byTooltip('Clear search'));
+    await tester.pumpAndSettle();
+    expect(find.text('Categories'), findsOneWidget);
+    await tester.ensureVisible(find.text('Pulmonary'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pulmonary'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(TextField));
+    await tester.enterText(find.byType(TextField), 'last entry');
+    await tester.pumpAndSettle();
+    expect(find.text('Pulmonary example 19'), findsOneWidget);
+    expect(find.text('Ethical & Situational example 19'), findsNothing);
+  });
+
   testWidgets('catalog categories, search, draft detail and back navigation',
       (tester) async {
     final repo = FakeRepository();

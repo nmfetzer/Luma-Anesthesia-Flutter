@@ -171,8 +171,7 @@ class _SpecialConsiderationDetailScreenState
                   if (!entry.isPublished)
                     _accessMessage(
                       'Clinical review pending',
-                      'This entry has been imported from the earlier Luma '
-                          'content collection. Its clinical text and deep dive '
+                      'This entry is a Luma content draft. Its clinical text and deep dive '
                           'are held for review before release. '
                           'It is not yet available as a clinical reference.',
                     )
