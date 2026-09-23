@@ -40,6 +40,7 @@ No medication records were changed. Import batches are insert-only and skip exis
 - **Brand:** Existing cream/navy/gold theme and Fraunces headings are retained.
 - **Deep dives:** Separate, on-demand request. They are not included in the catalog or basic content response, and sign-out clears loaded protected content.
 - **Dependency:** Added `flutter_markdown_plus: ^1.0.12`.
+- **Embedded preview:** `lib/preview_main.dart` uses in-memory session/PKCE storage for restricted preview frames. Normal mobile startup remains `lib/main.dart`; its authentication behavior is unchanged.
 
 The code was prepared against Flutter repository commit `74f1f84`. The handoff patch adds the feature without replacing iOS/Android project folders. It does not include clinical source data.
 
