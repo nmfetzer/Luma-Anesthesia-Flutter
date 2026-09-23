@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config.dart';
 import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
+import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
 import 'welcome/welcome_carousel.dart';
@@ -50,6 +51,12 @@ class LumaApp extends StatelessWidget {
         },
       ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/special-considerations') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const SpecialConsiderationsScreen(),
+          );
+        }
         if (settings.name == '/drug-library') {
           return MaterialPageRoute(builder: (_) => const DrugsCategoriesScreen());
         }
