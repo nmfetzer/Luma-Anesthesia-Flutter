@@ -15,6 +15,7 @@ dependencies:
   supabase_flutter: ^2.5.6
   # For tapping source URLs in Drug Detail
   url_launcher: ^6.3.0
+  http: ^1.6.0
   flutter_markdown_plus: ^1.0.12
 dev_dependencies:
   flutter_lints: ^4.0.0
@@ -26,3 +27,4 @@ flutter:
   assets:
     - assets/data/medications.json
     - assets/branding/luma_icon.png
+    - assets/branding/google_g.png

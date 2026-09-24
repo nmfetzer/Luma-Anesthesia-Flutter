@@ -1,39 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth/account_access.dart';
 import '../theme/luma_theme.dart';
 
-abstract class AccountAccess {
-  String? get email;
-  Future<bool> submit(String email, String password, {required bool create});
-  Future<void> signOut();
-}
-
-class SupabaseAccountAccess implements AccountAccess {
-  SupabaseAccountAccess(this.client);
-  final SupabaseClient client;
-
-  @override
-  String? get email => client.auth.currentUser?.isAnonymous == false
-      ? client.auth.currentUser?.email
-      : null;
-
-  @override
-  Future<bool> submit(String email, String password,
-      {required bool create}) async {
-    final result = create
-        ? await client.auth.signUp(email: email, password: password)
-        : await client.auth
-            .signInWithPassword(email: email, password: password);
-    return result.session != null;
-  }
-
-  @override
-  Future<void> signOut() => client.auth.signOut();
-}
+export '../auth/account_access.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key, this.access});
+  const AccountScreen({
+    super.key,
+    this.access,
+    this.allowSocialSignIn = true,
+  });
   final AccountAccess? access;
+
+  /// Embedded previews have no persistent PKCE storage or valid callback origin.
+  final bool allowSocialSignIn;
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -48,18 +31,120 @@ class _AccountScreenState extends State<AccountScreen> {
   bool _busy = false;
   bool _hidePassword = true;
   String? _message;
+  StreamSubscription<void>? _authSubscription;
+  Set<OAuthProvider> _providers = {};
+  bool _checkingProviders = true;
+  bool _providerCheckFailed = false;
 
   @override
   void initState() {
     super.initState();
     _access = widget.access ?? SupabaseAccountAccess(Supabase.instance.client);
+    _authSubscription = _access.changes.listen((_) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        if (_access.email != null) {
+          _password.clear();
+          _message = null;
+        }
+      });
+    }, onError: (Object error, StackTrace stackTrace) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _message = 'Sign-in was not completed. Please try again, or use email.';
+      });
+    });
+    unawaited(_loadProviders());
   }
 
   @override
   void dispose() {
+    unawaited(_authSubscription?.cancel());
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadProviders() async {
+    if (!widget.allowSocialSignIn) {
+      setState(() => _checkingProviders = false);
+      return;
+    }
+    setState(() {
+      _checkingProviders = true;
+      _providerCheckFailed = false;
+    });
+    try {
+      final providers = await _access.enabledProviders();
+      if (mounted) setState(() => _providers = providers);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _providers = {};
+          _providerCheckFailed = true;
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _checkingProviders = false);
+    }
+  }
+
+  Future<void> _socialSignIn(OAuthProvider provider) async {
+    if (_busy || !_providers.contains(provider) || !widget.allowSocialSignIn) {
+      return;
+    }
+    final name = provider == OAuthProvider.apple ? 'Apple' : 'Google';
+    setState(() {
+      _busy = true;
+      _message = null;
+    });
+    try {
+      final opened = await _access.signInWithProvider(provider);
+      if (!mounted || _access.email != null) return;
+      setState(() => _message = opened
+          ? 'Continue with $name in your browser, then return to Luma. '
+              'If you canceled, you can try again or use email.'
+          : 'Could not open $name sign-in. Please try again.');
+    } catch (_) {
+      if (mounted) {
+        setState(() => _message =
+            '$name sign-in is unavailable right now. Please try again or use email.');
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Widget _socialButton(OAuthProvider provider) {
+    final apple = provider == OAuthProvider.apple;
+    final enabled = widget.allowSocialSignIn &&
+        !_busy &&
+        !_checkingProviders &&
+        _providers.contains(provider);
+    return OutlinedButton.icon(
+      onPressed: enabled ? () => _socialSignIn(provider) : null,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: apple ? Colors.black : Colors.white,
+        foregroundColor: apple ? Colors.white : const Color(0xFF1F1F1F),
+        disabledBackgroundColor: apple ? const Color(0xFF303030) : Colors.white,
+        disabledForegroundColor:
+            apple ? Colors.white70 : const Color(0xFF747775),
+        side: BorderSide(
+          color: apple ? Colors.black : const Color(0xFF747775),
+        ),
+        minimumSize: const Size(double.infinity, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      icon: apple
+          ? const Icon(Icons.apple, size: 22)
+          : Image.asset('assets/branding/google_g.png',
+              width: 20, height: 20, excludeFromSemantics: true),
+      label: Text(apple ? 'Continue with Apple' : 'Continue with Google'),
+    );
   }
 
   Future<void> _submit() async {
@@ -120,9 +205,21 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  void _returnToApp() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      navigator.pushReplacementNamed('/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('My Account')),
+        appBar: AppBar(
+          title: const Text('My Account'),
+          leading: BackButton(onPressed: _returnToApp),
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -146,6 +243,11 @@ class _AccountScreenState extends State<AccountScreen> {
                       if (_access.email != null) ...[
                         Text(_access.email!, style: lumaBody()),
                         const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: _returnToApp,
+                          child: const Text('Continue to Luma'),
+                        ),
+                        const SizedBox(height: 16),
                         Text(
                             'Your account can read published Special Considerations. '
                             'Deep dives require premium or complimentary access.',
@@ -160,6 +262,57 @@ class _AccountScreenState extends State<AccountScreen> {
                             onPressed: _busy ? null : _signOut,
                             child: const Text('Sign out')),
                       ] else ...[
+                        _socialButton(OAuthProvider.apple),
+                        const SizedBox(height: 12),
+                        _socialButton(OAuthProvider.google),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Sign in or create your free account. '
+                          'These buttons do not purchase a subscription.',
+                          style: lumaBody(size: 13),
+                        ),
+                        if (_checkingProviders)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text('Checking sign-in availability…'),
+                          )
+                        else if (!widget.allowSocialSignIn)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text(
+                                'Social sign-in is unavailable inside this '
+                                'embedded preview. Use the app or your local Chrome build.'),
+                          )
+                        else if (_providerCheckFailed ||
+                            _providers.length < 2) ...[
+                          const SizedBox(height: 8),
+                          Text(_providerCheckFailed
+                              ? 'Could not check social sign-in availability. '
+                                  'Email sign-in is still available below.'
+                              : 'Unavailable sign-in options are still being set up. '
+                                  'You can use email below.'),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton(
+                              onPressed: _busy ? null : _loadProviders,
+                              child: const Text('Check availability again'),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 20),
+                        const Row(children: [
+                          Expanded(child: Divider()),
+                          Flexible(
+                            flex: 3,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('or use email',
+                                  textAlign: TextAlign.center),
+                            ),
+                          ),
+                          Expanded(child: Divider()),
+                        ]),
+                        const SizedBox(height: 20),
                         Wrap(
                           spacing: 12,
                           runSpacing: 8,

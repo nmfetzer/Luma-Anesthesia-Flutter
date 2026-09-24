@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -35,7 +36,8 @@ Future<void> main() async {
 }
 
 class LumaApp extends StatelessWidget {
-  const LumaApp({super.key});
+  const LumaApp({super.key, this.allowSocialSignIn = true});
+  final bool allowSocialSignIn;
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +46,23 @@ class LumaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLumaTheme(),
       navigatorKey: _navKey,
-      home: WelcomeCarousel(
-        onFinish: () {
-          final navigator = _navKey.currentState;
-          navigator?.pushReplacement(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
-        },
-      ),
+      home: kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
+          ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
+          : WelcomeCarousel(
+              onFinish: () {
+                final navigator = _navKey.currentState;
+                navigator?.pushReplacement(
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                );
+              },
+            ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/home') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const HomeScreen(),
+          );
+        }
         if (settings.name == '/special-considerations') {
           return MaterialPageRoute(
             settings: settings,
@@ -77,7 +87,7 @@ class LumaApp extends StatelessWidget {
         if (settings.name == '/account') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => const AccountScreen(),
+            builder: (_) => AccountScreen(allowSocialSignIn: allowSocialSignIn),
           );
         }
         if (settings.name == '/drug-library') {
