@@ -48,6 +48,18 @@ The embedded Perplexity preview intentionally disables social OAuth because it
 uses in-memory PKCE storage and has no approved stable callback origin. It shows
 the actual account layout, but use main.dart locally or on a device to sign in.
 
+Build the embedded preview with its preview-only hosting preparation:
+
+```bash
+flutter build web --release -t lib/preview_main.dart
+node tools/prepare_web_preview.mjs build/web
+```
+
+Deploy the prepared `build/web` directory. Preparation makes asset URLs relative
+to the deployment directory, removes service-worker registration (blocked by
+the embedded viewer), and uses the bundled CanvasKit renderer. Do not skip this
+step when rebuilding the shared preview. It is not needed for native builds.
+
 Automated tests cover provider availability, provider dispatch, auth-state UI,
 no false success on browser launch, retries/errors, preview restrictions, redirect
 construction, and enlarged text. They do not validate real Google/Apple
