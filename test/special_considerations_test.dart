@@ -308,4 +308,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('premium denial opens options but an entitled reader stays',
+      (tester) async {
+    final repo = FakeRepository()..hasAccount = true;
+    addTearDown(repo.controller.close);
+    var paywallOpens = 0;
+    await tester.pumpWidget(MaterialApp(
+      home: SpecialConsiderationDetailScreen(
+        entry: published,
+        repository: repo,
+        onSubscribe: () => paywallOpens++,
+      ),
+    ));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Open deep dive'));
+    await tester.tap(find.text('Open deep dive'));
+    await tester.pumpAndSettle();
+    expect(paywallOpens, 1);
+    repo.premium = 'Entitled test content';
+    await tester.tap(find.text('Open deep dive'));
+    await tester.pumpAndSettle();
+    expect(paywallOpens, 1);
+    expect(find.text('Entitled test content'), findsOneWidget);
+  });
 }

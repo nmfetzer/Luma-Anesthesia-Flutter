@@ -86,7 +86,15 @@ class _AccountScreenState extends State<AccountScreen> {
       }
     } on AuthException catch (error) {
       if (mounted) {
-        setState(() => _message = error.message);
+        setState(() => _message = error.code == 'invalid_credentials' ||
+                error.message
+                    .toLowerCase()
+                    .contains('invalid login credentials')
+            ? 'We could not sign you in. Check your email and password. '
+                'If this is your first time in the new Luma app, choose '
+                'New account to register. Your previous app login may not '
+                'be registered here yet.'
+            : error.message);
       }
     } catch (_) {
       if (mounted) {
@@ -140,14 +148,50 @@ class _AccountScreenState extends State<AccountScreen> {
                         const SizedBox(height: 16),
                         Text(
                             'Your account can read published Special Considerations. '
-                            'Deep dives require an active clinical subscription.',
+                            'Deep dives require premium or complimentary access.',
                             style: lumaBody()),
+                        const SizedBox(height: 12),
+                        TextButton(
+                            onPressed: () =>
+                                Navigator.pushNamed(context, '/subscribe'),
+                            child: const Text('Preview Luma Premium')),
                         const SizedBox(height: 24),
                         OutlinedButton(
                             onPressed: _busy ? null : _signOut,
                             child: const Text('Sign out')),
                       ] else ...[
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: const Text('Existing account'),
+                              selected: !_create,
+                              onSelected: _busy
+                                  ? null
+                                  : (_) => setState(() {
+                                        _create = false;
+                                        _message = null;
+                                        _password.clear();
+                                      }),
+                            ),
+                            ChoiceChip(
+                              label: const Text('New account'),
+                              selected: _create,
+                              onSelected: _busy
+                                  ? null
+                                  : (_) => setState(() {
+                                        _create = true;
+                                        _message = null;
+                                        _password.clear();
+                                      }),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
                         Text(
+                            '${_create ? 'Create your free Luma account here. ' : 'Already registered in this new Luma app? Sign in below. '
+                                'First visit? Choose New account above. '}'
                             'A free account unlocks published Special Considerations. '
                             'Deep dives remain subscription-protected.',
                             style: lumaBody()),

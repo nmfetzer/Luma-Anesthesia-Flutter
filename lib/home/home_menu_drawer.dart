@@ -53,6 +53,7 @@ class HomeMenuDrawer extends StatelessWidget {
                   _sub(context, 'SEE Exam Prep', '/luma-academy/see'),
                   _sub(context, 'Anesthesia Flashcards', '/luma-academy/flashcards'),
                   _sectionLabel('ACCOUNT'),
+                  _link(context, 'Luma Premium', '/subscribe'),
                   _link(context, 'My Account', '/account'),
                   _link(context, 'Settings', '/settings'),
                 ],

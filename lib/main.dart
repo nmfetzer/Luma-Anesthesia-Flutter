@@ -10,6 +10,7 @@ import 'config.dart';
 import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
+import 'screens/subscription_screen.dart';
 import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
@@ -57,7 +58,20 @@ class LumaApp extends StatelessWidget {
             settings: settings,
             builder: (_) => SpecialConsiderationsScreen(
               onSignIn: () => _navKey.currentState?.pushNamed('/account'),
+              onSubscribe: () => _navKey.currentState?.pushNamed('/subscribe'),
             ),
+          );
+        }
+        if (settings.name == '/subscribe') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const SubscriptionScreen(),
+          );
+        }
+        if (settings.name == '/ce-halo') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const CeAccessScreen(),
           );
         }
         if (settings.name == '/account') {

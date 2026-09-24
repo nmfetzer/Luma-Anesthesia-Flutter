@@ -93,10 +93,13 @@ class _SpecialConsiderationDetailScreenState
       setState(() {
         _deepDive = body;
         if (body == null || body.trim().isEmpty) {
-          _deepStatus = 'Deep dives require a subscription and separate '
-              'clinical review. This deep dive is not available to this account.';
+          _deepStatus = 'This deep dive is not available to this account. '
+              'Explore Luma Premium for extended clinical content.';
         }
       });
+      if (body == null || body.trim().isEmpty) {
+        widget.onSubscribe?.call();
+      }
     } catch (_) {
       if (mounted && generation == _generation) {
         setState(
@@ -261,8 +264,8 @@ class _SpecialConsiderationDetailScreenState
                             else ...[
                               Text(
                                 _deepStatus ??
-                                    'Extended content is available only after '
-                                        'review and with a clinical subscription.',
+                                    'Extended clinical content is included with '
+                                        'Luma Premium or complimentary app access.',
                                 style: lumaBody(
                                   size: 14,
                                   color: LumaColors.inkSecondary,

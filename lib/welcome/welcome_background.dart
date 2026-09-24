@@ -58,6 +58,23 @@ class _WelcomeBackgroundState extends State<WelcomeBackground>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    for (final controller in [_pulse, _spin, _drift, _silk, _planet, _twinkle]) {
+      if (reducedMotion) {
+        controller.stop();
+      } else if (!controller.isAnimating) {
+        controller.repeat(
+            reverse: controller == _pulse ||
+                controller == _drift ||
+                controller == _silk ||
+                controller == _planet);
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _pulse.dispose();
     _spin.dispose();
