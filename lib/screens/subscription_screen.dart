@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../welcome/luma_theme.dart' as brand;
 import '../welcome/welcome_background.dart';
 
 /// Presentation only until store products and verified billing are connected.
 /// This screen never grants access or changes a subscription.
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key});
+  const SubscriptionScreen({super.key, this.openExternal});
+
+  /// Optional launcher for testing legal links without opening a real browser.
+  final Future<bool> Function(Uri)? openExternal;
 
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
@@ -18,6 +23,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   TextStyle _body({double size = 14}) =>
       brand.LumaText.body(size: size, color: _muted);
+
+  Future<void> _openLegal(String address) async {
+    try {
+      final uri = Uri.parse(address);
+      final opened = await (widget.openExternal?.call(uri) ??
+          launchUrl(uri, mode: LaunchMode.externalApplication));
+      if (!opened) throw StateError('Unable to open legal page');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Could not open this page. Please visit $address'),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -98,9 +117,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               LayoutBuilder(builder: (context, constraints) {
                                 final plans = [
                                   _plan(true, 'Annual', '\$69.99', '/ year',
-                                      'One yearly payment'),
+                                      'Billed annually. Auto-renews.'),
                                   _plan(false, 'Monthly', '\$9.99', '/ month',
-                                      'One monthly payment'),
+                                      'Billed monthly. Auto-renews.'),
                                 ];
                                 if (constraints.maxWidth < 350) {
                                   return Column(children: [
@@ -119,6 +138,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 );
                               }),
                               const SizedBox(height: 16),
+                              Text(
+                                  _annual
+                                      ? 'Luma Premium Annual: a 1-year auto-renewable '
+                                          'subscription at the preview price of \$69.99 per year.'
+                                      : 'Luma Premium Monthly: a 1-month auto-renewable '
+                                          'subscription at the preview price of \$9.99 per month.',
+                                  style: _body(size: 12)),
+                              const SizedBox(height: 8),
+                              Text(
+                                  'Subscriptions automatically renew unless canceled. '
+                                  'Cancel before your next renewal to avoid another charge. '
+                                  'Access continues through the paid subscription period.',
+                                  style: _body(size: 12)),
+                              const SizedBox(height: 8),
+                              Text(
+                                  subscriptionBillingNotice(
+                                      Theme.of(context).platform,
+                                      isWeb: kIsWeb),
+                                  style: _body(size: 12)),
+                              const SizedBox(height: 12),
                               const FilledButton(
                                 onPressed: null,
                                 child: Text('Purchases coming soon'),
@@ -142,6 +181,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   const TextButton(
                                     onPressed: null,
                                     child: Text('Restore purchases'),
+                                  ),
+                                ],
+                              ),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 8,
+                                children: [
+                                  TextButton(
+                                    onPressed: () => _openLegal(
+                                        'https://lumaeducationalapps.com/terms-of-use-eula'),
+                                    child: const Text('Terms of Use / EULA'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => _openLegal(
+                                        'https://lumaeducationalapps.com/privacy-policy-1'),
+                                    child: const Text('Privacy Policy'),
                                   ),
                                 ],
                               ),
@@ -246,6 +301,25 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       ),
     );
   }
+}
+
+/// Web is a preview, not an Apple or Google checkout surface.
+String subscriptionBillingNotice(TargetPlatform platform,
+    {required bool isWeb}) {
+  const apple =
+      'Payment is charged to your Apple Account at purchase confirmation. '
+      'Renewal is charged within 24 hours before the next subscription period. '
+      'Manage or cancel in Settings > your name > Subscriptions.';
+  const google = 'Payment is charged through your Google Play account. '
+      'Manage or cancel in Google Play > Payments & subscriptions > Subscriptions.';
+  if (isWeb) {
+    return 'For iOS purchases: $apple\n\n'
+        'For Android purchases: $google\n\n'
+        'Store billing is not available in this Chrome preview.';
+  }
+  return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS
+      ? apple
+      : google;
 }
 
 class CeAccessMessage extends StatelessWidget {
