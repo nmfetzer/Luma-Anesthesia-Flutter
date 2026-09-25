@@ -12,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config.dart';
 import '../models/medication.dart';
+import 'medication_public_fields.dart';
 
 class MedicationRepository {
   MedicationRepository._();
@@ -25,7 +26,7 @@ class MedicationRepository {
     if (LumaConfig.supabaseConfigured) {
       final rows = await Supabase.instance.client
           .from('medication')
-          .select()
+          .select(medicationPublicFields)
           .order('name');
       _cache = (rows as List)
           .map((r) => Medication.fromJson(r as Map<String, dynamic>))

@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../widgets/medication_deep_dive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/medication.dart';
@@ -140,7 +141,7 @@ class DrugDetailScreen extends StatelessWidget {
                 title: 'Deep Dive',
                 initiallyExpanded: false,
                 children: [
-                  _Text(value: m.deepDiveContent),
+                  MedicationDeepDive(medicationId: m.id),
                 ],
               ),
               _Section(

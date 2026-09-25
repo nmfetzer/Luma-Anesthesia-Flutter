@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import '../theme/luma_theme.dart';
+import 'luma_home_button.dart';
 
 class LumaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -29,10 +30,7 @@ class LumaAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.search, size: 20),
           onPressed: () {},
         ),
-        IconButton(
-          icon: const Icon(Icons.home_outlined, size: 20),
-          onPressed: () {},
-        ),
+        const LumaHomeButton(),
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 8, 12, 8),
           child: CircleAvatar(

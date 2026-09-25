@@ -10,6 +10,7 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 
 import '../data/medication_repository.dart';
 import '../models/medication.dart';
@@ -51,6 +52,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     return Scaffold(
       backgroundColor: LumaColors.cream,
       appBar: AppBar(
+        actions: const [LumaHomeButton()],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.of(context).pop(),

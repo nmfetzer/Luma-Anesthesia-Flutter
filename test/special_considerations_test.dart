@@ -212,7 +212,7 @@ void main() {
           SpecialConsiderationDetailScreen(entry: published, repository: repo),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('Sign in to read this entry'), findsOneWidget);
+    expect(find.text('Luma Premium content'), findsOneWidget);
     expect(find.text('At a glance'), findsNothing);
   });
 
@@ -231,7 +231,7 @@ void main() {
     repo.controller.add(null);
     await tester.pumpAndSettle();
     expect(find.text('At a glance'), findsNothing);
-    expect(find.text('Sign in to read this entry'), findsOneWidget);
+    expect(find.text('Luma Premium content'), findsOneWidget);
   });
 
   testWidgets('deep dive loads only on request and is cleared on sign out',
@@ -332,4 +332,31 @@ void main() {
     expect(paywallOpens, 1);
     expect(find.text('Entitled test content'), findsOneWidget);
   });
+
+  for (final hasAccount in [false, true]) {
+    testWidgets('locked reference opens paywall, account=$hasAccount',
+        (tester) async {
+      final repo = FakeRepository()
+        ..hasAccount = hasAccount
+        ..body = null;
+      addTearDown(repo.controller.close);
+      var paywallOpens = 0;
+      var signInOpens = 0;
+      await tester.pumpWidget(MaterialApp(
+        home: SpecialConsiderationDetailScreen(
+          entry: published,
+          repository: repo,
+          onSubscribe: () => paywallOpens++,
+          onSignIn: () => signInOpens++,
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(paywallOpens, 1);
+      expect(signInOpens, 0);
+      expect(find.text('At a glance'), findsNothing);
+      repo.controller.add(null);
+      await tester.pumpAndSettle();
+      expect(paywallOpens, 1, reason: 'No repeated paywall on auth refresh');
+    });
+  }
 }

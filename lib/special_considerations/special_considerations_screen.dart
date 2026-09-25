@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config.dart';
 import '../theme/luma_theme.dart';
@@ -75,7 +76,10 @@ class _SpecialConsiderationsScreenState
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Special Considerations')),
+        appBar: AppBar(
+          title: const Text('Special Considerations'),
+          actions: const [LumaHomeButton()],
+        ),
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(

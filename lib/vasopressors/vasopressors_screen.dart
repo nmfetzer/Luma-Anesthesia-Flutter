@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../shared/luma_theme_tokens.dart';
 import '../blood_products/blood_products_view.dart';
@@ -57,7 +58,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
               'black_box_warning, lasa_warning, dea_schedule, onset_duration, onset_minutes, duration_minutes, '
               'pharmacokinetics, antidote_reversal, concentration_mixing, requires_dilution, target_concentration, '
               'standard_recipe, final_volume_ml, diluent, alternative_concentrations, mixing_pearls, '
-              'stability_hours_room_temp, stability_hours_refrigerated, deep_dive_content, sources')
+              'stability_hours_room_temp, stability_hours_refrigerated, sources')
           .not('vasoactive_role', 'is', null)
           .order('name');
 
@@ -171,7 +172,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 32),
+          const LumaHomeButton(),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../welcome/luma_theme.dart' as brand;
@@ -61,6 +62,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               child: Text('Luma Anesthesia',
                                   style: brand.LumaText.wordmark()),
                             ),
+                            const LumaHomeButton(color: brand.LumaColors.cream),
                             IconButton(
                               tooltip: 'Close subscription options',
                               onPressed: () => Navigator.of(context).maybePop(),
@@ -94,15 +96,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                       size: 32, color: _ink)),
                               const SizedBox(height: 12),
                               Text(
-                                  'Go beyond the essentials with extended '
-                                  'anesthesia reference content.',
+                                  'Unlock subscriber-only anesthesia reference content. '
+                                  'Creating an account alone does not unlock paid sections.',
                                   style: _body(size: 16)),
                               const SizedBox(height: 24),
                               _benefit(
                                   Icons.menu_book_outlined,
-                                  'Go deeper into Special Considerations',
-                                  'Extended reading across 240 conditions in '
-                                      '12 clinical categories.'),
+                                  'Unlock Special Considerations',
+                                  'Condition references and deep dives across '
+                                      '240 conditions in 12 clinical categories.'),
+                              _benefit(
+                                  Icons.medication_outlined,
+                                  'Explore Drug Library Deep Dives',
+                                  'Extended medication reading is subscription-only. '
+                                      'All other Drug Library content remains free.'),
                               _benefit(
                                   Icons.account_tree_outlined,
                                   'Connect physiology to perioperative care',
@@ -207,6 +214,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 onPressed: () =>
                                     Navigator.pushNamed(context, '/ce-halo'),
                                 child: const Text('Explore CE access'),
+                              ),
+                              const Divider(height: 32),
+                              Text('Meet Luma, your AI learning companion',
+                                  style: brand.LumaText.title(size: 24, color: _ink)),
+                              const SizedBox(height: 8),
+                              Text('Coming soon: an included AI-credit allowance '
+                                  'with eligible plans and optional credit packs. '
+                                  'Amounts and prices are not finalized. AI is not '
+                                  'included in this preview.',
+                                  style: _body()),
+                              TextButton(
+                                onPressed: () => Navigator.pushNamed(context, '/luma-ai'),
+                                child: const Text('Meet Luma'),
                               ),
                             ],
                           ),
@@ -339,11 +359,16 @@ class CeAccessMessage extends StatelessWidget {
             style: brand.LumaText.body(size: 14, color: brand.LumaColors.navy),
           ),
           const SizedBox(height: 16),
-          _bonus('1 course purchase', '1 month of complimentary app access'),
+          _bonus('1 course purchase', '1 complimentary month, one time'),
           const SizedBox(height: 12),
-          _bonus('Bundle purchase', '3 months of complimentary app access'),
+          _bonus('Bundle purchase', '3 complimentary months, one time'),
           const SizedBox(height: 12),
-          Text('Course purchases and bonus activation are coming soon.',
+          Text('Planned activation: access is added to your account after a '
+              'verified course purchase. No code and no automatic subscription '
+              'charge. Repeat purchases do not add more free months. '
+              'Complimentary access includes the same Luma AI-credit allowance '
+              'as a subscription once AI launches; credit amounts are being finalized. '
+              'Course purchases and bonus activation are coming soon.',
               style: brand.LumaText.body(
                   size: 12, color: const Color(0xFF52606A))),
         ],
@@ -378,7 +403,10 @@ class CeAccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('CE HALO')),
+        appBar: AppBar(
+          title: const Text('CE HALO'),
+          actions: const [LumaHomeButton()],
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Center(

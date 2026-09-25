@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/account_access.dart';
 import '../theme/luma_theme.dart';
@@ -219,6 +220,7 @@ class _AccountScreenState extends State<AccountScreen> {
         appBar: AppBar(
           title: const Text('My Account'),
           leading: BackButton(onPressed: _returnToApp),
+          actions: const [LumaHomeButton()],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -249,8 +251,9 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                            'Your account can read published Special Considerations. '
-                            'Deep dives require premium or complimentary access.',
+                            'Creating an account does not unlock paid content. '
+                            'Special Considerations and deep dives require an active '
+                            'subscription or authorized complimentary app access.',
                             style: lumaBody()),
                         const SizedBox(height: 12),
                         TextButton(
@@ -345,8 +348,10 @@ class _AccountScreenState extends State<AccountScreen> {
                         Text(
                             '${_create ? 'Create your free Luma account here. ' : 'Already registered in this new Luma app? Sign in below. '
                                 'First visit? Choose New account above. '}'
-                            'A free account unlocks published Special Considerations. '
-                            'Deep dives remain subscription-protected.',
+                            'An account identifies you; it does not unlock paid content. '
+                            'Special Considerations and Drug Library Deep Dives require '
+                            'a subscription or authorized complimentary app access. '
+                            'Other Drug Library content stays free.',
                             style: lumaBody()),
                         const SizedBox(height: 24),
                         Form(

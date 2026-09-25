@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../widgets/medication_deep_dive.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../shared/luma_theme_tokens.dart';
 
@@ -75,6 +77,7 @@ class DrugDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: LumaTokens.creamSoft,
       appBar: AppBar(
+        actions: const [LumaHomeButton()],
         backgroundColor: LumaTokens.creamSoft,
         elevation: 0,
         iconTheme: const IconThemeData(color: LumaTokens.textPrimary),
@@ -376,8 +379,6 @@ class DrugDetailScreen extends StatelessWidget {
   }
 
   Widget _deepDiveSection(BuildContext context) {
-    final content = _clean(drug['deep_dive_content']);
-    if (content == null) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 22),
@@ -400,7 +401,7 @@ class DrugDetailScreen extends StatelessWidget {
           children: [
             Container(height: 0.5, color: LumaTokens.hairlineGold),
             const SizedBox(height: 12),
-            Text(content, style: LumaTokens.body),
+            MedicationDeepDive(medicationId: drug['id'].toString()),
           ],
         ),
       ),

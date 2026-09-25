@@ -40,7 +40,7 @@ END $$;
 SELECT set_config('request.jwt.claims',
  jsonb_build_object('sub',current_setting('luma.test_user'),'is_anonymous',false)::text,true);
 DO $$ BEGIN
- ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=2, 'Account basic';
+ ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=2, 'Premium condition reference';
  ASSERT (SELECT count(*) FROM public.special_consideration_deep_dives WHERE slug='luma-test-account')=1, 'Premium allowed';
  ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug='luma-test-draft')=0, 'Draft hidden from member';
 END $$;
@@ -50,7 +50,7 @@ WHERE user_id=current_setting('luma.test_user')::uuid;
 SET LOCAL ROLE authenticated;
 DO $$ BEGIN
  ASSERT (SELECT count(*) FROM public.special_consideration_deep_dives WHERE slug='luma-test-account')=0, 'Expired premium denied';
- ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=2, 'Free account keeps basic';
+ ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=1, 'Expired account keeps previews only';
 END $$;
 RESET ROLE;
 UPDATE public.luma_content_entitlements SET valid_until=now()+interval '1 hour',revoked_at=now()
@@ -58,6 +58,15 @@ WHERE user_id=current_setting('luma.test_user')::uuid;
 SET LOCAL ROLE authenticated;
 DO $$ BEGIN
  ASSERT (SELECT count(*) FROM public.special_consideration_deep_dives WHERE slug='luma-test-account')=0, 'Revoked premium denied';
+ ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=1, 'Revoked account keeps previews only';
+END $$;
+RESET ROLE;
+DELETE FROM public.luma_content_entitlements
+WHERE user_id=current_setting('luma.test_user')::uuid;
+SET LOCAL ROLE authenticated;
+DO $$ BEGIN
+ ASSERT (SELECT count(*) FROM public.special_considerations WHERE slug LIKE 'luma-test-%')=1, 'Free account without entitlement keeps previews only';
+ ASSERT (SELECT count(*) FROM public.special_consideration_deep_dives WHERE slug='luma-test-account')=0, 'Free account cannot read deep dives';
 END $$;
 RESET ROLE;
 ROLLBACK;

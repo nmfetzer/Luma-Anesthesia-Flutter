@@ -8,10 +8,13 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
+import 'widgets/luma_home_button.dart';
 import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
+import 'screens/luma_assistant_screen.dart';
+import 'ekg/ekg_screen.dart';
 import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
@@ -36,8 +39,10 @@ Future<void> main() async {
 }
 
 class LumaApp extends StatelessWidget {
-  const LumaApp({super.key, this.allowSocialSignIn = true});
+  const LumaApp({super.key, this.allowSocialSignIn = true,
+    this.showEkgDraft = false});
   final bool allowSocialSignIn;
+  final bool showEkgDraft;
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +56,22 @@ class LumaApp extends StatelessWidget {
           : WelcomeCarousel(
               onFinish: () {
                 final navigator = _navKey.currentState;
-                navigator?.pushReplacement(
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                );
+                navigator?.pushReplacementNamed('/home');
               },
             ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/diagnostics' || settings.name == '/ekg') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => EkgScreen(showClinicalDraft: showEkgDraft),
+          );
+        }
+        if (settings.name == '/luma-ai') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const LumaAssistantScreen(),
+          );
+        }
         if (settings.name == '/home') {
           return MaterialPageRoute(
             settings: settings,
@@ -99,7 +114,10 @@ class LumaApp extends StatelessWidget {
         }
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            appBar: AppBar(title: Text(settings.name ?? 'Coming soon')),
+            appBar: AppBar(
+              title: Text(settings.name ?? 'Coming soon'),
+              actions: const [LumaHomeButton()],
+            ),
             body: Center(
               child: Text(
                 '${settings.name}\n\nComing soon',

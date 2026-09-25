@@ -43,6 +43,7 @@ class HomeMenuDrawer extends StatelessWidget {
                   _link(context, 'Practice Guidelines', '/practice-guidelines'),
                   _link(context, 'Crisis Guidelines', '/crisis-guidelines', accent: const Color(0xFFB43C37)),
                   _sectionLabel('EDUCATION'),
+                  _link(context, 'Meet Luma AI', '/luma-ai'),
                   _link(context, 'CE Halo', '/ce-halo'),
                   _sub(context, 'My Courses', '/ce-halo/courses'),
                   _sub(context, 'My Certificates', '/ce-halo/certificates'),

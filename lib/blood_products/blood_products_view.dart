@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../shared/luma_theme_tokens.dart';
@@ -167,6 +168,7 @@ class _BloodProductDetail extends StatelessWidget {
     return Scaffold(
       backgroundColor: LumaTokens.creamSoft,
       appBar: AppBar(
+        actions: const [LumaHomeButton()],
         backgroundColor: LumaTokens.creamSoft,
         elevation: 0,
         scrolledUnderElevation: 0,

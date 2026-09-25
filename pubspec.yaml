@@ -28,3 +28,4 @@ flutter:
     - assets/data/medications.json
     - assets/branding/luma_icon.png
     - assets/branding/google_g.png
+    - assets/branding/luma_assistant.png

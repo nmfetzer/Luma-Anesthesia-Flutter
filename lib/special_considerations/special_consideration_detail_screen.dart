@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../widgets/luma_home_button.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/luma_theme.dart';
@@ -34,6 +35,7 @@ class _SpecialConsiderationDetailScreenState
   bool _deepBusy = false;
   String? _deepStatus;
   int _generation = 0;
+  bool _paywallShown = false;
 
   @override
   void initState() {
@@ -51,9 +53,18 @@ class _SpecialConsiderationDetailScreenState
     });
   }
 
-  Future<SpecialConsiderationDetail?> _load() => widget.entry.isPublished
-      ? widget.repository.detail(widget.entry.slug)
-      : Future.value(null);
+  Future<SpecialConsiderationDetail?> _load() async {
+    if (!widget.entry.isPublished) return null;
+    final generation = _generation;
+    final detail = await widget.repository.detail(widget.entry.slug);
+    if (detail == null && mounted && generation == _generation && !_paywallShown) {
+      _paywallShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && generation == _generation) widget.onSubscribe?.call();
+      });
+    }
+    return detail;
+  }
 
   @override
   void dispose() {
@@ -152,7 +163,10 @@ class _SpecialConsiderationDetailScreenState
   Widget build(BuildContext context) {
     final entry = widget.entry;
     return Scaffold(
-      appBar: AppBar(title: const Text('Special Considerations')),
+      appBar: AppBar(
+        title: const Text('Special Considerations'),
+        actions: const [LumaHomeButton()],
+      ),
       body: SafeArea(
         child: Align(
           alignment: Alignment.topCenter,
@@ -204,19 +218,12 @@ class _SpecialConsiderationDetailScreenState
                         final detail = snapshot.data;
                         if (detail == null) {
                           return _accessMessage(
-                            widget.repository.hasAccount
-                                ? 'This entry is unavailable'
-                                : 'Sign in to read this entry',
-                            widget.repository.hasAccount
-                                ? 'It may have been withdrawn for review. '
-                                    'Return to the library and refresh.'
-                                : 'A free account unlocks reviewed condition '
-                                    'references. Guest previews remain free.'
-                                    '${widget.onSignIn == null ? ' Account setup is being completed.' : ''}',
-                            action: 'Sign in',
-                            onAction: widget.repository.hasAccount
-                                ? null
-                                : widget.onSignIn,
+                            'Luma Premium content',
+                            'An active subscription or authorized complimentary '
+                                'app access is required. Creating an account alone '
+                                'does not unlock this content.',
+                            action: 'View subscription options',
+                            onAction: widget.onSubscribe,
                           );
                         }
                         return Column(
@@ -281,10 +288,10 @@ class _SpecialConsiderationDetailScreenState
                                         : 'Open deep dive',
                                   ),
                                 )
-                              else if (widget.onSignIn != null)
+                              else if (widget.onSubscribe != null)
                                 OutlinedButton(
-                                  onPressed: widget.onSignIn,
-                                  child: const Text('Sign in to continue'),
+                                  onPressed: widget.onSubscribe,
+                                  child: const Text('View subscription options'),
                                 ),
                               if (widget.repository.hasAccount &&
                                   widget.onSubscribe != null)
