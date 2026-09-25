@@ -3,6 +3,7 @@ import 'home_background.dart';
 import 'home_tile.dart';
 import 'home_menu_drawer.dart';
 import 'home_search.dart';
+import 'luma_ai_tile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -293,6 +294,8 @@ class _PhoneLayout extends StatelessWidget {
                 const SizedBox(height: 8),
                 SizedBox(height: 130, child: HomeTile(data: _tile('ce-halo'))),
                 const SizedBox(height: 8),
+                const SizedBox(height: 124, child: LumaAiTile()),
+                const SizedBox(height: 8),
                 _tileRow(_tile('crisis-guidelines'), _tile('vasopressors-infusions')),
                 const SizedBox(height: 8),
                 _tileRow(_tile('special-considerations'), _tile('surgical-prep')),
@@ -348,7 +351,11 @@ class _TabletLayout extends StatelessWidget {
                 const SizedBox(height: 10),
                 Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
                 const SizedBox(height: 10),
-                Expanded(flex: 1, child: HomeTile(data: _tile('luma-academy'))),
+                Expanded(flex: 1, child: Row(children: [
+                  Expanded(child: HomeTile(data: _tile('luma-academy'))),
+                  const SizedBox(width: 10),
+                  const Expanded(child: LumaAiTile()),
+                ])),
               ],
             ),
           ),
@@ -383,7 +390,11 @@ class _DesktopLayout extends StatelessWidget {
                     const SizedBox(height: 10),
                     Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('surgical-prep'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
                     const SizedBox(height: 10),
-                    Expanded(flex: 1, child: HomeTile(data: _tile('luma-academy'))),
+                    Expanded(flex: 1, child: Row(children: [
+                      Expanded(flex: 5, child: HomeTile(data: _tile('luma-academy'))),
+                      const SizedBox(width: 10),
+                      const Expanded(flex: 7, child: LumaAiTile()),
+                    ])),
                   ],
                 ),
               ),
