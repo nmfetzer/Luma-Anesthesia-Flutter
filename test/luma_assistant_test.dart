@@ -9,6 +9,13 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: LumaAssistantScreen()));
     await tester.pump();
     expect(find.text('Meet Luma'), findsOneWidget);
+    expect(find.text('Before using Luma AI'), findsOneWidget);
+    await tester.ensureVisible(find.byType(CheckboxListTile));
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Continue to AI preview'));
+    await tester.tap(find.text('Continue to AI preview'));
+    await tester.pump();
     expect(find.textContaining('not connected yet'), findsOneWidget);
     expect(find.textContaining('Amounts and prices'), findsOneWidget);
     expect(find.textContaining('Do not share patient-identifying'), findsOneWidget);

@@ -164,7 +164,9 @@ class _SpecialConsiderationDetailScreenState
     final entry = widget.entry;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Special Considerations'),
+        toolbarHeight: 80,
+        title: const Text('Pathophysiology & Anesthesia Considerations',
+            maxLines: 3, style: TextStyle(fontSize: 17)),
         actions: const [LumaHomeButton()],
       ),
       body: SafeArea(

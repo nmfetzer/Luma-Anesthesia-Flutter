@@ -77,7 +77,9 @@ class _SpecialConsiderationsScreenState
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('Special Considerations'),
+          toolbarHeight: 80,
+          title: const Text('Pathophysiology & Anesthesia Considerations',
+              maxLines: 3, style: TextStyle(fontSize: 17)),
           actions: const [LumaHomeButton()],
         ),
         body: SafeArea(
@@ -104,7 +106,7 @@ class _SpecialConsiderationsScreenState
                   if (all.isEmpty) {
                     return const _StateMessage(
                       title: 'The library is being prepared',
-                      body: 'Special Considerations entries will appear here '
+                      body: 'Pathophysiology & Anesthesia Considerations entries will appear here '
                           'when they are available.',
                     );
                   }
@@ -157,6 +159,8 @@ class _SpecialConsiderationsScreenState
                                 onChanged: (_) => setState(() {}),
                                 decoration: InputDecoration(
                                   labelText: 'Search conditions or keywords',
+                                  helperText: 'Pathophysiology & Anesthesia Considerations',
+                                  helperMaxLines: 2,
                                   prefixIcon: const Icon(Icons.search),
                                   suffixIcon: searching
                                       ? IconButton(

@@ -15,6 +15,7 @@ class HomeTile extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, data.route),
       borderRadius: BorderRadius.circular(14),
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         decoration: BoxDecoration(
           gradient: palette.gradient,

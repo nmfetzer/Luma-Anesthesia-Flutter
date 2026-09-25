@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_background.dart';
 import 'home_tile.dart';
 import 'home_menu_drawer.dart';
+import 'home_search.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -66,15 +67,15 @@ const List<HomeTileData> _tiles = [
   ),
   HomeTileData(titlePlain: 'Luma', titleAccent: 'Academy', route: '/luma-academy'),
   HomeTileData(titlePlain: 'Vasopressors, Infusions, &', titleAccent: 'Transfusions', route: '/vasopressors-infusions'),
-  HomeTileData(titlePlain: 'Special', titleAccent: 'Considerations', route: '/special-considerations'),
+  HomeTileData(titlePlain: 'Pathophysiology &', titleAccent: 'Anesthesia Considerations', route: '/special-considerations'),
   HomeTileData(titlePlain: 'Surgical Case', titleAccent: 'Prep', route: '/surgical-prep'),
   HomeTileData(titlePlain: '', titleAccent: 'Diagnostics', route: '/diagnostics'),
   HomeTileData(titlePlain: 'Regional &', titleAccent: 'Procedures', route: '/regional-procedures'),
   HomeTileData(titlePlain: 'Practice', titleAccent: 'Guidelines', style: HomeTileStyle.parchment, route: '/practice-guidelines'),
   HomeTileData(
     titlePlain: '',
-    titleAccent: 'Crisis',
-    subtitle: 'Malignant Hyperthermia · ACLS · PALS & more',
+    titleAccent: 'Crisis Hub',
+    subtitle: 'MH · ACLS · PALS & more',
     style: HomeTileStyle.crisis,
     route: '/crisis-guidelines',
   ),
@@ -203,32 +204,19 @@ class _Greeting extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const _SearchPill(),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchPill extends StatelessWidget {
-  const _SearchPill();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 460),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F1E6),
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 18, offset: Offset(0, 6))],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(Icons.search, size: 14, color: Color(0x8C0F2A3D)),
-          SizedBox(width: 8),
-          Text('Search drugs, guidelines, cases, procedures…', style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontStyle: FontStyle.italic, color: Color(0x8C0F2A3D))),
+          HomeSearch(sections: [
+            for (final tile in _tiles)
+              HomeSearchSection(
+                '${tile.titlePlain} ${tile.titleAccent}'.trim(),
+                tile.route,
+                keywords: '${tile.subtitle ?? ''} '
+                    '${tile.route == '/special-considerations' ? 'special considerations conditions' : ''} '
+                    '${tile.route == '/diagnostics' ? 'EKG ECG rhythms' : ''} '
+                    '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia emergency' : ''}',
+              ),
+            const HomeSearchSection('Luma AI', '/luma-ai',
+                keywords: 'assistant'),
+          ]),
         ],
       ),
     );
@@ -305,7 +293,7 @@ class _PhoneLayout extends StatelessWidget {
                 const SizedBox(height: 8),
                 SizedBox(height: 130, child: HomeTile(data: _tile('ce-halo'))),
                 const SizedBox(height: 8),
-                _tileRow(_tile('luma-academy'), _tile('vasopressors-infusions')),
+                _tileRow(_tile('crisis-guidelines'), _tile('vasopressors-infusions')),
                 const SizedBox(height: 8),
                 _tileRow(_tile('special-considerations'), _tile('surgical-prep')),
                 const SizedBox(height: 8),
@@ -313,7 +301,7 @@ class _PhoneLayout extends StatelessWidget {
                 const SizedBox(height: 8),
                 SizedBox(height: 68, child: HomeTile(data: _tile('practice-guidelines'))),
                 const SizedBox(height: 8),
-                SizedBox(height: 68, child: HomeTile(data: _tile('crisis-guidelines'))),
+                SizedBox(height: 68, child: HomeTile(data: _tile('luma-academy'))),
               ],
             ),
           ),
@@ -325,7 +313,7 @@ class _PhoneLayout extends StatelessWidget {
 
   Widget _tileRow(HomeTileData a, HomeTileData b) {
     return SizedBox(
-      height: 88,
+      height: 132,
       child: Row(
         children: [
           Expanded(child: HomeTile(data: a)),
@@ -354,13 +342,13 @@ class _TabletLayout extends StatelessWidget {
               children: [
                 Expanded(flex: 3, child: Row(children: [Expanded(child: HomeTile(data: _tile('drug-library'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('ce-halo')))])),
                 const SizedBox(height: 10),
-                Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('luma-academy'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions')))])),
+                Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('crisis-guidelines'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions')))])),
                 const SizedBox(height: 10),
                 Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('special-considerations'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('surgical-prep')))])),
                 const SizedBox(height: 10),
                 Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
                 const SizedBox(height: 10),
-                Expanded(flex: 1, child: HomeTile(data: _tile('crisis-guidelines'))),
+                Expanded(flex: 1, child: HomeTile(data: _tile('luma-academy'))),
               ],
             ),
           ),
@@ -391,11 +379,11 @@ class _DesktopLayout extends StatelessWidget {
                   children: [
                     Expanded(flex: 2, child: Row(children: [Expanded(flex: 5, child: HomeTile(data: _tile('drug-library'))), const SizedBox(width: 10), Expanded(flex: 7, child: HomeTile(data: _tile('ce-halo')))])),
                     const SizedBox(height: 10),
-                    Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('luma-academy'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('special-considerations')))])),
+                    Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('crisis-guidelines'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('special-considerations')))])),
                     const SizedBox(height: 10),
                     Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('surgical-prep'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
                     const SizedBox(height: 10),
-                    Expanded(flex: 1, child: HomeTile(data: _tile('crisis-guidelines'))),
+                    Expanded(flex: 1, child: HomeTile(data: _tile('luma-academy'))),
                   ],
                 ),
               ),

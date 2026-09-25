@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import '../welcome/luma_theme.dart' as brand;
 import '../welcome/welcome_background.dart';
 import '../widgets/luma_home_button.dart';
+import '../widgets/luma_ai_safety_notice.dart';
 
 /// Honest visual preview: no model calls, invented balance, or purchase flow.
-class LumaAssistantScreen extends StatelessWidget {
+class LumaAssistantScreen extends StatefulWidget {
   const LumaAssistantScreen({super.key});
+
+  @override
+  State<LumaAssistantScreen> createState() => _LumaAssistantScreenState();
+}
+
+class _LumaAssistantScreenState extends State<LumaAssistantScreen> {
+  bool _safetyAcknowledged = false;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -35,7 +43,11 @@ class LumaAssistantScreen extends StatelessWidget {
                       color: brand.LumaColors.cream,
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: Column(
+                    child: !_safetyAcknowledged
+                        ? LumaAiSafetyNotice(
+                            onAcknowledged: () =>
+                                setState(() => _safetyAcknowledged = true))
+                        : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text('Your learning companion.',
@@ -59,6 +71,11 @@ class LumaAssistantScreen extends StatelessWidget {
                         const FilledButton(
                             onPressed: null, child: Text('Chat coming soon')),
                         const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () =>
+                              setState(() => _safetyAcknowledged = false),
+                          child: const Text('Review AI safety notice'),
+                        ),
                         const Text('For learning and reference, not patient-specific '
                             'orders or emergencies. Do not share patient-identifying '
                             'information. AI responses will require independent verification.',

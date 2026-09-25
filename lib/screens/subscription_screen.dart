@@ -102,7 +102,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               const SizedBox(height: 24),
                               _benefit(
                                   Icons.menu_book_outlined,
-                                  'Unlock Special Considerations',
+                                  'Unlock Pathophysiology & Anesthesia Considerations',
                                   'Condition references and deep dives across '
                                       '240 conditions in 12 clinical categories.'),
                               _benefit(

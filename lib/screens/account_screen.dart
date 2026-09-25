@@ -252,7 +252,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         const SizedBox(height: 16),
                         Text(
                             'Creating an account does not unlock paid content. '
-                            'Special Considerations and deep dives require an active '
+                            'Pathophysiology & Anesthesia Considerations and deep dives require an active '
                             'subscription or authorized complimentary app access.',
                             style: lumaBody()),
                         const SizedBox(height: 12),
@@ -349,7 +349,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             '${_create ? 'Create your free Luma account here. ' : 'Already registered in this new Luma app? Sign in below. '
                                 'First visit? Choose New account above. '}'
                             'An account identifies you; it does not unlock paid content. '
-                            'Special Considerations and Drug Library Deep Dives require '
+                            'Pathophysiology & Anesthesia Considerations and Drug Library Deep Dives require '
                             'a subscription or authorized complimentary app access. '
                             'Other Drug Library content stays free.',
                             style: lumaBody()),

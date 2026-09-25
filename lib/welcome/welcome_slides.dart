@@ -252,7 +252,7 @@ class _FeatureGrid extends StatelessWidget {
       _FeatureData(Icons.emergency_outlined, 'Crisis Hub', 'Fast paths for the moments that count.'),
       _FeatureData(Icons.control_point_duplicate_outlined, 'Regional Anesthesia', 'Blocks, landmarks, and dosing.'),
       _FeatureData(Icons.checklist_rtl_outlined, 'Case Setup', 'Checklists tuned to the procedure.'),
-      _FeatureData(Icons.star_outline_rounded, 'Special Considerations', 'OB, cardiac, peds, and more.'),
+      _FeatureData(Icons.star_outline_rounded, 'Pathophysiology & Anesthesia Considerations', 'OB, cardiac, peds, and more.'),
       _FeatureData(Icons.menu_book_outlined, 'Board Prep', 'NCLEX · SEE · ABA Basic + Advanced.'),
       _FeatureData(Icons.style_outlined, 'Flashcards', 'Spaced repetition, made for anesthesia.'),
     ];
