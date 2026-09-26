@@ -8,6 +8,7 @@ import '../widgets/clinical_source_link.dart';
 import 'crisis_repository.dart';
 import 'crisis_reference_sections.dart';
 import 'crisis_algorithm_links.dart';
+import 'provider_support_screen.dart';
 
 class CrisisHubScreen extends StatefulWidget {
   const CrisisHubScreen({super.key, this.repository, this.initialQuery = ''});
@@ -24,6 +25,9 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
       TextEditingController(text: widget.initialQuery);
   late Future<List<CrisisEntry>> _catalog = _repo.catalog();
   String? _category;
+  bool get _showSupport => (_category == null || _category == 'mental') &&
+      _search.text.toLowerCase().trim().split(RegExp(r'\s+')).every(
+          'mental health recovery support suicide 988 aana asa rehab addiction substance use provider wellness parkdale marworth'.contains);
   @override
   void dispose() {
     _search.dispose();
@@ -84,6 +88,20 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                                           () => _category = category.key))),
                           ])),
                     ])),
+            if (_showSupport)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Card(
+                  child: ListTile(
+                    title: const Text('Mental Health & Recovery Support'),
+                    subtitle: const Text('Free · Crisis contacts, treatment, and state resources'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      builder: (_) => const ProviderSupportScreen(),
+                    )),
+                  ),
+                ),
+              ),
             Expanded(
                 child: FutureBuilder<List<CrisisEntry>>(
                     future: _catalog,
@@ -102,7 +120,7 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                               e.matches(_search.text))
                           .toList();
                       if (rows.isEmpty)
-                        return const Center(
+                        return _showSupport ? const SizedBox.shrink() : const Center(
                             child: Padding(
                                 padding: EdgeInsets.all(24),
                                 child: Text(

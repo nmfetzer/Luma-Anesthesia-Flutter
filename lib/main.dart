@@ -16,6 +16,7 @@ import 'screens/subscription_screen.dart';
 import 'screens/luma_assistant_screen.dart';
 import 'ekg/ekg_screen.dart';
 import 'crisis/crisis_screen.dart';
+import 'crisis/provider_support_screen.dart';
 import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
@@ -61,6 +62,12 @@ class LumaApp extends StatelessWidget {
               },
             ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/provider-support') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const ProviderSupportScreen(),
+          );
+        }
         if (settings.name == '/crisis-guidelines' ||
             settings.name == '/crisis') {
           return MaterialPageRoute(

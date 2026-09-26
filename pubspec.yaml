@@ -28,6 +28,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/data/medications.json
+    - assets/data/provider_support.json
     - assets/branding/luma_icon.png
     - assets/branding/luma_symbol_halo.png
     - assets/branding/google_g.png
