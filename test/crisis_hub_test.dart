@@ -83,6 +83,46 @@ void main() {
             .isPublished,
         isFalse);
   });
+  test('Neurological references keep separate tiles and searchable aliases',
+      () {
+    final entries = [
+      const CrisisEntry(
+          slug: 'perioperative-reflexes',
+          title: 'Perioperative Reflexes',
+          category: 'neurological',
+          searchTerms: 'OCR Bezold Jarisch Cushing'),
+      const CrisisEntry(
+          slug: 'autonomic-dysreflexia',
+          title: 'Autonomic Dysreflexia',
+          category: 'neurological',
+          searchTerms: 'AD hyperreflexia'),
+      const CrisisEntry(
+          slug: 'perioperative-seizures',
+          title: 'Seizures and Status Epilepticus',
+          category: 'neurological',
+          searchTerms: 'EEG status'),
+      const CrisisEntry(
+          slug: 'increased-intracranial-pressure-icp',
+          title: 'Intracranial Hypertension and Impending Herniation',
+          category: 'neurological',
+          searchTerms: 'ICP herniation'),
+      const CrisisEntry(
+          slug: 'traumatic-brain-injury',
+          title: 'Traumatic Brain Injury',
+          category: 'neurological',
+          searchTerms: 'TBI'),
+      const CrisisEntry(
+          slug: 'acute-spinal-cord-injury',
+          title: 'Acute Spinal Cord Injury',
+          category: 'neurological',
+          searchTerms: 'SCI neurogenic shock'),
+    ];
+    expect(entries.map((e) => e.slug).toSet().length, 6);
+    expect(entries.every((e) => e.categoryLabel == 'Neurological'), isTrue);
+    for (final alias in ['OCR', 'hyperreflexia', 'EEG', 'ICP', 'TBI', 'SCI']) {
+      expect(entries.where((e) => e.matches(alias)).length, 1);
+    }
+  });
   testWidgets('search filters immediately, clears, and opens a draft safely',
       (t) async {
     final repo = FakeCrisis();

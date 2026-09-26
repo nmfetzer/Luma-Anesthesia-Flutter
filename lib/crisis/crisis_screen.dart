@@ -129,7 +129,7 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.w600)),
                                           subtitle: Text(!entry.isPublished
-                                              ? 'Imported • Clinical review pending'
+                                              ? 'Clinical review pending'
                                               : entry.isFree
                                                   ? 'Free reference'
                                                   : 'Subscription reference'),
@@ -238,7 +238,7 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                               result.access.reviewer
                           ? 'This reference is temporarily unavailable. Please return to Crisis Hub and try again.'
                           : 'A subscription is required for this reference. Creating an account alone does not unlock paid content.'
-                      : 'Imported from Base44. The clinical content is held for review and is not yet released for patient care.'),
+                      : 'This clinical reference is held for review and is not yet released for patient care.'),
                   const SizedBox(height: 16),
                   if (widget.entry.isPublished &&
                       !widget.entry.isFree &&
