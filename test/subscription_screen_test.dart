@@ -24,6 +24,10 @@ void main() {
       (tester) async {
     await tester.pumpWidget(app());
     await tester.pump();
+    final logo = tester.widget<Image>(find.byType(Image));
+    expect((logo.image as AssetImage).assetName,
+        'assets/branding/luma_symbol_halo.png');
+    expect(logo.fit, BoxFit.contain);
     expect(find.text('LUMA PREMIUM'), findsOneWidget);
     expect(find.text('\$69.99'), findsOneWidget);
     expect(find.text('\$9.99'), findsOneWidget);

@@ -55,8 +55,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       children: [
                         Row(
                           children: [
-                            Image.asset('assets/branding/luma_icon.png',
-                                height: 44, excludeFromSemantics: true),
+                            Image.asset('assets/branding/luma_symbol_halo.png',
+                                height: 44,
+                                fit: BoxFit.contain,
+                                excludeFromSemantics: true),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text('Luma Anesthesia',
