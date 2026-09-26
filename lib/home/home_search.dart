@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config.dart';
+import '../crisis/crisis_repository.dart';
+import '../crisis/crisis_screen.dart';
 import '../data/medication_repository.dart';
 import '../models/medication.dart';
 import '../screens/drug_detail_screen.dart';
@@ -21,10 +23,12 @@ class HomeSearchData {
   const HomeSearchData({
     this.medications = const [],
     this.conditions = const [],
+    this.crises = const [],
     this.unavailable = const [],
   });
   final List<Medication> medications;
   final List<SpecialConsiderationEntry> conditions;
+  final List<CrisisEntry> crises;
   final List<String> unavailable;
 }
 
@@ -53,8 +57,19 @@ class _HomeSearchState extends State<HomeSearch> {
     }
     var medications = <Medication>[];
     var conditions = <SpecialConsiderationEntry>[];
+    var crises = <CrisisEntry>[];
     final unavailable = <String>[];
     await Future.wait([
+      () async {
+        try {
+          if (LumaConfig.supabaseConfigured) {
+            crises = await SupabaseCrisisRepository(Supabase.instance.client)
+                .catalog();
+          }
+        } catch (_) {
+          unavailable.add('Crisis Hub');
+        }
+      }(),
       () async {
         try {
           medications = await MedicationRepository.instance
@@ -80,6 +95,7 @@ class _HomeSearchState extends State<HomeSearch> {
     return HomeSearchData(
       medications: medications,
       conditions: conditions.where((e) => e.isPublished).toList(),
+      crises: crises,
       unavailable: unavailable,
     );
   }
@@ -156,6 +172,9 @@ class _HomeSearchState extends State<HomeSearch> {
             .toList()
         : <SpecialConsiderationEntry>[];
     final navigator = Navigator.of(this.context);
+    final crises = searching
+        ? (data?.crises ?? []).where((e) => e.matches(query)).toList()
+        : <CrisisEntry>[];
     Widget heading(String text) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
           child:
@@ -171,6 +190,17 @@ class _HomeSearchState extends State<HomeSearch> {
             leading: const Icon(Icons.grid_view_outlined),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _open(null, route: section.route),
+          ),
+        if (crises.isNotEmpty) heading('Crisis Hub · ${crises.length} results'),
+        for (final entry in crises.take(30))
+          ListTile(
+            title: Text(entry.title),
+            subtitle: Text(entry.categoryLabel),
+            leading: const Icon(Icons.emergency_outlined),
+            onTap: () => _open(CrisisDetailScreen(
+              entry: entry,
+              repository: SupabaseCrisisRepository(Supabase.instance.client),
+            )),
           ),
         if (medications.isNotEmpty)
           heading('Drug Library · ${medications.length} results'),
@@ -232,6 +262,7 @@ class _HomeSearchState extends State<HomeSearch> {
             sections.isEmpty &&
             medications.isEmpty &&
             conditions.isEmpty &&
+            crises.isEmpty &&
             (data?.unavailable.isEmpty ?? true))
           const Padding(
             padding: EdgeInsets.all(24),

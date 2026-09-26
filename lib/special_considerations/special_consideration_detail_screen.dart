@@ -57,7 +57,10 @@ class _SpecialConsiderationDetailScreenState
     if (!widget.entry.isPublished) return null;
     final generation = _generation;
     final detail = await widget.repository.detail(widget.entry.slug);
-    if (detail == null && mounted && generation == _generation && !_paywallShown) {
+    if (detail == null &&
+        mounted &&
+        generation == _generation &&
+        !_paywallShown) {
       _paywallShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && generation == _generation) widget.onSubscribe?.call();
@@ -293,7 +296,8 @@ class _SpecialConsiderationDetailScreenState
                               else if (widget.onSubscribe != null)
                                 OutlinedButton(
                                   onPressed: widget.onSubscribe,
-                                  child: const Text('View subscription options'),
+                                  child:
+                                      const Text('View subscription options'),
                                 ),
                               if (widget.repository.hasAccount &&
                                   widget.onSubscribe != null)
@@ -310,30 +314,15 @@ class _SpecialConsiderationDetailScreenState
                                 style: lumaDisplay(size: 21),
                               ),
                               const SizedBox(height: 8),
-                              if (widget.onCrisisTopic == null)
-                                Text(
-                                  'Cross-links will open once Crisis Hub is connected.',
-                                  style: lumaBody(
-                                    size: 12,
-                                    color: LumaColors.inkMuted,
-                                  ),
-                                ),
                               for (final topic in detail.crisisTopics)
-                                widget.onCrisisTopic == null
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 6,
-                                        ),
-                                        child: Text(
-                                          topic,
-                                          style: lumaBody(size: 14),
-                                        ),
-                                      )
-                                    : TextButton(
-                                        onPressed: () =>
-                                            widget.onCrisisTopic!(topic),
-                                        child: Text(topic),
-                                      ),
+                                TextButton(
+                                  onPressed: () => widget.onCrisisTopic != null
+                                      ? widget.onCrisisTopic!(topic)
+                                      : Navigator.of(context).pushNamed(
+                                          '/crisis-guidelines',
+                                          arguments: topic),
+                                  child: Text(topic),
+                                ),
                             ],
                             const SizedBox(height: 28),
                             Text('References', style: lumaDisplay(size: 21)),

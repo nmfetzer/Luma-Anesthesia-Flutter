@@ -15,6 +15,7 @@ import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
 import 'screens/luma_assistant_screen.dart';
 import 'ekg/ekg_screen.dart';
+import 'crisis/crisis_screen.dart';
 import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
@@ -39,8 +40,8 @@ Future<void> main() async {
 }
 
 class LumaApp extends StatelessWidget {
-  const LumaApp({super.key, this.allowSocialSignIn = true,
-    this.showEkgDraft = false});
+  const LumaApp(
+      {super.key, this.allowSocialSignIn = true, this.showEkgDraft = false});
   final bool allowSocialSignIn;
   final bool showEkgDraft;
 
@@ -60,6 +61,17 @@ class LumaApp extends StatelessWidget {
               },
             ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/crisis-guidelines' ||
+            settings.name == '/crisis') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => CrisisHubScreen(
+              initialQuery: settings.arguments is String
+                  ? settings.arguments as String
+                  : '',
+            ),
+          );
+        }
         if (settings.name == '/diagnostics' || settings.name == '/ekg') {
           return MaterialPageRoute(
             settings: settings,
