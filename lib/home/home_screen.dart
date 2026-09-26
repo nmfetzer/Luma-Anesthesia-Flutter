@@ -96,7 +96,15 @@ class _TopBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _MenuPill(compact: compact),
-          _Wordmark(compact: compact),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: _Wordmark(compact: compact),
+              ),
+            ),
+          ),
           const _AccountAvatar(),
         ],
       ),
@@ -159,26 +167,18 @@ class _AccountAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        width: 40, height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0F2A3D), Color(0xFF08192B)]),
-          border: Border.all(color: const Color(0xFFE6CF9C), width: 1.5),
-          boxShadow: [
-            BoxShadow(color: const Color(0xFFD4A95A).withValues(alpha: 0.25), blurRadius: 6, spreadRadius: 0.5),
-            const BoxShadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 2)),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Image.asset('assets/branding/luma_icon.png', fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(Icons.medical_services, size: 20, color: Color(0xFFE6CF9C)),
-          ),
-        ),
+    return IconButton(
+      key: const ValueKey('home-account-button'),
+      tooltip: 'Account',
+      onPressed: () => Navigator.of(context).pushNamed('/account'),
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+      padding: const EdgeInsets.all(4),
+      icon: Image.asset(
+        'assets/branding/luma_symbol_halo.png',
+        width: 40,
+        height: 40,
+        fit: BoxFit.contain,
+        excludeFromSemantics: true,
       ),
     );
   }

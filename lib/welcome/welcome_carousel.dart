@@ -66,14 +66,14 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
     final size = MediaQuery.sizeOf(context);
 
     // Icon-morph target values
-    final iconSize = isHero ? 200.0 : 40.0;
+    final heroSize = (size.height * 0.22).clamp(110.0, 190.0);
+    final iconSize = isHero ? heroSize : 40.0;
     final iconLeft = isHero
         ? (size.width - iconSize) / 2
         : 22.0;
     final iconTop = isHero
-        ? size.height * 0.24
+        ? safe.top + size.height * 0.15
         : safe.top + 20.0;
-    final iconRadius = isHero ? 32.0 : 10.0;
 
     return Scaffold(
       backgroundColor: LumaColors.navyDeep,
@@ -92,9 +92,10 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
               onPageChanged: (i) => setState(() => _index = i),
               itemBuilder: (context, i) {
                 // Push content below the hero icon area on slide 1
-                final topPad = i == 0 ? size.height * 0.52 : size.height * 0.28;
+                final topPad = i == 0
+                    ? size.height * 0.15 + heroSize + 70
+                    : size.height * 0.28;
                 return SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.only(top: topPad),
                   child: switch (i) {
                     0 => const WelcomeSlideOne(),
@@ -115,7 +116,6 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
             top: iconTop,
             child: _FloatingIcon(
               size: iconSize,
-              radius: iconRadius,
               floating: isHero,
             ),
           ),
@@ -159,9 +159,8 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
 
 class _FloatingIcon extends StatefulWidget {
   final double size;
-  final double radius;
   final bool floating;
-  const _FloatingIcon({required this.size, required this.radius, required this.floating});
+  const _FloatingIcon({required this.size, required this.floating});
 
   @override
   State<_FloatingIcon> createState() => _FloatingIconState();
@@ -188,26 +187,39 @@ class _FloatingIconState extends State<_FloatingIcon> with SingleTickerProviderS
       animation: _float,
       builder: (context, child) {
         final t = Curves.easeInOut.transform(_float.value);
-        final dy = widget.floating ? -6 * t : 0.0;
+        final dy = widget.floating && !MediaQuery.disableAnimationsOf(context)
+            ? -6 * t
+            : 0.0;
         return Transform.translate(offset: Offset(0, dy), child: child);
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeInOutCubicEmphasized,
+      child: SizedBox(
         width: widget.size,
-        height: widget.size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(widget.radius),
-          boxShadow: widget.floating
-              ? [BoxShadow(color: LumaColors.gold.withOpacity(0.45), blurRadius: 40, offset: const Offset(0, 12))]
-              : const [],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(widget.radius),
-          child: Image.asset(
-            'assets/branding/luma_icon.png',
-            fit: BoxFit.cover,
-          ),
+        height: widget.size + (widget.floating ? 54 : 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/branding/luma_symbol_halo.png',
+              width: widget.size,
+              height: widget.size,
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
+            if (widget.floating) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 44,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Luma',
+                    key: const ValueKey('welcome-luma-wordmark'),
+                    style: LumaText.title(size: 38, color: LumaColors.gold),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

@@ -211,15 +211,14 @@ class _BrandLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 6,
+      runSpacing: 6,
       children: [
-        Container(width: 30, height: 0.5, color: LumaColors.goldSoft.withOpacity(0.55)),
-        const SizedBox(width: 10),
         Text('LUMA · ', style: LumaText.brandLine()),
-        Text('Knowledge Illuminated', style: LumaText.brandLineItalic()),
-        const SizedBox(width: 10),
-        Container(width: 30, height: 0.5, color: LumaColors.goldSoft.withOpacity(0.55)),
+        Text('Knowledge Illuminated', textAlign: TextAlign.center, style: LumaText.brandLineItalic()),
       ],
     );
   }

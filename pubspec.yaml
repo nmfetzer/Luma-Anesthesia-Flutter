@@ -27,5 +27,6 @@ flutter:
   assets:
     - assets/data/medications.json
     - assets/branding/luma_icon.png
+    - assets/branding/luma_symbol_halo.png
     - assets/branding/google_g.png
     - assets/branding/luma_assistant.png
