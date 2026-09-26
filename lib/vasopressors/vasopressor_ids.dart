@@ -1,4 +1,4 @@
-/// Curated Vasopressors, Infusions & Transfusions drug set (34 drugs).
+/// Curated Vasopressors, Infusions & Transfusions drug set (31 drugs).
 ///
 /// Filtering by explicit ID list — durable against category renames.
 /// EXCLUDED: all insulin infusions, lidocaine patch 5%, esketamine/Spravato.

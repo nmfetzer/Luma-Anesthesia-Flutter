@@ -8,7 +8,7 @@
 
 import 'package:flutter/material.dart';
 import '../widgets/medication_deep_dive.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../widgets/clinical_source_link.dart';
 
 import '../models/medication.dart';
 import '../theme/luma_theme.dart';
@@ -55,7 +55,9 @@ class DrugDetailScreen extends StatelessWidget {
                     ),
                   _Text(label: 'ROUTES', value: m.routes),
                   _Text(label: 'DOSAGE FORMS', value: m.dosageForms),
-                  _Text(label: 'COMMON CONCENTRATIONS', value: m.commonConcentrations),
+                  _Text(
+                      label: 'COMMON CONCENTRATIONS',
+                      value: m.commonConcentrations),
                 ],
               ),
               _Section(
@@ -63,13 +65,19 @@ class DrugDetailScreen extends StatelessWidget {
                 children: [
                   _Text(label: 'MIXING', value: m.concentrationMixing),
                   if (m.requiresDilution)
-                    const _Chip(label: 'Requires dilution before administration'),
-                  _Text(label: 'TARGET CONCENTRATION', value: m.targetConcentration),
+                    const _Chip(
+                        label: 'Requires dilution before administration'),
+                  _Text(
+                      label: 'TARGET CONCENTRATION',
+                      value: m.targetConcentration),
                   _Text(label: 'STANDARD RECIPE', value: m.standardRecipe),
                   if (m.finalVolumeMl != null)
-                    _Text(label: 'FINAL VOLUME', value: '${m.finalVolumeMl} mL'),
+                    _Text(
+                        label: 'FINAL VOLUME', value: '${m.finalVolumeMl} mL'),
                   _Text(label: 'DILUENT', value: m.diluent),
-                  _Text(label: 'ALTERNATIVE CONCENTRATIONS', value: m.alternativeConcentrations),
+                  _Text(
+                      label: 'ALTERNATIVE CONCENTRATIONS',
+                      value: m.alternativeConcentrations),
                   if (m.stabilityHoursRoomTemp != null)
                     _Text(
                       label: 'STABILITY (ROOM TEMP)',
@@ -98,9 +106,13 @@ class DrugDetailScreen extends StatelessWidget {
                 title: 'Warnings & Safety',
                 children: [
                   _Text(label: 'CONTRAINDICATIONS', value: m.contraindications),
-                  _Text(label: 'WARNINGS & PRECAUTIONS', value: m.warningsPrecautions),
+                  _Text(
+                      label: 'WARNINGS & PRECAUTIONS',
+                      value: m.warningsPrecautions),
                   _Text(label: 'SIDE EFFECTS', value: m.sideEffects),
-                  _Text(label: 'SERIOUS ADVERSE EFFECTS', value: m.seriousEffects),
+                  _Text(
+                      label: 'SERIOUS ADVERSE EFFECTS',
+                      value: m.seriousEffects),
                   _Text(label: 'DRUG INTERACTIONS', value: m.drugInteractions),
                   if (m.interactionsCritical.isNotEmpty)
                     _ChipList(
@@ -108,15 +120,22 @@ class DrugDetailScreen extends StatelessWidget {
                       items: m.interactionsCritical,
                       color: LumaColors.highAlert,
                     ),
-                  _Text(label: 'ANTIDOTE / REVERSAL', value: m.antidoteReversal),
+                  _Text(
+                      label: 'ANTIDOTE / REVERSAL', value: m.antidoteReversal),
                 ],
               ),
               _Section(
                 title: 'Administration',
                 children: [
-                  _Text(label: 'ADMINISTRATION DETAILS', value: m.administrationDetails),
-                  _Text(label: 'SPECIAL POPULATIONS', value: m.specialPopulations),
-                  _Text(label: 'PREGNANCY & LACTATION', value: m.pregnancyLactation),
+                  _Text(
+                      label: 'ADMINISTRATION DETAILS',
+                      value: m.administrationDetails),
+                  _Text(
+                      label: 'SPECIAL POPULATIONS',
+                      value: m.specialPopulations),
+                  _Text(
+                      label: 'PREGNANCY & LACTATION',
+                      value: m.pregnancyLactation),
                 ],
               ),
               _Section(
@@ -134,7 +153,9 @@ class DrugDetailScreen extends StatelessWidget {
                 title: 'Clinical Pearls',
                 children: [
                   _Text(label: 'PEARLS', value: m.clinicalPearls),
-                  _Text(label: 'SPECIAL CONSIDERATIONS', value: m.specialConsiderations),
+                  _Text(
+                      label: 'SPECIAL CONSIDERATIONS',
+                      value: m.specialConsiderations),
                 ],
               ),
               _Section(
@@ -188,11 +209,13 @@ class _Header extends StatelessWidget {
         Text(m.name, style: lumaDisplay(size: 32, weight: FontWeight.w700)),
         if (m.brandName != null) ...[
           const SizedBox(height: 2),
-          Text(m.brandName!, style: t.bodyMedium?.copyWith(color: LumaColors.inkMuted)),
+          Text(m.brandName!,
+              style: t.bodyMedium?.copyWith(color: LumaColors.inkMuted)),
         ],
         if (m.classShort != null) ...[
           const SizedBox(height: 6),
-          Text(m.classShort!, style: t.bodyLarge?.copyWith(color: LumaColors.inkNavy)),
+          Text(m.classShort!,
+              style: t.bodyLarge?.copyWith(color: LumaColors.inkNavy)),
         ],
         if (badges.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -257,14 +280,16 @@ class _WarningBanners extends StatelessWidget {
     if (banners.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
-        for (final b in banners) Padding(padding: const EdgeInsets.only(bottom: 12), child: b),
+        for (final b in banners)
+          Padding(padding: const EdgeInsets.only(bottom: 12), child: b),
       ],
     );
   }
 }
 
 class _WarningCard extends StatelessWidget {
-  const _WarningCard({required this.label, required this.text, required this.color});
+  const _WarningCard(
+      {required this.label, required this.text, required this.color});
   final String label;
   final String text;
   final Color color;
@@ -294,7 +319,8 @@ class _WarningCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             text,
-            style: TextStyle(color: LumaColors.inkNavy, fontSize: 14, height: 1.4),
+            style:
+                TextStyle(color: LumaColors.inkNavy, fontSize: 14, height: 1.4),
           ),
         ],
       ),
@@ -330,7 +356,6 @@ class _Section extends StatelessWidget {
     }).toList();
     if (populated.isEmpty) return const SizedBox.shrink();
 
-    final t = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
@@ -343,17 +368,19 @@ class _Section extends StatelessWidget {
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
-          initiallyExpanded: initiallyExpanded,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          expandedAlignment: Alignment.topLeft,
-          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          title: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(title, style: lumaDisplay(size: 18, weight: FontWeight.w600)),
-          ),
-          iconColor: LumaColors.inkNavy,
-          collapsedIconColor: LumaColors.inkMuted,
+            initiallyExpanded: initiallyExpanded,
+            tilePadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            expandedAlignment: Alignment.topLeft,
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            title: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(title,
+                  style: lumaDisplay(size: 18, weight: FontWeight.w600)),
+            ),
+            iconColor: LumaColors.inkNavy,
+            collapsedIconColor: LumaColors.inkMuted,
             children: populated,
           ),
         ),
@@ -447,7 +474,8 @@ class _Chip extends StatelessWidget {
 }
 
 class _ChipList extends StatelessWidget {
-  const _ChipList({required this.label, required this.items, required this.color});
+  const _ChipList(
+      {required this.label, required this.items, required this.color});
   final String label;
   final List<String> items;
   final Color color;
@@ -476,7 +504,8 @@ class _ChipList extends StatelessWidget {
             children: [
               for (final item in items)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.10),
                     borderRadius: BorderRadius.circular(4),
@@ -505,46 +534,47 @@ class _SourceRow extends StatelessWidget {
     final s = source;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (s.number != null)
-                Text(
-                  '${s.number}.  ',
-                  style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+      child: ClinicalSourceLink(
+        url: s.url,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (s.number != null)
+                  Text(
+                    '${s.number}.  ',
+                    style: t.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                Expanded(
+                  child: Text(
+                    s.citation ?? '(no citation text)',
+                    style: t.bodyMedium?.copyWith(height: 1.4),
+                  ),
                 ),
-              Expanded(
-                child: Text(
-                  s.citation ?? '(no citation text)',
-                  style: t.bodyMedium?.copyWith(height: 1.4),
-                ),
-              ),
-            ],
-          ),
-          if (s.tier != null || s.type != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4, left: 20),
-              child: Text(
-                [
-                  if (s.tier != null) s.tier!.toUpperCase(),
-                  if (s.type != null) s.type!.replaceAll('_', ' ').toUpperCase(),
-                ].join(' · '),
-                style: TextStyle(color: LumaColors.inkMuted, fontSize: 11, letterSpacing: 0.5),
-              ),
+              ],
             ),
-          if (s.url != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4, left: 20),
-              child: InkWell(
-                onTap: () async {
-                  final uri = Uri.tryParse(s.url!);
-                  if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
-                },
+            if (s.tier != null || s.type != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 20),
                 child: Text(
-                  s.url!,
+                  [
+                    if (s.tier != null) s.tier!.toUpperCase(),
+                    if (s.type != null)
+                      s.type!.replaceAll('_', ' ').toUpperCase(),
+                  ].join(' · '),
+                  style: TextStyle(
+                      color: LumaColors.inkMuted,
+                      fontSize: 11,
+                      letterSpacing: 0.5),
+                ),
+              ),
+            if (ClinicalSourceLink.validUri(s.url) != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 20),
+                child: Text(
+                  'Open source ↗',
                   style: TextStyle(
                     color: LumaColors.haloGold,
                     fontSize: 12,
@@ -552,8 +582,8 @@ class _SourceRow extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

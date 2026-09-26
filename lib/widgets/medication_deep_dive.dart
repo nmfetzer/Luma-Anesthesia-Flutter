@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config.dart';
+import 'clinical_source_link.dart';
 
 /// Protected prose is fetched separately, never from the public drug model.
 class MedicationDeepDive extends StatefulWidget {
@@ -98,7 +101,13 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_body?.trim().isNotEmpty ?? false)
-            SelectableText(_body!)
+            MarkdownBody(
+              data: _body!,
+              selectable: true,
+              extensionSet: md.ExtensionSet.gitHubWeb,
+              onTapLink: (_, href, __) =>
+                  ClinicalSourceLink.open(context, href),
+            )
           else ...[
             const Text(
               'Deep Dives are included with Luma Premium or authorized '

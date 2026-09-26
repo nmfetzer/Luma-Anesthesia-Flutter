@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../widgets/medication_deep_dive.dart';
 import '../widgets/luma_home_button.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../widgets/clinical_source_link.dart';
 import '../shared/luma_theme_tokens.dart';
 
 /// Rich drug detail screen — clinical-reference aesthetic.
@@ -449,10 +449,7 @@ class DrugDetailScreen extends StatelessWidget {
     final url = (s['url'] ?? '').toString().trim();
     final type = (s['type'] ?? '').toString().trim();
 
-    final uri = Uri.tryParse(url);
-    final hasUrl = uri != null &&
-        uri.host.isNotEmpty &&
-        (uri.scheme == 'https' || uri.scheme == 'http');
+    final hasUrl = ClinicalSourceLink.validUri(url) != null;
     final content = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -505,30 +502,8 @@ class DrugDetailScreen extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: hasUrl
-          ? InkWell(
-              onTap: () => _openUrl(context, url),
-              borderRadius: BorderRadius.circular(4),
-              child: content,
-            )
-          : content,
+      child: ClinicalSourceLink(url: url, child: content),
     );
-  }
-
-  Future<void> _openUrl(BuildContext context, String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    var ok = false;
-    try {
-      ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      // Missing browser handlers should not crash the clinical reference.
-    }
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $url')),
-      );
-    }
   }
 
   Widget _kvRow(String label, String value) {

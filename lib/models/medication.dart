@@ -2,6 +2,8 @@
 // Medication — full Base44 Medication entity schema.
 // -----------------------------------------------------------------------------
 
+import 'dart:convert';
+
 class MedicationSource {
   final int? number;
   final String? tier;
@@ -21,11 +23,36 @@ class MedicationSource {
         number: j['number'] is int
             ? j['number'] as int
             : int.tryParse('${j['number'] ?? ''}'),
-        tier: j['tier'] as String?,
-        type: j['type'] as String?,
-        citation: j['citation'] as String?,
-        url: j['url'] as String?,
+        tier: j['tier']?.toString(),
+        type: j['type']?.toString(),
+        citation: j['citation']?.toString(),
+        url: j['url']?.toString().trim(),
       );
+
+  /// Base44 imports contain both objects and JSON-encoded source objects.
+  static List<MedicationSource> parseList(dynamic raw) {
+    if (raw is! List) return const [];
+    final sources = <MedicationSource>[];
+    for (final item in raw) {
+      dynamic value = item;
+      if (value is String) {
+        try {
+          value = jsonDecode(value);
+        } on FormatException {
+          continue;
+        }
+      }
+      if (value is Map) {
+        sources.add(
+          MedicationSource.fromJson(
+            value.map((key, value) => MapEntry(key.toString(), value)),
+          ),
+        );
+      }
+    }
+    sources.sort((a, b) => (a.number ?? 9999).compareTo(b.number ?? 9999));
+    return sources;
+  }
 }
 
 class Medication {
@@ -224,7 +251,8 @@ class Medication {
         standardRecipe: _nullIfBlank(j['standard_recipe']),
         finalVolumeMl: _num(j['final_volume_ml']),
         diluent: _nullIfBlank(j['diluent']),
-        alternativeConcentrations: _nullIfBlank(j['alternative_concentrations']),
+        alternativeConcentrations:
+            _nullIfBlank(j['alternative_concentrations']),
         stabilityHoursRoomTemp: _num(j['stability_hours_room_temp']),
         stabilityHoursRefrigerated: _num(j['stability_hours_refrigerated']),
         mixingPearls: _nullIfBlank(j['mixing_pearls']),
@@ -250,13 +278,7 @@ class Medication {
         specialConsiderations: _nullIfBlank(j['special_considerations']),
         monitoringParameters: _stringList(j['monitoring_parameters']),
         deepDiveContent: _nullIfBlank(j['deep_dive_content']),
-        sources: (j['sources'] is List)
-            ? (j['sources'] as List)
-                .whereType<Map>()
-                .map((m) => MedicationSource.fromJson(
-                    Map<String, dynamic>.from(m as Map)))
-                .toList()
-            : const [],
+        sources: MedicationSource.parseList(j['sources']),
         lastReviewed: _nullIfBlank(j['last_reviewed']),
         clinicalReviewer: _nullIfBlank(j['clinical_reviewer']),
         reviewCycleMonths: _int(j['review_cycle_months']),
