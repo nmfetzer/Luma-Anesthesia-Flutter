@@ -25,9 +25,11 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
       TextEditingController(text: widget.initialQuery);
   late Future<List<CrisisEntry>> _catalog = _repo.catalog();
   String? _category;
-  bool get _showSupport => (_category == null || _category == 'mental') &&
+  bool get _showSupport =>
+      (_category == null || _category == 'mental') &&
       _search.text.toLowerCase().trim().split(RegExp(r'\s+')).every(
-          'mental health recovery support suicide 988 aana asa rehab addiction substance use provider wellness parkdale marworth'.contains);
+          'mental health recovery support suicide 988 aana asa rehab addiction substance use provider wellness parkdale marworth physician doctor md do crna caa student resident fellow nurse anesthesiologist technician burnout anxiety depression trauma'
+              .contains);
   @override
   void dispose() {
     _search.dispose();
@@ -94,9 +96,11 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                 child: Card(
                   child: ListTile(
                     title: const Text('Mental Health & Recovery Support'),
-                    subtitle: const Text('Free · Crisis contacts, treatment, and state resources'),
+                    subtitle: const Text(
+                        'Free · Crisis contacts, treatment, and state resources'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute<void>(
                       builder: (_) => const ProviderSupportScreen(),
                     )),
                   ),
@@ -120,11 +124,13 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                               e.matches(_search.text))
                           .toList();
                       if (rows.isEmpty)
-                        return _showSupport ? const SizedBox.shrink() : const Center(
-                            child: Padding(
-                                padding: EdgeInsets.all(24),
-                                child: Text(
-                                    'No matching emergencies. Try another name or choose All topics.')));
+                        return _showSupport
+                            ? const SizedBox.shrink()
+                            : const Center(
+                                child: Padding(
+                                    padding: EdgeInsets.all(24),
+                                    child: Text(
+                                        'No matching emergencies. Try another name or choose All topics.')));
                       return ListView(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
                           children: [
@@ -186,6 +192,10 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.entry.category == 'mental') {
+      _load = Future.value((access: const CrisisAccess(), content: null));
+      return;
+    }
     _load = _fetch();
     _auth = widget.repository.authChanges.listen((_) {
       if (mounted)
@@ -219,209 +229,214 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
           p: lumaBody(size: 16),
           h3: lumaBody(size: 17, weight: FontWeight.w700)));
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-            title: const Text('Crisis reference'),
-            actions: const [LumaHomeButton()]),
-        body: SafeArea(
-            child: Center(
-                child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: FutureBuilder(
-            key: ValueKey(_version),
-            future: _load,
-            builder: (context, snapshot) {
-              if (snapshot.hasError)
-                return _LoadFailure(
-                    onRetry: () => setState(() {
-                          _version++;
-                          _load = _fetch();
-                        }));
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final result = snapshot.data!;
-              final content = result.content;
-              if (content == null)
+  Widget build(BuildContext context) => widget.entry.category == 'mental'
+      ? const ProviderSupportScreen()
+      : Scaffold(
+          appBar: AppBar(
+              title: const Text('Crisis reference'),
+              actions: const [LumaHomeButton()]),
+          body: SafeArea(
+              child: Center(
+                  child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: FutureBuilder(
+              key: ValueKey(_version),
+              future: _load,
+              builder: (context, snapshot) {
+                if (snapshot.hasError)
+                  return _LoadFailure(
+                      onRetry: () => setState(() {
+                            _version++;
+                            _load = _fetch();
+                          }));
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final result = snapshot.data!;
+                final content = result.content;
+                if (content == null)
+                  return ListView(padding: const EdgeInsets.all(24), children: [
+                    Text(widget.entry.title, style: lumaDisplay(size: 28)),
+                    const SizedBox(height: 20),
+                    Icon(
+                        widget.entry.isPublished
+                            ? Icons.lock_outline
+                            : Icons.fact_check_outlined,
+                        size: 44),
+                    const SizedBox(height: 16),
+                    Text(widget.entry.isPublished
+                        ? widget.entry.isFree ||
+                                result.access.premium ||
+                                result.access.reviewer
+                            ? 'This reference is temporarily unavailable. Please return to Crisis Hub and try again.'
+                            : 'A subscription is required for this reference. Creating an account alone does not unlock paid content.'
+                        : 'This clinical reference is held for review and is not yet released for patient care.'),
+                    const SizedBox(height: 16),
+                    if (widget.entry.isPublished &&
+                        !widget.entry.isFree &&
+                        !result.access.premium &&
+                        !result.access.reviewer)
+                      FilledButton(
+                          onPressed: () =>
+                              Navigator.of(context).pushNamed('/subscribe'),
+                          child: const Text('View subscription options')),
+                    OutlinedButton(
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed('/account'),
+                        child: Text(widget.entry.isPublished
+                            ? 'Sign in to your account'
+                            : 'Owner sign-in to review')),
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Back to Crisis Hub')),
+                  ]);
+                // Preserve the reviewed source content while presenting it as
+                // reference sections, never as an interactive treatment checklist.
+                final sections = (content['steps'] as List? ?? []).cast<Map>();
+                final sources = (content['sources'] as List? ?? []).cast<Map>();
+                String value(String key) => content[key]?.toString() ?? '';
                 return ListView(padding: const EdgeInsets.all(24), children: [
+                  Text(widget.entry.categoryLabel,
+                      style: lumaBody(size: 13, color: LumaColors.inkMuted)),
+                  const SizedBox(height: 8),
                   Text(widget.entry.title, style: lumaDisplay(size: 28)),
                   const SizedBox(height: 20),
-                  Icon(
-                      widget.entry.isPublished
-                          ? Icons.lock_outline
-                          : Icons.fact_check_outlined,
-                      size: 44),
+                  if (!widget.entry.isPublished ||
+                      content['_review_draft'] == true)
+                    Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                            color: LumaColors.haloGoldLight,
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                  'OWNER REVIEW • NOT RELEASED FOR PATIENT CARE',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 8),
+                              const Text(
+                                  'Draft clinical reference. Clinical review and release approval are required before patient-care use.'),
+                              for (final flag
+                                  in content['migration_flags'] as List? ?? [])
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text('• $flag')),
+                            ])),
                   const SizedBox(height: 16),
-                  Text(widget.entry.isPublished
-                      ? widget.entry.isFree ||
-                              result.access.premium ||
-                              result.access.reviewer
-                          ? 'This reference is temporarily unavailable. Please return to Crisis Hub and try again.'
-                          : 'A subscription is required for this reference. Creating an account alone does not unlock paid content.'
-                      : 'This clinical reference is held for review and is not yet released for patient care.'),
-                  const SizedBox(height: 16),
-                  if (widget.entry.isPublished &&
-                      !widget.entry.isFree &&
-                      !result.access.premium &&
-                      !result.access.reviewer)
-                    FilledButton(
-                        onPressed: () =>
-                            Navigator.of(context).pushNamed('/subscribe'),
-                        child: const Text('View subscription options')),
+                  if (crisisAlgorithms.containsKey(widget.entry.slug)) ...[
+                    CrisisAlgorithmLinks(slug: widget.entry.slug),
+                    const SizedBox(height: 24),
+                  ],
+                  if (value('summary').isNotEmpty) ...[
+                    Text('Overview', style: lumaDisplay(size: 22)),
+                    const SizedBox(height: 8),
+                    SelectableText(value('summary'), style: lumaBody(size: 16)),
+                  ],
+                  if (sections.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    Text('Clinical management considerations',
+                        style: lumaDisplay(size: 22)),
+                    for (final section in sections)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Semantics(
+                                    header: true,
+                                    child: Text('${section['action'] ?? ''}',
+                                        style: lumaBody(
+                                            size: 18,
+                                            weight: FontWeight.w700))),
+                                if (section['details'] != null) ...[
+                                  const SizedBox(height: 8),
+                                  SelectableText('${section['details']}',
+                                      style: lumaBody(size: 16)),
+                                ],
+                                if (section['is_critical'] == true) ...[
+                                  const SizedBox(height: 8),
+                                  Text('Critical clinical consideration',
+                                      style: lumaBody(
+                                          size: 13,
+                                          weight: FontWeight.w700,
+                                          color: LumaColors.highAlert)),
+                                ],
+                              ])),
+                  ],
+                  for (final field in {
+                    'key_drugs': 'Key drugs',
+                    'notes': 'Clinical notes'
+                  }.entries)
+                    if (value(field.key).isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(field.value, style: lumaDisplay(size: 22)),
+                      const SizedBox(height: 8),
+                      SelectableText(value(field.key),
+                          style: lumaBody(size: 16)),
+                    ],
+                  if (value('body_markdown').isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    _markdown(value('body_markdown')),
+                  ],
+                  if (content['reference_sections'] is List) ...[
+                    const SizedBox(height: 24),
+                    CrisisReferenceSections(
+                      sections:
+                          (content['reference_sections'] as List).cast<Map>(),
+                    ),
+                  ],
+                  if (value('supplement_markdown').isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    ExpansionTile(
+                        title:
+                            const Text('Additional Base44 card (unreconciled)'),
+                        children: [
+                          Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: _markdown(value('supplement_markdown')))
+                        ]),
+                  ],
+                  const SizedBox(height: 24),
+                  Text('References', style: lumaDisplay(size: 22)),
+                  if (value('reference').isNotEmpty)
+                    Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(value('reference'))),
+                  if (sources.isEmpty)
+                    const Text(
+                        'The original reference needs direct source links before release.'),
+                  for (final source in sources)
+                    Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: ClinicalSourceLink(
+                            url: source['url']?.toString(),
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.open_in_new, size: 18),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                      child: Text(
+                                          '${source['title'] ?? source['url'] ?? 'Reference'}',
+                                          style: const TextStyle(
+                                              decoration:
+                                                  TextDecoration.underline))),
+                                ]))),
+                  const SizedBox(height: 24),
                   OutlinedButton(
                       onPressed: () =>
-                          Navigator.of(context).pushNamed('/account'),
-                      child: Text(widget.entry.isPublished
-                          ? 'Sign in to your account'
-                          : 'Owner sign-in to review')),
+                          Navigator.of(context).pushNamed('/drug-library'),
+                      child: const Text('Open Drug Library')),
                   TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Back to Crisis Hub')),
                 ]);
-              // Preserve the reviewed source content while presenting it as
-              // reference sections, never as an interactive treatment checklist.
-              final sections = (content['steps'] as List? ?? []).cast<Map>();
-              final sources = (content['sources'] as List? ?? []).cast<Map>();
-              String value(String key) => content[key]?.toString() ?? '';
-              return ListView(padding: const EdgeInsets.all(24), children: [
-                Text(widget.entry.categoryLabel,
-                    style: lumaBody(size: 13, color: LumaColors.inkMuted)),
-                const SizedBox(height: 8),
-                Text(widget.entry.title, style: lumaDisplay(size: 28)),
-                const SizedBox(height: 20),
-                if (!widget.entry.isPublished ||
-                    content['_review_draft'] == true)
-                  Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                          color: LumaColors.haloGoldLight,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                                'OWNER REVIEW • NOT RELEASED FOR PATIENT CARE',
-                                style: TextStyle(fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 8),
-                            const Text(
-                                'Draft clinical reference. Clinical review and release approval are required before patient-care use.'),
-                            for (final flag
-                                in content['migration_flags'] as List? ?? [])
-                              Padding(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: Text('• $flag')),
-                          ])),
-                const SizedBox(height: 16),
-                if (crisisAlgorithms.containsKey(widget.entry.slug)) ...[
-                  CrisisAlgorithmLinks(slug: widget.entry.slug),
-                  const SizedBox(height: 24),
-                ],
-                if (value('summary').isNotEmpty) ...[
-                  Text('Overview', style: lumaDisplay(size: 22)),
-                  const SizedBox(height: 8),
-                  SelectableText(value('summary'), style: lumaBody(size: 16)),
-                ],
-                if (sections.isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  Text('Clinical management considerations',
-                      style: lumaDisplay(size: 22)),
-                  for (final section in sections)
-                    Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Semantics(
-                                  header: true,
-                                  child: Text('${section['action'] ?? ''}',
-                                      style: lumaBody(
-                                          size: 18, weight: FontWeight.w700))),
-                              if (section['details'] != null) ...[
-                                const SizedBox(height: 8),
-                                SelectableText('${section['details']}',
-                                    style: lumaBody(size: 16)),
-                              ],
-                              if (section['is_critical'] == true) ...[
-                                const SizedBox(height: 8),
-                                Text('Critical clinical consideration',
-                                    style: lumaBody(
-                                        size: 13,
-                                        weight: FontWeight.w700,
-                                        color: LumaColors.highAlert)),
-                              ],
-                            ])),
-                ],
-                for (final field in {
-                  'key_drugs': 'Key drugs',
-                  'notes': 'Clinical notes'
-                }.entries)
-                  if (value(field.key).isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    Text(field.value, style: lumaDisplay(size: 22)),
-                    const SizedBox(height: 8),
-                    SelectableText(value(field.key), style: lumaBody(size: 16)),
-                  ],
-                if (value('body_markdown').isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  _markdown(value('body_markdown')),
-                ],
-                if (content['reference_sections'] is List) ...[
-                  const SizedBox(height: 24),
-                  CrisisReferenceSections(
-                    sections:
-                        (content['reference_sections'] as List).cast<Map>(),
-                  ),
-                ],
-                if (value('supplement_markdown').isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  ExpansionTile(
-                      title:
-                          const Text('Additional Base44 card (unreconciled)'),
-                      children: [
-                        Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: _markdown(value('supplement_markdown')))
-                      ]),
-                ],
-                const SizedBox(height: 24),
-                Text('References', style: lumaDisplay(size: 22)),
-                if (value('reference').isNotEmpty)
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Text(value('reference'))),
-                if (sources.isEmpty)
-                  const Text(
-                      'The original reference needs direct source links before release.'),
-                for (final source in sources)
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: ClinicalSourceLink(
-                          url: source['url']?.toString(),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.open_in_new, size: 18),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                    child: Text(
-                                        '${source['title'] ?? source['url'] ?? 'Reference'}',
-                                        style: const TextStyle(
-                                            decoration:
-                                                TextDecoration.underline))),
-                              ]))),
-                const SizedBox(height: 24),
-                OutlinedButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed('/drug-library'),
-                    child: const Text('Open Drug Library')),
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Back to Crisis Hub')),
-              ]);
-            },
-          ),
-        ))),
-      );
+              },
+            ),
+          ))),
+        );
 }
 
 class _LoadFailure extends StatelessWidget {

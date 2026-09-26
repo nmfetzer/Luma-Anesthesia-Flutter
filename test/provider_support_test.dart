@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/crisis/provider_support_screen.dart';
 import 'package:luma_anesthesia/crisis/crisis_screen.dart';
+import 'package:luma_anesthesia/crisis/crisis_repository.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'crisis_hub_test.dart' show FakeCrisis, CrisisSourceLauncher;
 
@@ -19,12 +20,21 @@ void main() {
     expect(states.map((e) => e['state']).toSet().length, 51);
     expect(states.where((e) => e['state'] == 'Wisconsin').single['note'],
         contains('not a Wisconsin PHP'));
-    expect((data['facilities'] as List).length, 4);
-    expect((data['sections'] as List).length, 7);
-    expect(payload, contains('November 30, 2025'));
+    expect((data['facilities'] as List).length, 34);
+    expect((data['sections'] as List).length, 9);
+    expect(data['access'], 'always_free_no_account');
+    expect(payload, contains('certified anesthesiologist assistants'));
+    expect(payload, contains('medical students'));
+    expect(payload, contains('not a complete census'));
     expect(payload, contains('not a 24/7 emergency line'));
     for (final row in states) {
       expect(Uri.parse(row['source'] as String).scheme, 'https');
+    }
+    for (final f in data['facilities'] as List) {
+      expect(f['level'], isNotEmpty);
+      expect(f['eligibility'], isNotEmpty);
+      expect(f['student_eligibility'], isNotEmpty);
+      expect(Uri.parse(f['sources'][0]['url']).scheme, 'https');
     }
   });
   for (final width in [390.0, 1200.0]) {
@@ -56,6 +66,7 @@ void main() {
       await t.pumpAndSettle();
       expect(launcher.opened, 'sms:988');
       await t.ensureVisible(find.text('988 chat and crisis support'));
+      await t.pumpAndSettle();
       await t.tap(find.text('988 chat and crisis support'));
       await t.pumpAndSettle();
       expect(launcher.opened, 'https://988lifeline.org/');
@@ -93,7 +104,54 @@ void main() {
     await t.ensureVisible(find.text('Clear state filter'));
     await t.tap(find.text('Clear state filter'));
     await t.pumpAndSettle();
+    expect(
+        find.byKey(const ValueKey('programs-Pennsylvania-')), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+  testWidgets('live search finds student programs and handles no results',
+      (t) async {
+    t.view.physicalSize = const Size(1200, 1600);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    await t.pumpWidget(MaterialApp(
+        home: ProviderSupportScreen(
+            loadContent: () async => Map<String, dynamic>.from(data))));
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.byKey(const ValueKey('support-search')));
+    await t.enterText(find.byKey(const ValueKey('support-search')), 'Marworth');
+    await t.pumpAndSettle();
     expect(find.text('Geisinger Marworth · Pennsylvania'), findsOneWidget);
+    expect(find.text('Parkdale Center · Indiana'), findsNothing);
+    await t.enterText(find.byKey(const ValueKey('support-search')), 'students');
+    await t.pumpAndSettle();
+    expect(
+        find.text(
+            'Caron Philadelphia Outpatient Treatment Center · Pennsylvania'),
+        findsOneWidget);
+    await t.enterText(
+        find.byKey(const ValueKey('support-search')), 'no-such-program');
+    await t.pumpAndSettle();
+    expect(
+        find.textContaining('No matching verified listings.'), findsOneWidget);
+    await t.tap(find.byTooltip('Clear search'));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('programs-Indiana-')), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+  testWidgets(
+      'legacy paid mental entry bypasses entitlement and database calls',
+      (t) async {
+    final repo = FakeCrisis()..fail = true;
+    addTearDown(repo.events.close);
+    const entry = CrisisEntry(
+        slug: 'mental_health', title: 'Mental Health', category: 'mental');
+    expect(entry.isVisibleInHub, isFalse);
+    await t.pumpWidget(
+        MaterialApp(home: CrisisDetailScreen(entry: entry, repository: repo)));
+    await t.pumpAndSettle();
+    expect(find.text('Call 988'), findsOneWidget);
+    expect(find.text('View subscription options'), findsNothing);
     expect(t.takeException(), isNull);
   });
   testWidgets(

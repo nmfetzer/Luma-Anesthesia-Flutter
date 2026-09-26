@@ -218,7 +218,7 @@ class _Greeting extends StatelessWidget {
             const HomeSearchSection('Luma AI', '/luma-ai',
                 keywords: 'assistant'),
             const HomeSearchSection('Mental Health & Recovery Support', '/provider-support',
-                keywords: 'mental emergency suicide 988 AANA ASA rehab addiction substance use provider wellness Parkdale Marworth'),
+                keywords: 'mental emergency suicide 988 AANA ASA rehab addiction substance use provider wellness Parkdale Marworth physician doctor MD DO CRNA CAA student resident fellow nurse anesthesiologist technician burnout anxiety depression trauma'),
           ]),
         ],
       ),

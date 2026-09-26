@@ -1,40 +1,50 @@
 {
-  "checked": "September 26, 2026",
+  "checked": "2026-09-26",
   "sections": [
     {
       "id": "support-0",
-      "title": "Immediate help and suicide safety",
-      "body_markdown": "- **Immediate danger, overdose, serious injury, or inability to stay safe:** Call 911 or seek emergency care. Do not wait for a professional-assistance callback. ([AANA help resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **Suicidal thoughts or emotional distress:** In the United States, call or text 988, or use the 988 website chat, any time. You can also contact 988 because you are worried about someone else. ([988 Suicide & Crisis Lifeline](https://988lifeline.org/))\n- **Reach a person:** Tell a trusted person that you need support and ask them to stay with you while you connect with care; reduce access to medications, weapons, and other dangerous items when it can be done safely. ([988 guidance](https://988lifeline.org/help-someone-else/))\n- **Outside the United States:** Use your local emergency number or local crisis service. These contact listings are U.S.-focused.\n- **Luma is a reference, not a monitored service:** This page does not dispatch help, monitor your safety, or provide counseling. Use the listed services directly."
+      "title": "Support for every anesthesia role",
+      "body_markdown": "- **Everyone belongs here:** This free section is for MD/DO anesthesiologists, CRNAs, certified anesthesiologist assistants (CAAs), residents, fellows, medical students, nurse anesthesia students/residents, CAA students, anesthesia technicians, and other anesthesia staff.\n- **Match the service to your role:** This app welcomes everyone, but individual programs have their own eligibility rules. Confirm profession, training status, location, and level of care before arranging treatment. ([State assistance programs](https://www.fsphp.org/state-programs))\n- **No account or subscription:** All Luma support resources in this section are free to browse. Treatment, transport, and external services may have fees; free app access does not mean treatment is free."
     },
     {
       "id": "support-1",
-      "title": "AANA, ASA, and national support",
-      "body_markdown": "- **AANA Helpline: 800-654-5167.** Available 24/7 for confidential support, information, and resources for CRNAs and nurse anesthesia residents with drug or alcohol concerns; colleagues, administrators, friends, and family can also call with concerns. It is not a substitute for 911 or 988 in an immediate crisis. ([AANA help resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/), [AANA substance-use resources](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))\n- **ASA well-being resources:** ASA links to 988, Physician Support Line, professional-health programs, and other support options. These are distinct services, not one ASA-operated crisis hotline. ([ASA well-being](https://www.asahq.org/advocating-for-you/well-being))\n- **Physician Support Line: 888-409-0141.** Free, confidential, anonymous peer support from volunteer psychiatrists for U.S. physicians and medical students; Monday\u2013Friday, 8 a.m.\u201311 p.m. Eastern, excluding federal holidays. No appointment needed; not a 24/7 emergency line and not a service advertised for all license types. ([Physician Support Line](https://www.physiciansupportline.com/))\n- **ASA Member Services: 630-912-2552.** Administrative contact for membership and resource questions; Monday\u2013Friday, 7:30 a.m.\u20134:30 p.m. Central. This is not a crisis, counseling, or treatment line. ([ASA Member Experience FAQs](https://www.asahq.org/member-center/membership-faqs), [ASA published contact hours](https://www.asahq.org/about-asa/asa-refund-policy))\n- **ASA SafeHaven:** Check current enrollment and benefit availability directly with ASA. The public offer page reviewed for this resource still describes benefit access ending November 30, 2025; do not assume its older price or access terms remain valid. ([ASA SafeHaven](https://www.asahq.org/advocating-for-you/safehaven))\n- **SAMHSA treatment referral: 800-662-4357.** Free, confidential, 24/7 information and treatment-referral service in English and Spanish for mental-health and substance-use concerns. This service does not provide counseling. ([SAMHSA National Helpline](https://www.samhsa.gov/find-help/national-helpline))"
+      "title": "Immediate help and suicide safety",
+      "body_markdown": "- **Immediate danger, overdose, serious injury, or inability to stay safe:** Call 911 or go to an emergency department. Do not wait for an admissions or professional-assistance callback. ([988 guidance](https://988lifeline.org/))\n- **Emotional distress or suicidal thoughts:** In the U.S., call or text 988, or use 988 online chat. Support is available 24/7 for anyone, regardless of profession or subscription status. ([988 Lifeline](https://988lifeline.org/))\n- **Supporting someone else:** Ask directly about suicide, listen without judgment, help them connect to care, and stay involved. If safe, reduce access to lethal means; do not leave someone in immediate danger without help. ([988: help someone else](https://988lifeline.org/help-someone-else/))"
     },
     {
       "id": "support-2",
-      "title": "If you are struggling during clinical work",
-      "body_markdown": "- **Put immediate safety first:** If you may be unable to provide safe care, arrange a safe handoff and notify the appropriate clinical supervisor or designated fitness-for-duty contact. Protect both patients and the provider; do not manage the concern alone. ([AANA substance-use and workplace guidance](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))\n- **Ask for assessment rather than diagnosing yourself:** Contact a qualified mental-health or addiction clinician, your available employee-assistance service, or an appropriate professional-assistance program. PHPs can help coordinate evaluation, treatment, and continuing-care monitoring; they do not replace an emergency department. ([AANA help resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/), [FSPHP FAQs](https://www.fsphp.org/faqs))\n- **Burnout, grief, and depression deserve attention:** Sleep difficulty, appetite changes, and depression can accompany sustained professional stress; connect with professional support rather than treating all distress as something to push through. ([ASA well-being](https://www.asahq.org/advocating-for-you/well-being))\n- **After an adverse event:** Ask about your institution's peer-support service and professional counseling options. Peer support and follow-up are resources for recovery, not proof that you are unfit to practice. ([ASA well-being resources](https://www.asahq.org/advocating-for-you/well-being))\n- **Withdrawal needs clinical assessment:** Ask a qualified clinician what level of care is safe; a working-professionals program is not automatically a medical detox unit. Parkdale's program page specifically distinguishes withdrawal management from detoxification services. ([Parkdale program descriptions](https://parkdalecenter.com/programs/))"
+      "title": "National contacts and who they serve",
+      "body_markdown": "- **Physician Support Line: 888-409-0141.** Free peer support for U.S. physicians and medical students. Monday–Friday, 8 a.m.–11 p.m. Eastern, excluding federal holidays; not a 24/7 emergency line. ([Eligibility and hours](https://www.physiciansupportline.com/))\n- **AANA Helpline: 800-654-5167.** Available 24/7 for substance-use concerns involving CRNAs and nurse anesthesia residents; concerned family or colleagues can seek guidance. This is not a universal physician or CAA helpline. ([AANA help resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **SAMHSA: 800-662-4357.** Free 24/7 treatment referral and information for individuals and families. This is a referral service, not counseling or emergency dispatch. ([SAMHSA National Helpline](https://www.samhsa.gov/find-help/national-helpline))\n- **ASA well-being resources:** Physician and anesthesia-team resources, peer support, professional health programs, and recovery resources. ASA’s general office is not presented here as a crisis hotline. ([ASA well-being](https://www.asahq.org/advocating-for-you/well-being))\n- **CAAs, technicians, and other staff:** Use 988 for urgent emotional support and SAMHSA for treatment navigation. Ask your employer or school about counseling and confirm eligibility before using a profession-specific program. ([988](https://988lifeline.org/), [SAMHSA](https://www.samhsa.gov/find-help/national-helpline))"
     },
     {
       "id": "support-3",
-      "title": "Helping a colleague",
-      "body_markdown": "- **Ask directly and kindly:** \u201cI am concerned about you. Are you thinking about suicide?\u201d Listen without judgment; do not argue, shame, or offer simplistic reassurance. ([988 guidance](https://988lifeline.org/help-someone-else/))\n- **Connect, do not promise secrecy:** If a colleague describes a plan to hurt themselves, seek crisis support rather than agreeing to keep it secret; call 988 for guidance or 911 for immediate danger. ([988 guidance](https://988lifeline.org/help-someone-else/), [AANA crisis resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **Use the proper workplace channel:** Concerning behavior or suspected diversion should be addressed through the supervisor or designated chain of command, with provider and patient safety as priorities. AANA can advise on addressing a substance-use concern safely. ([AANA substance-use resources](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))\n- **Do not diagnose from a single behavior:** Absences, personality changes, or documentation concerns are not by themselves proof of substance misuse. Seek appropriate assessment rather than labeling a colleague. ([Marworth healthcare-professional guidance](https://www.marworth.org/programs/healthcare-professionals))\n- **Follow up:** Stay connected after the immediate conversation and help the person reach ongoing support. Take care of your own well-being when supporting someone in distress. ([988 guidance](https://988lifeline.org/help-someone-else/))"
+      "title": "Burnout, anxiety, depression, grief, and trauma",
+      "body_markdown": "- **Support is not only for addiction:** Anesthesia professionals may seek help for anxiety, depression, burnout, traumatic events, isolation, grief, or personal stress. Professional well-being resources include mental-health and peer-support options. ([ASA well-being](https://www.asahq.org/advocating-for-you/well-being))\n- **Choose the right level of support:** Consider a licensed mental-health clinician for assessment and treatment; peer support, a trusted colleague, and employer support can complement care. Peer resources do not replace emergency or clinical treatment. ([ASA resources](https://www.asahq.org/advocating-for-you/well-being))\n- **Questions to ask:** Is the service counseling, psychiatric treatment, peer support, or referral? Who can use it? What does it cost? What information may be shared, and under what circumstances?"
     },
     {
       "id": "support-4",
-      "title": "Choosing treatment and planning recovery",
-      "body_markdown": "- **Match the program to your needs:** Ask whether the program treats your profession, mental-health concerns, substance-use condition, and any needed withdrawal or medical stabilization. Healthcare-professional programs describe different evaluation, treatment, and re-entry services. ([Marworth](https://www.marworth.org/programs/healthcare-professionals), [Parkdale](https://parkdalecenter.com/programs/), [Talbott](https://talbottcampus.com/addiction-treatment-programs/professionals/healthcare-professionals-program/))\n- **Clarify professional requirements before enrollment when safe to do so:** Ask the relevant assistance or monitoring program whether a proposed evaluation or treatment provider meets its requirements. Do not delay emergency care to obtain administrative approval. ([FSPHP FAQs](https://www.fsphp.org/faqs))\n- **Ask about practical details:** Confirm intake availability, level of care, cost, insurance, travel, co-occurring-condition care, family involvement, medication treatment options, and continuing care directly with the facility; inclusion here is not a guarantee of availability or coverage.\n- **Return to practice is individualized:** Work with the treating team and, when applicable, employer, credentialing body, licensing board, and monitoring program. Completion of a treatment program does not by itself guarantee unrestricted return to anesthesia practice. ([FSPHP FAQs](https://www.fsphp.org/faqs), [AANA workplace guidance](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))\n- **Recovery community:** AANA describes Anesthetists in Recovery (AIR), an independent virtual community for CRNAs and nurse anesthesia residents in or seeking recovery; use AANA's page for current contact information. Peer support complements, rather than replaces, indicated treatment. ([AANA recovery resources](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))"
+      "title": "Students, residents, fellows, and trainees",
+      "body_markdown": "- **Medical students and physicians in training:** Physician Support Line explicitly includes medical students and physicians. State professional-health programs vary in their trainee eligibility. ([Physician Support Line](https://www.physiciansupportline.com/), [FSPHP directory](https://www.fsphp.org/state-programs))\n- **Nurse anesthesia students/residents:** AANA provides substance-use support and navigation for nurse anesthesia residents. ([AANA](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **Treatment listings with explicit trainee language:** Caron’s Plymouth Meeting program includes healthcare students; Recovery First describes medical residents/interns; Freeman describes nursing students. These statements do not establish eligibility for every student or CAA program. ([Caron](https://www.caron.org/healthcare-professionals-outpatient-program-plymouth-meeting), [Recovery First](https://recoveryfirst.org/addiction-treatment-florida/healthcare-professionals/), [Freeman](https://www.freemanrecoverycenter.com/programs/professionals/healthcare-workers/))\n- **Practical questions for your school or training program:** Ask about counseling, student health, GME support, a non-evaluative support contact, leave options, and confidentiality limits before disclosing details when circumstances allow. Immediate safety takes priority over administrative planning."
     },
     {
       "id": "support-5",
-      "title": "Confidentiality, reporting, and what to ask",
-      "body_markdown": "- **Ask about limits before sharing nonurgent identifying details:** \u201cWho can access my information? What triggers disclosure or a board report? Is this voluntary treatment, peer support, or formal monitoring?\u201d Program structure and legal requirements vary; no directory can promise anonymity or no licensing consequences across all states and professions. ([FSPHP FAQs](https://www.fsphp.org/faqs), [AANA reporting guidance](https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/))\n- **Separate the services:** An association helpline, a treating clinician, a PHP, a nursing assistance program, and a licensing board are not interchangeable. Confirm eligibility and the role of the service you contact. ([FSPHP state-program directory](https://www.fsphp.org/state-programs), [AANA help resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **PHP has two meanings:** In the state directory it means Physician/Professional Health Program; in a treatment facility's description it can mean partial hospitalization program. Do not confuse a monitoring/referral service with a level of treatment. ([FSPHP FAQs](https://www.fsphp.org/faqs), [Parkdale programs](https://parkdalecenter.com/programs/))\n- **Emergency exception:** Questions about privacy or employment should not delay emergency help when someone is in immediate danger. ([AANA crisis resources](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))"
+      "title": "Addiction treatment and sustained recovery",
+      "body_markdown": "- **Care levels differ:** A treatment facility may provide medical withdrawal management, residential care, partial hospitalization (PHP), intensive outpatient (IOP), or standard outpatient care. A professional-assistance program is not the same as a treatment facility. ([SAMHSA treatment navigation](https://www.samhsa.gov/find-help/national-helpline), [FSPHP directory](https://www.fsphp.org/state-programs))\n- **Before admission:** Confirm whether the program treats your substance-use and co-occurring mental-health needs, has a dedicated professional track, accepts your profession or student status, and can meet any existing monitoring requirements.\n- **Recovery planning:** Ask about continuing care, peer support, relapse prevention, and an individualized plan for returning to clinical duties. Facility advertising is not a guarantee of licensing-board approval or fitness for duty. ([ASA recovery resources](https://www.asahq.org/advocating-for-you/well-being), [FSPHP FAQs](https://www.fsphp.org/faqs))\n- **Peer recovery:** ASA links to International Doctors in Alcoholics Anonymous and other resources. Check each group’s eligibility; peer fellowship is not medical detox or emergency treatment. ([ASA well-being](https://www.asahq.org/advocating-for-you/well-being))"
     },
     {
       "id": "support-6",
-      "title": "Directory scope and verification",
-      "body_markdown": "- **State resources:** The selector covers all 50 states and Washington, D.C. Most entries are professional-health assistance, evaluation-coordination, or monitoring contacts, not treatment facilities; eligibility for CRNAs, CAAs, physicians, and trainees must be checked with the individual program. ([FSPHP directory](https://www.fsphp.org/state-programs))\n- **Nurse anesthesia route in every state:** AANA's national helpline can provide CRNA- and nurse-anesthesia-resident-focused substance-use support and help identify relevant resources. A physician-only program should not be presumed to accept nurses. ([AANA](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **Treatment facilities:** The separate list is a selected, non-ranked set of programs with publicly described professional tracks, not an exhaustive all-state rehab directory and not an endorsement.\n- **Source checks:** Public source pages were checked September 26, 2026. Telephone connections, bed availability, insurance participation, and each program's current eligibility were not confirmed by phone; verify these directly.\n- **Privacy in this screen:** Luma does not ask you to enter symptoms, substance use, licensing details, or a personal history here. The state selection stays on this screen; external sites and calls have their own privacy practices."
+      "title": "A colleague is struggling or care may be unsafe",
+      "body_markdown": "- **Respond compassionately:** Speak directly and without judgment, offer help connecting to support, and take suicidal statements seriously. ([988: supporting someone](https://988lifeline.org/help-someone-else/))\n- **Patient or clinician safety:** If impairment may affect current clinical care, use institutional safety and escalation procedures and arrange appropriate coverage. Do not treat this directory as clearance to continue practicing. ([AANA support guidance](https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/))\n- **Immediate danger:** Use 911 for a medical emergency or imminent danger. Use 988 for suicide or emotional-crisis support; professional-program callbacks are not emergency response. ([988](https://988lifeline.org/))"
+    },
+    {
+      "id": "support-7",
+      "title": "Privacy, licensing, and professional monitoring",
+      "body_markdown": "- **No blanket confidentiality promise:** Treatment, peer support, employer services, schools, and monitoring programs have different privacy and reporting rules. Ask what is documented, who can receive it, and which exceptions apply. ([FSPHP FAQs](https://www.fsphp.org/faqs))\n- **Assistance versus regulation:** State physician/professional-health programs may offer evaluation, referral, and monitoring. They are not interchangeable with licensing boards or rehab facilities, and eligible professions vary. ([FSPHP state directory](https://www.fsphp.org/state-programs))\n- **Licensure and credentialing:** Do not assume that self-referral prevents reporting or that every treatment program meets a board or employer requirement. Confirm individual obligations with the appropriate program and qualified advice. ([FSPHP FAQs](https://www.fsphp.org/faqs))\n- **Luma screen privacy:** This support screen does not ask for symptoms, a diagnosis, or a recovery history. Following an external link takes you to another organization’s service and privacy practices."
+    },
+    {
+      "id": "support-8",
+      "title": "Directory scope and choosing a program",
+      "body_markdown": "- **By actual treatment location:** The directory includes all 50 states and D.C. for navigation. Listings identify physical treatment locations or explicitly label virtual services; serving a state does not mean a facility is located there.\n- **Verified public listings, not a complete census:** These entries were checked against official program information. A state with no listing is a verification gap, not a statement that no suitable care exists. Program websites alone cannot establish that every eligible facility has been found.\n- **Broader treatment search:** Use SAMHSA’s national directory and ask about a healthcare-professional track, your profession, student eligibility, cost, insurance, current availability, and professional-monitoring requirements. ([FindTreatment.gov](https://findtreatment.gov/))\n- **No ranking or endorsement:** No placement implies quality, board approval, current openings, or insurance acceptance. Published phone numbers and links were checked online, not by placing test calls.\n- **Useful abbreviations:** PHP in a facility’s care-level description means partial hospitalization; a state PHP generally means physician/professional health program. IOP means intensive outpatient program."
     }
   ],
   "states": [
@@ -173,7 +183,7 @@
     },
     {
       "state": "Louisiana",
-      "name": "Healthcare Professionals\u2019 Foundation of Louisiana",
+      "name": "Healthcare Professionals’ Foundation of Louisiana",
       "phone": "(225) 291-5000",
       "source": "https://www.fsphp.org/state-programs",
       "note": "Professional-health assistance/monitoring contact, not a rehab facility. Confirm license-type eligibility and confidentiality limits."
@@ -208,7 +218,7 @@
     },
     {
       "state": "Minnesota",
-      "name": "Minnesota\u00a0Health Professionals Services Program",
+      "name": "Minnesota Health Professionals Services Program",
       "phone": "(651) 642-0487",
       "source": "https://www.fsphp.org/state-programs",
       "note": "Professional-health assistance/monitoring contact, not a rehab facility. Confirm license-type eligibility and confidentiality limits."
@@ -412,64 +422,623 @@
   ],
   "facilities": [
     {
-      "state": "Indiana",
-      "name": "Parkdale Center",
-      "phone": "219-400-3545",
-      "body": "Working-professionals addiction treatment with partial hospitalization, intensive outpatient, dual-diagnosis care, and career-restoration support. AANA identifies its Parkdale partnership for CRNAs and nurse anesthesia residents. Confirm your required level of care: Parkdale's program page distinguishes withdrawal management from medical detoxification.",
+      "state": "Alabama",
+      "name": "Bradford at Warrior",
+      "location": "Warrior",
+      "phone": "205-947-3668",
+      "level": "Healthcare-professional treatment",
+      "eligibility": "Physicians, nurses, and other licensed professionals",
+      "body": "Evaluation, addiction treatment, co-occurring needs, and return-to-work planning. Confirm the recommended level of care.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
       "sources": [
         {
-          "title": "Parkdale: current contact and services",
-          "url": "https://parkdalecenter.com/"
+          "title": "Official program information",
+          "url": "https://bradfordatwarrior.com/healthcare-professionals-addiction-treatment/"
+        }
+      ]
+    },
+    {
+      "state": "Alabama",
+      "name": "UAB Addiction Recovery Program",
+      "location": "Alabama",
+      "phone": "",
+      "level": "Healthcare-professional program",
+      "eligibility": "Physicians, nurses, dentists, pharmacists, veterinarians, and other healthcare professionals",
+      "body": "Professional recovery groups and return-to-work coordination. Confirm treatment location and available care levels.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.uab.edu/medicine/psychiatry/?view=article&id=381&catid=17"
+        }
+      ]
+    },
+    {
+      "state": "Arizona",
+      "name": "Sierra Tucson Licensed Professionals Program",
+      "location": "Tucson",
+      "phone": "",
+      "level": "Licensed-professionals treatment",
+      "eligibility": "Physicians, nurses, nurse practitioners, physician assistants, pharmacists, and other licensed clinicians",
+      "body": "Substance-use and mental-health treatment addressing trauma and professional stress. Confirm residential admission and individualized services.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.sierratucson.com/programs/licensed-professionals/"
         },
         {
-          "title": "Program levels and withdrawal limits",
+          "title": "Location and contact information",
+          "url": "https://www.sierratucson.com/"
+        }
+      ]
+    },
+    {
+      "state": "California",
+      "name": "All Points North California Virtual Professionals Track",
+      "location": "Virtual care for eligible California professionals",
+      "phone": "",
+      "level": "Virtual outpatient program",
+      "eligibility": "Healthcare and other professionals; confirm profession and location eligibility",
+      "body": "Professionals-focused addiction and relapse-prevention groups. This is virtual treatment, not a California residential facility.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://apn.com/programs/california-virtual-professionals-track/"
+        }
+      ]
+    },
+    {
+      "state": "California",
+      "name": "California Center for Change",
+      "location": "San Francisco; California telehealth",
+      "phone": "833-771-1888",
+      "level": "Outpatient addiction therapy",
+      "eligibility": "Physicians, surgeons, nurses, pharmacists, dentists, and therapists",
+      "body": "Individual and group therapy; not a residential or detox facility. Self-pay; ask about a superbill and telehealth eligibility.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.cacenterforchange.com/addiction-treatment-healthcare-professionals-san-francisco"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.cacenterforchange.com/"
+        }
+      ]
+    },
+    {
+      "state": "Colorado",
+      "name": "All Points North Lodge",
+      "location": "Edwards",
+      "phone": "855-510-4585",
+      "level": "Residential / partial hospitalization",
+      "eligibility": "Healthcare and other safety-sensitive professionals",
+      "body": "Professionals curriculum, evaluation, and return-to-work or monitoring coordination. Confirm campus-specific availability.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://apn.com/programs/fsphp/"
+        }
+      ]
+    },
+    {
+      "state": "Colorado",
+      "name": "Spero Recovery Center",
+      "location": "Evergreen",
+      "phone": "303-900-3994",
+      "level": "Men’s residential addiction treatment",
+      "eligibility": "Men who are healthcare professionals; confirm individual eligibility",
+      "body": "Healthcare-professional recovery support and return-to-work concerns. This residential program is for men.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.sperorecovery.org/programs/healthcare-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.sperorecovery.org/"
+        }
+      ]
+    },
+    {
+      "state": "Colorado",
+      "name": "UCHealth CeDAR Professionals Program",
+      "location": "Aurora",
+      "phone": "720-848-3000",
+      "level": "Residential / inpatient addiction care",
+      "eligibility": "Physicians, nurses, and other licensed professionals",
+      "body": "Professional recovery support and aftercare. The official program article is older; confirm current program availability and care levels before arranging treatment.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.uchealth.org/today/addiction-treatment-for-professionals-at-cedar/"
+        }
+      ]
+    },
+    {
+      "state": "Connecticut",
+      "name": "Institute of Living Professionals Program",
+      "location": "Hartford",
+      "phone": "860-545-7200",
+      "level": "Intensive outpatient addiction treatment",
+      "eligibility": "Professionals; healthcare-profession and student eligibility must be confirmed",
+      "body": "Outpatient addiction services at the Institute of Living. Ask for the Professionals Program; listed contact uses option 3.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://instituteofliving.org/programs-services/adult-services/departments-services/addiction-services"
+        }
+      ]
+    },
+    {
+      "state": "Florida",
+      "name": "Ambrosia Healthcare Professionals Program",
+      "location": "West Palm Beach area",
+      "phone": "888-492-1633",
+      "level": "Individualized addiction / mental-health treatment",
+      "eligibility": "Doctors, nurses, medical staff, and technicians",
+      "body": "Professional-focused treatment and continuing recovery support. Confirm the treatment campus, care level, and current admissions criteria.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.ambrosiatc.com/programs/healthcare-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.ambrosiatc.com/"
+        }
+      ]
+    },
+    {
+      "state": "Florida",
+      "name": "Hanley Center Impaired Professionals Program",
+      "location": "West Palm Beach",
+      "phone": "561-841-1033",
+      "level": "Medical detox / residential treatment",
+      "eligibility": "Doctors, nurses, psychologists, social workers, and other professionals",
+      "body": "Addiction and co-occurring mental-health care, continuing-care planning, and professional-program coordination.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.hanleycenter.org/treatment/impaired-professionals-program/"
+        }
+      ]
+    },
+    {
+      "state": "Florida",
+      "name": "Lakeview Health Professionals Program",
+      "location": "Jacksonville",
+      "phone": "866-704-7692",
+      "level": "Detox / residential addiction treatment",
+      "eligibility": "Professionals including doctors and nurses",
+      "body": "Professional-focused therapy and workplace re-entry support. Confirm current professionals-program availability directly.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.lakeviewhealth.com/blog/professionals-programs-in-addiction-treatment/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.lakeviewhealth.com/"
+        }
+      ]
+    },
+    {
+      "state": "Florida",
+      "name": "Recovery First Healthcare Professionals Program",
+      "location": "Hollywood",
+      "phone": "954-526-5776",
+      "level": "Detox / inpatient / outpatient",
+      "eligibility": "Physicians, anesthesiologists, nurses, anesthesia nurses, pharmacists, and other healthcare professionals",
+      "body": "Addiction treatment, professional recovery planning, and Florida IPN/PRN coordination. Confirm campus and care level.",
+      "student_eligibility": "Medical residents and interns are explicitly described; other students should confirm eligibility.",
+      "student_confirmed": true,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://recoveryfirst.org/addiction-treatment-florida/healthcare-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "Florida",
+      "name": "Riverside Recovery of Tampa",
+      "location": "Tampa",
+      "phone": "800-871-5440",
+      "level": "Detox / residential / PHP / IOP / outpatient",
+      "eligibility": "Physicians, surgeons, nurses, nurse practitioners, CRNAs, pharmacists, dentists, and other clinicians",
+      "body": "Healthcare-professional treatment with return-to-work planning and IPN/PRN coordination where applicable.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://rrtampa.com/treatment-programs/healthcare-professionals-program/"
+        }
+      ]
+    },
+    {
+      "state": "Georgia",
+      "name": "Serenity Grove Professionals Program",
+      "location": "Athens",
+      "phone": "706-389-5157",
+      "level": "Detox / inpatient / PHP / IOP / outpatient",
+      "eligibility": "Physicians, physician assistants, advanced-practice nurses, nurses, pharmacists, and other healthcare professionals",
+      "body": "Professional recovery support, co-occurring care, and return-to-work planning.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.serenitygrove.com/addiction-treatment-program/rehab-for-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "Georgia",
+      "name": "Talbott Recovery Healthcare Professionals Program",
+      "location": "Atlanta",
+      "phone": "678-251-3189",
+      "level": "Evaluation / partial hospitalization / continuing care",
+      "eligibility": "Healthcare professionals; confirm discipline-specific eligibility",
+      "body": "Multidisciplinary evaluation, addiction and co-occurring treatment, recovery residences, and professional re-entry planning.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://talbottcampus.com/addiction-treatment-programs/professionals/healthcare-professionals-program/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://talbottcampus.com/contact/"
+        }
+      ]
+    },
+    {
+      "state": "Illinois",
+      "name": "PSI Health / Positive Sobriety Institute",
+      "location": "Chicago",
+      "phone": "312-312-9000",
+      "level": "Professional addiction evaluation / treatment",
+      "eligibility": "Physicians, nurses, and other healthcare professionals",
+      "body": "Specialized rehabilitation, relapse prevention, and employer or licensing coordination. Confirm current care levels.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.psi.health/impaired-physicians-program/"
+        }
+      ]
+    },
+    {
+      "state": "Indiana",
+      "name": "Parkdale Center",
+      "location": "Indiana",
+      "phone": "219-400-3545",
+      "level": "Partial hospitalization / intensive outpatient",
+      "eligibility": "Healthcare and other working professionals",
+      "body": "Addiction and co-occurring treatment with professional recovery and career-restoration support. Confirm withdrawal-management or medical-detox needs separately.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
           "url": "https://parkdalecenter.com/programs/"
+        }
+      ]
+    },
+    {
+      "state": "Louisiana",
+      "name": "Victory Professionals Program",
+      "location": "Lafayette and Metairie",
+      "phone": "337-379-7700",
+      "level": "Evaluation / detox / residential / PHP / IOP",
+      "eligibility": "Healthcare professionals including nurses, counselors, physical therapists, and pharmacists",
+      "body": "Professional evaluation and treatment with workplace and monitoring coordination. Services differ by campus; confirm the admission location.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://myvictorycenter.com/how-we-help/victory-professionals-program/"
         },
         {
-          "title": "AANA: Parkdale partnership and resources",
-          "url": "https://www.aana.com/membership/here-for-you/health-and-wellness/substance-use-disorder-sud/"
+          "title": "Location and contact information",
+          "url": "https://myvictorycenter.com/"
+        }
+      ]
+    },
+    {
+      "state": "Michigan",
+      "name": "Henry Ford Health Treatment for Professionals",
+      "location": "Southeast Michigan",
+      "phone": "248-661-6100",
+      "level": "Healthcare-professional addiction treatment",
+      "eligibility": "Licensed healthcare professionals; confirm individual eligibility",
+      "body": "Treatment addressing healthcare-professional recovery and Michigan HPRP requirements. Ask about campus and level of care.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.henryford.com/services/behavioral-health/addiction/treatments/profession"
+        }
+      ]
+    },
+    {
+      "state": "Minnesota",
+      "name": "Beauterre Residential Treatment for Professionals",
+      "location": "Owatonna",
+      "phone": "612-454-2444",
+      "level": "Residential / co-occurring treatment",
+      "eligibility": "Professionals in medicine, nursing, social work, therapy, and other disciplines",
+      "body": "Professional recovery planning, continuing care, and coordination with HPSP or return-to-practice requirements where applicable.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://beauterre.org/residential-treatment-for-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "Mississippi",
+      "name": "Pine Grove Professionals Recovery Track",
+      "location": "Mississippi",
+      "phone": "",
+      "level": "Residential addiction treatment",
+      "eligibility": "Licensed professionals, particularly medical professionals",
+      "body": "Professionals Recovery Track and optional Professional Enhancement Program; recovery groups and return-to-work or monitoring coordination.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.pinegrovetreatment.com/professionals-addiction-treatment/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.pinegrovetreatment.com/"
+        }
+      ]
+    },
+    {
+      "state": "Missouri",
+      "name": "Midwest Recovery Centers",
+      "location": "Kansas City, Missouri",
+      "phone": "",
+      "level": "Individualized care; not a dedicated professionals track",
+      "eligibility": "Physicians, nurses, pharmacists, technicians, and other medical professionals",
+      "body": "Detox, residential, intensive outpatient, and continuing care. The provider explicitly states it does not run a separate doctor or nurse track.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://midwestrecoverycenters.com/addiction-treatment-medical-professionals-kansas-city/"
+        }
+      ]
+    },
+    {
+      "state": "New York",
+      "name": "Wellbridge Healthcare Professionals Treatment",
+      "location": "Long Island",
+      "phone": "",
+      "level": "Detox / residential / co-occurring treatment",
+      "eligibility": "Physicians, nurses, nurse practitioners, LPNs, and allied healthcare professionals",
+      "body": "Healthcare-professional addiction treatment addressing professional stress, recovery, and return-to-work concerns.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://wellbridge.org/levels-of-care/healthcare-professionals-treatment/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://wellbridge.org/"
+        }
+      ]
+    },
+    {
+      "state": "Oregon",
+      "name": "Serenity Lane Healthcare Professionals Program",
+      "location": "Oregon; confirm campus",
+      "phone": "800-543-9905",
+      "level": "Detox / residential / PHP / IOP",
+      "eligibility": "Healthcare professionals; confirm profession-specific eligibility",
+      "body": "Addiction and co-occurring treatment, professional recovery planning, and employer or monitoring-program coordination.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://serenitylane.org/other-programs/healthcare-professionals-program/"
+        }
+      ]
+    },
+    {
+      "state": "Pennsylvania",
+      "name": "Caron Philadelphia Outpatient Treatment Center",
+      "location": "Plymouth Meeting",
+      "phone": "484-342-5750",
+      "level": "Outpatient; eligible Pennsylvania virtual care",
+      "eligibility": "Physicians, nurses, NPs, PAs, pharmacists, dentists, and other healthcare professionals",
+      "body": "Professional recovery groups, counseling, monitoring coordination, and return-to-work support.",
+      "student_eligibility": "Medical, nursing, pharmacy, and other healthcare students are explicitly included.",
+      "student_confirmed": true,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.caron.org/healthcare-professionals-outpatient-program-plymouth-meeting"
         }
       ]
     },
     {
       "state": "Pennsylvania",
       "name": "Geisinger Marworth",
+      "location": "Pennsylvania",
       "phone": "800-442-7722",
-      "body": "Healthcare Professionals Program with professional peer groups, re-entry planning, co-occurring-condition care, recurrence-prevention support, medication-assisted treatment, and withdrawal/detox help. The published contact is available 24/7; ask admissions to confirm the appropriate evaluation and level of care.",
+      "level": "Healthcare-professional addiction treatment",
+      "eligibility": "Healthcare professionals; confirm individual eligibility",
+      "body": "Withdrawal management, professional peer groups, co-occurring care, relapse prevention, and workplace re-entry planning.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
       "sources": [
         {
-          "title": "Marworth Healthcare Professionals Program",
+          "title": "Official program information",
           "url": "https://www.marworth.org/programs/healthcare-professionals"
         }
       ]
     },
     {
-      "state": "Georgia",
-      "name": "Talbott Recovery",
-      "phone": "678-251-3189",
-      "body": "Atlanta Healthcare Professionals Program describes multidisciplinary evaluation, addiction and co-occurring psychiatric care, partial hospitalization with recovery residences, continuing care, and professional re-entry support. Confirm the appropriate campus and current services with admissions.",
+      "state": "Tennessee",
+      "name": "Cumberland Heights Professionals Program",
+      "location": "Nashville area",
+      "phone": "",
+      "level": "Evaluation / residential / extended care",
+      "eligibility": "Medical and other professionals",
+      "body": "Professional evaluation, addiction and co-occurring care, and return-to-work planning. Confirm admissions and the recommended program.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
       "sources": [
         {
-          "title": "Healthcare Professionals Program",
-          "url": "https://talbottcampus.com/addiction-treatment-programs/professionals/healthcare-professionals-program/"
+          "title": "Official program information",
+          "url": "https://cumberlandheights.org/treatment/professionals-program/"
         },
         {
-          "title": "Talbott contact and Atlanta location",
-          "url": "https://talbottcampus.com/contact/"
+          "title": "Location and contact information",
+          "url": "https://cumberlandheights.org/"
         }
       ]
     },
     {
-      "state": "Alabama",
-      "name": "Bradford at Warrior",
-      "phone": "205-947-3668",
-      "body": "Healthcare Professionals Program for licensed professionals, including physicians and nurses, with evaluation, substance-use treatment, co-occurring-condition care, and return-to-practice support. The facility publishes a 24/7 general contact; evaluation appointments are listed separately at 205-756-3503.",
+      "state": "Tennessee",
+      "name": "Freeman Recovery Center Healthcare Workers Program",
+      "location": "Burns and Dickson",
+      "phone": "615-645-3677",
+      "level": "Detox / residential / PHP / IOP / outpatient",
+      "eligibility": "Doctors, nurses, technicians, and other clinical staff",
+      "body": "Burns provides detox/residential services; Dickson provides outpatient levels. Confirm the recommended campus and professional-program coordination.",
+      "student_eligibility": "Nursing students are explicitly included; other student disciplines should confirm.",
+      "student_confirmed": true,
       "sources": [
         {
-          "title": "Bradford Healthcare Professionals Program",
-          "url": "https://bradfordatwarrior.com/healthcare-professionals-addiction-treatment/"
+          "title": "Official program information",
+          "url": "https://www.freemanrecoverycenter.com/programs/professionals/healthcare-workers/"
+        }
+      ]
+    },
+    {
+      "state": "Tennessee",
+      "name": "Tennessee Detox Center Professionals Program",
+      "location": "La Vergne",
+      "phone": "",
+      "level": "Detox / residential / continuing care",
+      "eligibility": "Physicians, nurses, dentists, pharmacists, therapists, and other professionals",
+      "body": "Addiction and co-occurring treatment with professional recovery planning. Confirm outpatient arrangements and current admissions.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://tndetoxcenter.com/treatment/professionals-program-in-tennessee/"
+        }
+      ]
+    },
+    {
+      "state": "Texas",
+      "name": "All Points North Dallas–Fort Worth",
+      "location": "Dallas–Fort Worth",
+      "phone": "855-510-4585",
+      "level": "Residential / partial hospitalization",
+      "eligibility": "Healthcare and other safety-sensitive professionals",
+      "body": "Professionals curriculum, evaluation, and return-to-work or monitoring coordination. Confirm campus-specific availability.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://apn.com/programs/fsphp/"
+        }
+      ]
+    },
+    {
+      "state": "Texas",
+      "name": "Greenhouse Treatment Center",
+      "location": "Dallas–Fort Worth area",
+      "phone": "972-848-0221",
+      "level": "Detox / residential / PHP / IOP / outpatient",
+      "eligibility": "Physicians, nurses, nurse practitioners, physician assistants, pharmacists, and dentists",
+      "body": "Licensed-professionals addiction treatment and continuing recovery support. Confirm program and level-of-care availability.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://greenhousetreatment.com/addiction-treatment-services-dallas/licensed-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "Texas",
+      "name": "Santé Center for Healing",
+      "location": "Argyle",
+      "phone": "866-238-3154",
+      "level": "Evaluation / detox / residential / IOP",
+      "eligibility": "Physicians, nurses, and other healthcare professionals",
+      "body": "Addiction and co-occurring care, professional recovery support, and family or peer involvement.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.santecenter.com/addiction-treatment-programs/addiction-treatment-services/professionals-program/addiction-treatment-for-physicians/"
+        }
+      ]
+    },
+    {
+      "state": "Virginia",
+      "name": "Farley Center at Williamsburg Place",
+      "location": "Williamsburg",
+      "phone": "888-707-3220",
+      "level": "Detox / stabilization / partial hospitalization",
+      "eligibility": "Physicians, nurses, dentists, pharmacists, and allied healthcare professionals",
+      "body": "Professional peer groups, individual and group care, Caduceus meetings, and return-to-work planning.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://farleycenter.com/professionals-program/"
         }
       ]
     }
-  ]
+  ],
+  "access": "always_free_no_account"
 }

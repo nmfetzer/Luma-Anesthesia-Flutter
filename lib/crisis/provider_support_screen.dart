@@ -32,6 +32,14 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
   }
 
   String? _state;
+  String _query = '';
+  final _search = TextEditingController();
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   static const _contactUris = {
     'tel:988',
     'sms:988',
@@ -87,8 +95,6 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                   child: const Text('Call 911')),
             ]),
             _link('988 chat and crisis support', 'https://988lifeline.org/'),
-            _link('AANA: immediate-help guidance',
-                'https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/'),
           ]),
         ),
       );
@@ -106,7 +112,10 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                 style: lumaDisplay(size: 28)),
             const SizedBox(height: 8),
             const Text(
-                'Care for the person behind the provider. Free access, no account required.'),
+                'For the whole anesthesia team: MD/DO physicians, CRNAs, CAAs, residents, fellows, students, technicians, and other anesthesia professionals.'),
+            const SizedBox(height: 8),
+            const Text('Always free. Free access, no account required.',
+                style: TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 16),
             _emergencyHelp(),
             const SizedBox(height: 16),
@@ -114,17 +123,17 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               OutlinedButton(
-                  onPressed: () => _contact('tel:18006545167'),
-                  child: const Text('AANA · 800-654-5167')),
-              OutlinedButton(
                   onPressed: () => _contact('tel:18884090141'),
                   child: const Text('Physician Support · 888-409-0141')),
+              OutlinedButton(
+                  onPressed: () => _contact('tel:18006545167'),
+                  child: const Text('AANA · 800-654-5167')),
               OutlinedButton(
                   onPressed: () => _contact('tel:18006624357'),
                   child: const Text('SAMHSA · 800-662-4357')),
             ]),
             const Text(
-                'AANA: drug/alcohol concerns, 24/7. Physician Support Line: physicians and medical students, Mon–Fri 8 a.m.–11 p.m. Eastern, except federal holidays. SAMHSA: treatment referral, not counseling, 24/7.'),
+                'Physician Support Line: physicians and medical students, Mon–Fri 8 a.m.–11 p.m. Eastern, except federal holidays.\n\nAANA: substance-use concerns involving CRNAs and nurse anesthesia residents, 24/7.\n\nSAMHSA: treatment referral for anyone, not counseling, 24/7. Individual services have eligibility rules; this app section is open to everyone.'),
             _link('AANA help resources',
                 'https://www.aana.com/membership/here-for-you/health-and-wellness/where-to-get-help/'),
             _link('Physician Support Line eligibility and hours',
@@ -152,15 +161,49 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                     .toList()
                   ..sort();
                 final selectedFacilities = facilities
-                    .where((f) => _state == null || f['state'] == _state)
+                    .where((f) =>
+                        (_state == null || f['state'] == _state) &&
+                        '${f['state']} ${f['name']} ${f['location']} ${f['level']} ${f['eligibility']} ${f['body']} ${f['student_confirmed'] == true ? f['student_eligibility'] : ''}'
+                            .toLowerCase()
+                            .contains(_query.trim().toLowerCase()))
                     .toList();
+                final shownStates = states.where((state) =>
+                    (_state == null || state == _state) &&
+                    (_query.trim().isEmpty ||
+                        selectedFacilities.any((f) => f['state'] == state)));
                 return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Find help by state', style: lumaDisplay(size: 24)),
+                      Text('Treatment programs by state',
+                          style: lumaDisplay(size: 24)),
                       const SizedBox(height: 8),
                       const Text(
-                          'Assistance programs are not rehab facilities. Confirm your profession is eligible. This directory includes all 50 states and D.C.; gaps are clearly labeled.'),
+                          'Find addiction treatment for healthcare professionals, organized by treatment location. Virtual programs are labeled separately. Free to browse; external treatment may have fees.'),
+                      const SizedBox(height: 8),
+                      Text(
+                          '${facilities.length} verified public program listings. All 50 states and D.C. are included for navigation; states without verified listings are clearly marked. This is not a complete census or an endorsement.'),
+                      const SizedBox(height: 12),
+                      TextField(
+                        key: const ValueKey('support-search'),
+                        controller: _search,
+                        decoration: InputDecoration(
+                          labelText:
+                              'Search programs, professions, or locations',
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _query.isEmpty
+                              ? null
+                              : IconButton(
+                                  tooltip: 'Clear search',
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    _search.clear();
+                                    setState(() => _query = '');
+                                  },
+                                ),
+                        ),
+                        onChanged: (value) => setState(() => _query = value),
+                      ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
                         key: const ValueKey('support-state'),
@@ -171,7 +214,7 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                             border: OutlineInputBorder()),
                         items: [
                           const DropdownMenuItem(
-                              value: null, child: Text('Choose a state')),
+                              value: null, child: Text('All states and D.C.')),
                           for (final state in states)
                             DropdownMenuItem(value: state, child: Text(state)),
                         ],
@@ -181,6 +224,44 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                         TextButton(
                             onPressed: () => setState(() => _state = null),
                             child: const Text('Clear state filter')),
+                      ],
+                      const SizedBox(height: 12),
+                      if (shownStates.isEmpty)
+                        const Text(
+                            'No matching verified listings. Try another term, clear the state filter, or use the national treatment search below.'),
+                      for (final state in shownStates)
+                        if (_state != null)
+                          _statePrograms(state, selectedFacilities)
+                        else
+                          Card(
+                              child: ExpansionTile(
+                            key: ValueKey('programs-$state-${_query.trim()}'),
+                            initiallyExpanded: _query.trim().isNotEmpty,
+                            title: Text(state,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
+                            subtitle: Text(selectedFacilities
+                                    .any((f) => f['state'] == state)
+                                ? '${selectedFacilities.where((f) => f['state'] == state).length} program listing(s)'
+                                : 'No verified program listed yet'),
+                            children: [
+                              _statePrograms(state, selectedFacilities)
+                            ],
+                          )),
+                      _link('Search SAMHSA’s national treatment directory',
+                          'https://findtreatment.gov/'),
+                      const SizedBox(height: 24),
+                      Text('State assistance and referral programs',
+                          style: lumaDisplay(size: 24)),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'These are not rehab facilities. They may provide referrals, professional support, evaluation, or monitoring. Eligibility and reporting rules vary by profession and state.'),
+                      if (_state == null)
+                        const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Text(
+                                'Select a state above to see its assistance-program contact. Physicians, nurses, CAAs, students, and other professionals should confirm eligibility rather than assume every program accepts their role.')),
+                      if (_state != null)
                         for (final row
                             in rows.where((r) => r['state'] == _state))
                           Card(
@@ -203,50 +284,12 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                                           '${row['source']}'),
                                     ],
                                   ))),
-                        const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                            child: Text(
-                                'CRNA or nurse anesthesia resident? AANA: 800-654-5167, 24/7 for substance-use support and resource navigation. State PHP eligibility varies by profession.')),
-                      ],
+                      _link('FSPHP state-program directory',
+                          'https://www.fsphp.org/state-programs'),
                       const SizedBox(height: 20),
-                      Text('Selected professional treatment programs',
+                      Text('Support beyond the directory',
                           style: lumaDisplay(size: 24)),
-                      const SizedBox(height: 8),
-                      const Text(
-                          'Non-ranked examples, not an endorsement or an all-state rehab directory. Confirm admissions, insurance, services, and any monitoring-program requirements directly.'),
-                      if (selectedFacilities.isEmpty)
-                        const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                            child: Text(
-                                'No healthcare-professional treatment facility has been verified for this state in this selection. Use the referral contacts above or clear the filter to see the selected out-of-state programs.')),
-                      for (final facility in selectedFacilities)
-                        Card(
-                            child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                        '${facility['name']} · ${facility['state']}',
-                                        style: lumaBody(
-                                            size: 18, weight: FontWeight.w700)),
-                                    SelectableText('${facility['phone']}'),
-                                    const SizedBox(height: 8),
-                                    for (final point in '${facility['body']}'
-                                        .split(RegExp(r'(?<=[.!?])\s+')))
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 6),
-                                        child: Text('• $point'),
-                                      ),
-                                    for (final source
-                                        in facility['sources'] as List)
-                                      _link('${source['title']}',
-                                          '${source['url']}'),
-                                  ],
-                                ))),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       CrisisReferenceSections(
                           sections: (data['sections'] as List).cast<Map>()),
                       const SizedBox(height: 20),
@@ -258,4 +301,43 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
           ]),
         ))),
       );
+
+  Widget _statePrograms(String state, List<Map> facilities) {
+    final matches = facilities.where((f) => f['state'] == state).toList();
+    if (matches.isEmpty) {
+      return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+              'No matching healthcare-professional treatment program is verified in this directory for $state. This does not mean no care exists. Use SAMHSA or the state referral program, or explore out-of-state treatment.'));
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      for (final f in matches)
+        Card(
+            child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('${f['name']} · ${f['state']}',
+                        style: lumaBody(size: 18, weight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    Text('${f['location']}'),
+                    const SizedBox(height: 8),
+                    for (final point in [
+                      'Care: ${f['level']}',
+                      'Who the program describes serving: ${f['eligibility']}',
+                      '${f['body']}',
+                      'Students and trainees: ${f['student_eligibility']}',
+                    ])
+                      Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text('• $point')),
+                    if ('${f['phone']}'.isNotEmpty)
+                      SelectableText('Contact: ${f['phone']}'),
+                    for (final source in f['sources'] as List)
+                      _link('${source['title']}', '${source['url']}'),
+                  ],
+                ))),
+    ]);
+  }
 }

@@ -9,7 +9,7 @@ const crisisCategories = {
   'regional': 'Regional',
   'metabolic': 'Metabolic & Endocrine',
   'ob': 'OB Emergencies',
-  'mental': 'Mental Emergencies (for Healthcare Providers)',
+  'mental': 'Mental Health & Recovery',
 };
 
 class CrisisEntry {
@@ -34,7 +34,9 @@ class CrisisEntry {
   String get categoryLabel => crisisCategories[category] ?? category;
   // Temporarily reserved for a future pediatric anesthesia pack.
   // Presentation-only: preserve database records and existing access rules.
-  bool get isVisibleInHub => category != 'pediatric';
+  // Mental-health resources use the bundled, always-free support entry instead
+  // of a second legacy reference tile.
+  bool get isVisibleInHub => category != 'pediatric' && category != 'mental';
   bool matches(String query) {
     final text = '$title $searchTerms $categoryLabel'.toLowerCase();
     return query
