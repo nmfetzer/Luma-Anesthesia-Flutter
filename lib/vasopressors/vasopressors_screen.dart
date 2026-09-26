@@ -3,6 +3,7 @@ import '../widgets/luma_home_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../shared/luma_theme_tokens.dart';
 import '../blood_products/blood_products_view.dart';
+import '../data/medication_public_fields.dart';
 import 'drug_detail_screen.dart';
 
 /// Vasopressors, Infusions & Transfusions.
@@ -14,7 +15,11 @@ import 'drug_detail_screen.dart';
 ///
 /// Hemodynamic filters use medication.hemodynamic_tags (text[]).
 class VasopressorsScreen extends StatefulWidget {
-  const VasopressorsScreen({super.key});
+  const VasopressorsScreen(
+      {super.key, this.loadMedications, this.loadBloodProducts});
+
+  final Future<List<Map<String, dynamic>>> Function()? loadMedications;
+  final Future<List<Map<String, dynamic>>> Function()? loadBloodProducts;
 
   @override
   State<VasopressorsScreen> createState() => _VasopressorsScreenState();
@@ -47,30 +52,23 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
   }
 
   Future<void> _loadMedications() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
-      final rows = await Supabase.instance.client
-          .from('medication')
-          .select(
-              'id, name, brand_name, class_short, category, high_alert, hemodynamic_tags, vasoactive_role, '
-              'adult_dose, peds_dose, indications, mechanism, clinical_pearls, contraindications, '
-              'warnings_precautions, side_effects, serious_effects, drug_interactions, interactions_critical, '
-              'administration_details, special_populations, pregnancy_lactation, monitoring_parameters, '
-              'black_box_warning, lasa_warning, dea_schedule, onset_duration, onset_minutes, duration_minutes, '
-              'pharmacokinetics, antidote_reversal, concentration_mixing, requires_dilution, target_concentration, '
-              'standard_recipe, final_volume_ml, diluent, alternative_concentrations, mixing_pearls, '
-              'stability_hours_room_temp, stability_hours_refrigerated, sources')
-          .not('vasoactive_role', 'is', null)
-          .order('name');
+      final rows = await (widget.loadMedications?.call() ?? _fetchMedications())
+          .timeout(const Duration(seconds: 20));
 
-      final list = List<Map<String, dynamic>>.from(rows as List);
-      // Normalize sort key: strip leading non-letters so 'Adenosine' sorts by 'A',
-      // regardless of brand parentheticals or IV suffixes in the name.
-      String sortKey(Map<String, dynamic> r) {
-        final n = (r['name'] ?? '').toString().trim().toLowerCase();
-        return n.replaceAll(RegExp(r'[^a-z0-9].*$'), '');
-      }
+      final list = List<Map<String, dynamic>>.from(rows);
+      String sortKey(Map<String, dynamic> r) => (r['name'] ?? '')
+          .toString()
+          .trim()
+          .toLowerCase()
+          .replaceFirst(RegExp(r'^[^a-z0-9]+'), '');
       list.sort((a, b) => sortKey(a).compareTo(sortKey(b)));
-      final v = list.where((r) => r['vasoactive_role'] == 'vasopressor').toList();
+      final v =
+          list.where((r) => r['vasoactive_role'] == 'vasopressor').toList();
       final i = list.where((r) => r['vasoactive_role'] == 'infusion').toList();
 
       if (!mounted) return;
@@ -79,13 +77,23 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
         _infusions = i;
         _loading = false;
       });
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error =
+            'Unable to load medications. Check your connection and try again.';
         _loading = false;
       });
     }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchMedications() async {
+    final rows = await Supabase.instance.client
+        .from('medication')
+        .select(medicationPublicFields)
+        .not('vasoactive_role', 'is', null)
+        .order('name');
+    return List<Map<String, dynamic>>.from(rows);
   }
 
   List<Map<String, dynamic>> get _currentList {
@@ -115,11 +123,16 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
 
   String? _filterToTag(String label) {
     switch (label) {
-      case 'RAISES BP': return 'raises_bp';
-      case 'LOWERS BP': return 'lowers_bp';
-      case 'RAISES HR': return 'raises_hr';
-      case 'LOWERS HR': return 'lowers_hr';
-      case 'RAISES CO': return 'raises_co';
+      case 'RAISES BP':
+        return 'raises_bp';
+      case 'LOWERS BP':
+        return 'lowers_bp';
+      case 'RAISES HR':
+        return 'raises_hr';
+      case 'LOWERS HR':
+        return 'lowers_hr';
+      case 'RAISES CO':
+        return 'raises_co';
     }
     return null;
   }
@@ -159,8 +172,16 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: LumaTokens.textPrimary, size: 20),
-            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back,
+                color: LumaTokens.textPrimary, size: 20),
+            tooltip: 'Back',
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed('/home');
+              }
+            },
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
@@ -168,7 +189,8 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
             child: Center(
               child: Text(
                 'VASOPRESSORS · INFUSIONS · TRANSFUSIONS',
-                style: LumaTokens.eyebrow.copyWith(letterSpacing: 1.8),
+                textAlign: TextAlign.center,
+                style: LumaTokens.eyebrow.copyWith(letterSpacing: 1),
               ),
             ),
           ),
@@ -186,29 +208,40 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: List.generate(labels.length, (i) {
           final active = _tabIndex == i;
-          return Padding(
-            padding: const EdgeInsets.only(right: 22),
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _tabIndex = i;
-                _activeFilter = 'ALL';
-              }),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    labels[i],
-                    style: active
-                        ? LumaTokens.filterActive.copyWith(fontSize: 12, letterSpacing: 1.5)
-                        : LumaTokens.filterInactive.copyWith(fontSize: 12, letterSpacing: 1.5),
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    height: 1.5,
-                    width: labels[i].length * 8.0,
-                    color: active ? LumaTokens.goldPrimary : Colors.transparent,
-                  ),
-                ],
+          return Expanded(
+            child: Semantics(
+              selected: active,
+              child: TextButton(
+                onPressed: () => setState(() {
+                  _tabIndex = i;
+                  _activeFilter = 'ALL';
+                  _searchCtrl.clear();
+                }),
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 2, vertical: 12),
+                  minimumSize: const Size(48, 48),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      labels[i],
+                      textAlign: TextAlign.center,
+                      style: active
+                          ? LumaTokens.filterActive
+                              .copyWith(fontSize: 11, letterSpacing: 0.2)
+                          : LumaTokens.filterInactive
+                              .copyWith(fontSize: 11, letterSpacing: 0.2),
+                    ),
+                    const SizedBox(height: 5),
+                    Container(
+                      height: 1.5,
+                      width: 36,
+                      color:
+                          active ? LumaTokens.goldPrimary : Colors.transparent,
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -222,7 +255,8 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
       child: Container(
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: LumaTokens.hairlineNavy, width: 0.5)),
+          border: Border(
+              bottom: BorderSide(color: LumaTokens.hairlineNavy, width: 0.5)),
         ),
         child: TextField(
           controller: _searchCtrl,
@@ -230,6 +264,13 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
           decoration: InputDecoration(
             icon: Icon(Icons.search, size: 16, color: LumaTokens.textMuted),
             hintText: 'Search drugs',
+            suffixIcon: _searchQuery.isEmpty
+                ? null
+                : IconButton(
+                    tooltip: 'Clear search',
+                    icon: const Icon(Icons.close, size: 18),
+                    onPressed: _searchCtrl.clear,
+                  ),
             hintStyle: LumaTokens.bodyMuted,
             border: InputBorder.none,
             isDense: true,
@@ -242,7 +283,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
 
   Widget _buildFilterRow() {
     return Container(
-      height: 32,
+      height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -254,21 +295,26 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
         itemBuilder: (context, index) {
           final label = _filtersForTab[index];
           final active = _activeFilter == label;
-          return GestureDetector(
-            onTap: () => setState(() => _activeFilter = label),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: active ? LumaTokens.filterActive : LumaTokens.filterInactive),
-                const SizedBox(height: 3),
-                Container(
-                  height: 1,
-                  width: label.length * 6.5,
-                  color: active ? LumaTokens.goldPrimary : Colors.transparent,
-                ),
-              ],
+          return Semantics(
+            selected: active,
+            child: TextButton(
+              onPressed: () => setState(() => _activeFilter = label),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: active
+                          ? LumaTokens.filterActive
+                          : LumaTokens.filterInactive),
+                  const SizedBox(height: 3),
+                  Container(
+                    height: 1,
+                    width: label.length * 6.5,
+                    color: active ? LumaTokens.goldPrimary : Colors.transparent,
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -278,19 +324,55 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
 
   Widget _buildBody() {
     if (_tabIndex == 2) {
-      return const BloodProductsView();
+      return BloodProductsView(load: widget.loadBloodProducts);
     }
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: LumaTokens.goldPrimary));
+      return const Center(
+          child: CircularProgressIndicator(color: LumaTokens.goldPrimary));
     }
     if (_error != null) {
       return Padding(
         padding: const EdgeInsets.all(24),
-        child: Center(child: Text('Error: $_error', style: LumaTokens.bodyMuted)),
+        child: Center(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_error!,
+                style: LumaTokens.bodyMuted, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            OutlinedButton(
+                onPressed: _loadMedications, child: const Text('Retry')),
+          ],
+        )),
       );
     }
 
     final list = _currentList;
+    if (list.isEmpty) {
+      final hasFilters = _searchQuery.isNotEmpty || _activeFilter != 'ALL';
+      return Center(
+          child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(
+              hasFilters
+                  ? 'No medications match your search or filter.'
+                  : 'No medications are available in this tab.',
+              style: LumaTokens.bodyMuted,
+              textAlign: TextAlign.center),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: hasFilters
+                ? () => setState(() {
+                      _activeFilter = 'ALL';
+                      _searchCtrl.clear();
+                    })
+                : _loadMedications,
+            child: Text(hasFilters ? 'Clear search and filters' : 'Retry'),
+          ),
+        ]),
+      ));
+    }
     return Column(
       children: [
         Padding(
@@ -321,7 +403,6 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
     final name = drug['name'] ?? '';
     final brand = (drug['brand_name'] ?? '').toString();
     final classShort = (drug['class_short'] ?? '').toString();
-    final adultDose = (drug['adult_dose'] ?? '').toString();
 
     return LumaCard(
       highAlert: highAlert,
@@ -361,17 +442,9 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
             const SizedBox(height: 4),
             Text(classShort.toUpperCase(), style: LumaTokens.classLabel),
           ],
-          if (adultDose.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Text('OR DOSING', style: LumaTokens.dosingLabel),
-            const SizedBox(height: 3),
-            Text(
-              adultDose.split('\n').first,
-              style: LumaTokens.body,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          const SizedBox(height: 10),
+          Text('View dosing, preparation & safety',
+              style: LumaTokens.bodyMuted),
         ],
       ),
     );

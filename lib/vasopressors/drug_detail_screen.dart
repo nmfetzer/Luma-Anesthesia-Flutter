@@ -29,16 +29,15 @@ class DrugDetailScreen extends StatelessWidget {
 
   String? _clean(dynamic v) {
     if (v == null) return null;
-    final s = v.toString().trim();
+    final s = v.toString().replaceAll(r'\n', '\n').replaceAll('**', '').trim();
     if (_isPlaceholder(s)) return null;
     return s.isEmpty ? null : s;
   }
 
   List<String> _bulletize(String? raw) {
     if (raw == null) return const [];
-    final normalized = raw
-        .replaceAll(RegExp(r'^\s*[-•]\s*', multiLine: true), '')
-        .trim();
+    final normalized =
+        raw.replaceAll(RegExp(r'^\s*[-•]\s*', multiLine: true), '').trim();
     final parts = <String>[];
     for (final line in normalized.split(RegExp(r'\n+'))) {
       for (final chunk in line.split(RegExp(r';\s+'))) {
@@ -90,26 +89,26 @@ class DrugDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitleBlock(highAlert),
-
-            if (blackBox != null) _buildCallout(
-              tone: _CalloutTone.red,
-              eyebrow: 'BLACK BOX WARNING',
-              body: blackBox,
-            ),
-            if (lasa != null) _buildCallout(
-              tone: _CalloutTone.amber,
-              eyebrow: 'LOOK-ALIKE SOUND-ALIKE',
-              body: lasa,
-            ),
-
+            if (blackBox != null)
+              _buildCallout(
+                tone: _CalloutTone.red,
+                eyebrow: 'BLACK BOX WARNING',
+                body: blackBox,
+              ),
+            if (lasa != null)
+              _buildCallout(
+                tone: _CalloutTone.amber,
+                eyebrow: 'LOOK-ALIKE SOUND-ALIKE',
+                body: lasa,
+              ),
             const SizedBox(height: 16),
-
             _bulletSection('Indications', drug['indications']),
             _dosingSection(),
             _mixingSection(),
             _kineticsSection(),
             _bulletSection('Contraindications', drug['contraindications']),
-            _bulletSection('Warnings & Precautions', drug['warnings_precautions']),
+            _bulletSection(
+                'Warnings & Precautions', drug['warnings_precautions']),
             _bulletSection('Side Effects', drug['side_effects']),
             _bulletSection('Serious Adverse Effects', drug['serious_effects']),
             _bulletSection('Drug Interactions', drug['drug_interactions']),
@@ -117,9 +116,11 @@ class DrugDetailScreen extends StatelessWidget {
             _bulletSection('Mechanism', drug['mechanism'], forceProse: true),
             _bulletSection('Clinical Pearls', drug['clinical_pearls']),
             _bulletSection('Antidote / Reversal', drug['antidote_reversal']),
-            _bulletSection('Administration Details', drug['administration_details']),
+            _bulletSection(
+                'Administration Details', drug['administration_details']),
             _bulletSection('Special Populations', drug['special_populations']),
-            _bulletSection('Pregnancy & Lactation', drug['pregnancy_lactation']),
+            _bulletSection(
+                'Pregnancy & Lactation', drug['pregnancy_lactation']),
             _monitoringSection(),
             _deepDiveSection(context),
             _sourcesSection(context),
@@ -167,22 +168,20 @@ class DrugDetailScreen extends StatelessWidget {
     required String eyebrow,
     required String body,
   }) {
-    final borderColor = tone == _CalloutTone.red
-        ? LumaTokens.alertRed
-        : LumaTokens.goldDeep;
-    final eyebrowColor = tone == _CalloutTone.red
-        ? LumaTokens.alertRed
-        : LumaTokens.goldDeep;
-    final bgColor = tone == _CalloutTone.red
-        ? LumaTokens.alertRedBg
-        : LumaTokens.parchment;
+    final borderColor =
+        tone == _CalloutTone.red ? LumaTokens.alertRed : LumaTokens.goldDeep;
+    final eyebrowColor =
+        tone == _CalloutTone.red ? LumaTokens.alertRed : LumaTokens.goldDeep;
+    final bgColor =
+        tone == _CalloutTone.red ? LumaTokens.alertRedBg : LumaTokens.parchment;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border.all(color: borderColor.withValues(alpha: 0.35), width: 0.5),
+        border:
+            Border.all(color: borderColor.withValues(alpha: 0.35), width: 0.5),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -203,7 +202,8 @@ class DrugDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _bulletSection(String label, dynamic value, {bool forceProse = false}) {
+  Widget _bulletSection(String label, dynamic value,
+      {bool forceProse = false}) {
     final cleaned = _clean(value);
     if (cleaned == null) return const SizedBox.shrink();
     final items = _bulletize(cleaned);
@@ -284,9 +284,14 @@ class DrugDetailScreen extends StatelessWidget {
     final stabRoom = drug['stability_hours_room_temp'];
     final stabFridge = drug['stability_hours_refrigerated'];
 
-    final hasAny = recipe != null || target != null || diluent != null ||
-        finalVol != null || altConc != null || mixingPearls != null ||
-        stabRoom != null || stabFridge != null;
+    final hasAny = recipe != null ||
+        target != null ||
+        diluent != null ||
+        finalVol != null ||
+        altConc != null ||
+        mixingPearls != null ||
+        stabRoom != null ||
+        stabFridge != null;
     if (!hasAny) return const SizedBox.shrink();
 
     return Padding(
@@ -301,7 +306,8 @@ class DrugDetailScreen extends StatelessWidget {
           if (finalVol != null) _kvRow('Final Volume', '$finalVol mL'),
           if (altConc != null) _kvRow('Alternative Concentrations', altConc),
           if (stabRoom != null) _kvRow('Stability (room temp)', '$stabRoom h'),
-          if (stabFridge != null) _kvRow('Stability (refrigerated)', '$stabFridge h'),
+          if (stabFridge != null)
+            _kvRow('Stability (refrigerated)', '$stabFridge h'),
           if (mixingPearls != null) ...[
             const SizedBox(height: 10),
             Text('MIXING PEARLS', style: LumaTokens.dosingLabel),
@@ -319,7 +325,8 @@ class DrugDetailScreen extends StatelessWidget {
     final durMin = drug['duration_minutes'];
     final pk = _clean(drug['pharmacokinetics']);
 
-    final hasAny = onset != null || onsetMin != null || durMin != null || pk != null;
+    final hasAny =
+        onset != null || onsetMin != null || durMin != null || pk != null;
     if (!hasAny) return const SizedBox.shrink();
 
     return Padding(
@@ -345,7 +352,8 @@ class DrugDetailScreen extends StatelessWidget {
   Widget _criticalInteractions() {
     final raw = drug['interactions_critical'];
     if (raw is! List || raw.isEmpty) return const SizedBox.shrink();
-    final items = raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    final items =
+        raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -363,7 +371,8 @@ class DrugDetailScreen extends StatelessWidget {
   Widget _monitoringSection() {
     final raw = drug['monitoring_parameters'];
     if (raw is! List || raw.isEmpty) return const SizedBox.shrink();
-    final items = raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    final items =
+        raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -379,7 +388,6 @@ class DrugDetailScreen extends StatelessWidget {
   }
 
   Widget _deepDiveSection(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 22),
       child: Theme(
@@ -433,13 +441,18 @@ class DrugDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _sourceRow(BuildContext context, int fallbackNumber, Map<String, dynamic> s) {
-    final number = s['number'] is num ? (s['number'] as num).toInt() : fallbackNumber;
+  Widget _sourceRow(
+      BuildContext context, int fallbackNumber, Map<String, dynamic> s) {
+    final number =
+        s['number'] is num ? (s['number'] as num).toInt() : fallbackNumber;
     final citation = (s['citation'] ?? '').toString().trim();
     final url = (s['url'] ?? '').toString().trim();
     final type = (s['type'] ?? '').toString().trim();
 
-    final hasUrl = url.isNotEmpty && url.startsWith('http');
+    final uri = Uri.tryParse(url);
+    final hasUrl = uri != null &&
+        uri.host.isNotEmpty &&
+        (uri.scheme == 'https' || uri.scheme == 'http');
     final content = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -462,7 +475,8 @@ class DrugDetailScreen extends StatelessWidget {
                 style: LumaTokens.body.copyWith(
                   fontSize: 12.5,
                   height: 1.4,
-                  decoration: hasUrl ? TextDecoration.underline : TextDecoration.none,
+                  decoration:
+                      hasUrl ? TextDecoration.underline : TextDecoration.none,
                   decorationColor: LumaTokens.goldDeep.withValues(alpha: 0.4),
                 ),
               ),
@@ -483,7 +497,8 @@ class DrugDetailScreen extends StatelessWidget {
         if (hasUrl)
           Padding(
             padding: const EdgeInsets.only(left: 6, top: 2),
-            child: Icon(Icons.open_in_new, size: 13, color: LumaTokens.goldDeep),
+            child:
+                Icon(Icons.open_in_new, size: 13, color: LumaTokens.goldDeep),
           ),
       ],
     );
@@ -503,7 +518,12 @@ class DrugDetailScreen extends StatelessWidget {
   Future<void> _openUrl(BuildContext context, String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    var ok = false;
+    try {
+      ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Missing browser handlers should not crash the clinical reference.
+    }
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Could not open $url')),
