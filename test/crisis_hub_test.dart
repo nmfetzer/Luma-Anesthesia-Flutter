@@ -4,6 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/crisis/crisis_repository.dart';
 import 'package:luma_anesthesia/crisis/crisis_screen.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+
+class CrisisSourceLauncher extends UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+  String? opened;
+  LaunchOptions? options;
+  @override
+  Future<bool> launchUrl(String url, LaunchOptions options) async {
+    opened = url;
+    this.options = options;
+    return true;
+  }
+}
 
 const mh = CrisisEntry(
     slug: 'mh',
@@ -92,6 +107,10 @@ void main() {
     await t.pumpWidget(host(CrisisDetailScreen(entry: mh, repository: repo)));
     await t.pumpAndSettle();
     expect(find.textContaining('OWNER REVIEW'), findsOneWidget);
+    expect(find.textContaining('Clinical review and release approval'),
+        findsOneWidget);
+    expect(find.textContaining('Original Base44 content is preserved'),
+        findsNothing);
     await t.ensureVisible(find.byType(CheckboxListTile));
     await t.tap(find.byType(CheckboxListTile));
     await t.pumpAndSettle();
@@ -121,6 +140,24 @@ void main() {
     await t.tap(find.byTooltip('Clear search'));
     await t.pumpAndSettle();
     expect(find.text('CICO'), findsOneWidget);
+  });
+  testWidgets('Crisis reference opens the exact source in a separate window',
+      (t) async {
+    final previous = UrlLauncherPlatform.instance;
+    final launcher = CrisisSourceLauncher();
+    UrlLauncherPlatform.instance = launcher;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+    final repo = FakeCrisis()..reviewer = true;
+    addTearDown(repo.events.close);
+    await t.pumpWidget(host(CrisisDetailScreen(entry: mh, repository: repo)));
+    await t.pumpAndSettle();
+    final source = find.text('Example guideline');
+    await t.ensureVisible(source);
+    await t.pumpAndSettle();
+    await t.tap(source);
+    await t.pumpAndSettle();
+    expect(launcher.opened, 'https://example.org/guideline');
+    expect(launcher.options?.webOnlyWindowName, '_blank');
   });
   testWidgets('published paid entry uses existing paywall, not account unlock',
       (t) async {

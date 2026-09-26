@@ -282,7 +282,7 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                                 style: TextStyle(fontWeight: FontWeight.w700)),
                             const SizedBox(height: 8),
                             const Text(
-                                'Original Base44 content is preserved below. Known inconsistencies have not been silently approved.'),
+                                'Draft clinical reference. Clinical review and release approval are required before patient-care use.'),
                             for (final flag
                                 in content['migration_flags'] as List? ?? [])
                               Padding(
