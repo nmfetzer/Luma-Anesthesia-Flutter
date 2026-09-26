@@ -155,6 +155,8 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                 final data = snapshot.data!;
                 final rows = (data['states'] as List).cast<Map>();
                 final facilities = (data['facilities'] as List).cast<Map>();
+                final locators =
+                    (data['treatment_locators'] as List? ?? []).cast<Map>();
                 final states = rows
                     .map((r) => r['state'] as String)
                     .toSet()
@@ -231,7 +233,7 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                             'No matching verified listings. Try another term, clear the state filter, or use the national treatment search below.'),
                       for (final state in shownStates)
                         if (_state != null)
-                          _statePrograms(state, selectedFacilities)
+                          _statePrograms(state, selectedFacilities, locators)
                         else
                           Card(
                               child: ExpansionTile(
@@ -243,9 +245,10 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
                             subtitle: Text(selectedFacilities
                                     .any((f) => f['state'] == state)
                                 ? '${selectedFacilities.where((f) => f['state'] == state).length} program listing(s)'
-                                : 'No verified program listed yet'),
+                                : 'Treatment search and referral options'),
                             children: [
-                              _statePrograms(state, selectedFacilities)
+                              _statePrograms(
+                                  state, selectedFacilities, locators)
                             ],
                           )),
                       _link('Search SAMHSA’s national treatment directory',
@@ -302,13 +305,26 @@ class _ProviderSupportScreenState extends State<ProviderSupportScreen> {
         ))),
       );
 
-  Widget _statePrograms(String state, List<Map> facilities) {
+  Widget _statePrograms(
+      String state, List<Map> facilities, List<Map> locators) {
     final matches = facilities.where((f) => f['state'] == state).toList();
     if (matches.isEmpty) {
       return Padding(
           padding: const EdgeInsets.all(16),
-          child: Text(
-              'No matching healthcare-professional treatment program is verified in this directory for $state. This does not mean no care exists. Use SAMHSA or the state referral program, or explore out-of-state treatment.'));
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(
+                'No matching healthcare-professional treatment program is verified in this directory for $state. This does not mean no care exists.'),
+            for (final locator
+                in locators.where((r) => r['state'] == state)) ...[
+              const SizedBox(height: 8),
+              Text('${locator['note']}'),
+              _link('${locator['title']}', '${locator['url']}'),
+            ],
+            _link('Search treatment nationwide', 'https://findtreatment.gov/'),
+            const Text(
+                'You can also use the state assistance program below or explore out-of-state treatment.'),
+          ]));
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       for (final f in matches)

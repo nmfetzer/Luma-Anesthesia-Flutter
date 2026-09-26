@@ -20,7 +20,17 @@ void main() {
     expect(states.map((e) => e['state']).toSet().length, 51);
     expect(states.where((e) => e['state'] == 'Wisconsin').single['note'],
         contains('not a Wisconsin PHP'));
-    expect((data['facilities'] as List).length, 34);
+    expect((data['facilities'] as List).length, 52);
+    final programStates =
+        (data['facilities'] as List).map((e) => e['state']).toSet();
+    expect(programStates.length, 31);
+    final locators = (data['treatment_locators'] as List).cast<Map>();
+    expect(locators.length, 20);
+    expect({...programStates, ...locators.map((e) => e['state'])}.length, 51);
+    for (final locator in locators) {
+      expect(locator['type'], 'general_treatment_locator');
+      expect(Uri.parse(locator['url']).scheme, 'https');
+    }
     expect((data['sections'] as List).length, 9);
     expect(data['access'], 'always_free_no_account');
     expect(payload, contains('certified anesthesiologist assistants'));
@@ -137,6 +147,37 @@ void main() {
     await t.tap(find.byTooltip('Clear search'));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('programs-Indiana-')), findsOneWidget);
+    expect(t.takeException(), isNull);
+  });
+  testWidgets(
+      'remaining state exposes a general locator without implying a track',
+      (t) async {
+    t.view.physicalSize = const Size(390, 844);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final launcher = CrisisSourceLauncher();
+    UrlLauncherPlatform.instance = launcher;
+    await t.pumpWidget(MaterialApp(
+        home: ProviderSupportScreen(
+            loadContent: () async => Map<String, dynamic>.from(data))));
+    await t.pumpAndSettle();
+    await t.scrollUntilVisible(
+        find.byKey(const ValueKey('support-state')), 400);
+    await t.tap(find.byKey(const ValueKey('support-state')));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Alaska').last);
+    await t.pumpAndSettle();
+    expect(find.textContaining('not a verified healthcare-professional track'),
+        findsOneWidget);
+    final locator =
+        find.text('Alaska treatment search and referral information');
+    await t.ensureVisible(locator);
+    await t.tap(locator);
+    await t.pumpAndSettle();
+    expect(launcher.opened,
+        'https://health.alaska.gov/en/education/sud-treatment-faqs/');
+    expect(find.text('View subscription options'), findsNothing);
     expect(t.takeException(), isNull);
   });
   testWidgets(

@@ -718,6 +718,27 @@
       ]
     },
     {
+      "state": "Hawaii",
+      "name": "Providence Treatment Honolulu",
+      "location": "Honolulu",
+      "phone": "808-445-6780",
+      "level": "Outpatient addiction treatment",
+      "eligibility": "Physicians and other healthcare professionals",
+      "body": "Professional-focused addiction treatment. Confirm in-person versus telehealth availability and the recommended level of care.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.providencetreatment.com/addiction-blog/affiliate-member-of-hah/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.providencetreatment.com/physicians/"
+        }
+      ]
+    },
+    {
       "state": "Illinois",
       "name": "PSI Health / Positive Sobriety Institute",
       "location": "Chicago",
@@ -769,6 +790,44 @@
         {
           "title": "Location and contact information",
           "url": "https://myvictorycenter.com/"
+        }
+      ]
+    },
+    {
+      "state": "Massachusetts",
+      "name": "Brook Recovery Centers",
+      "location": "Abington",
+      "phone": "866-518-9455",
+      "level": "Outpatient / evening IOP",
+      "eligibility": "Physicians, nurses, and other healthcare professionals",
+      "body": "Professional-focused individualized addiction care with evening scheduling. A separate healthcare-only treatment track is not established by this listing.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://brookrecovery.com/who-we-help/professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://brookrecovery.com/"
+        }
+      ]
+    },
+    {
+      "state": "Massachusetts",
+      "name": "Providence Treatment Boston",
+      "location": "Boston, Beacon Street",
+      "phone": "",
+      "level": "PHP / IOP / outpatient",
+      "eligibility": "Physicians, nurses, dentists, veterinarians, and healthcare trainees",
+      "body": "Physician-focused treatment and a professionals-in-training group. Medical detox is coordinated by referral, not represented as onsite detox.",
+      "student_eligibility": "Medical, nursing, pharmacy, physician assistant, and veterinary students are explicitly included. Confirm other trainee eligibility.",
+      "student_confirmed": true,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.providencetreatment.com/drug-rehab-boston/"
         }
       ]
     },
@@ -845,6 +904,120 @@
       ]
     },
     {
+      "state": "Montana",
+      "name": "Rocky Mountain Treatment Center",
+      "location": "Great Falls",
+      "phone": "",
+      "level": "Residential / supervised detox",
+      "eligibility": "Physicians, nurses, aides, medics, and respiratory therapists",
+      "body": "Healthcare-informed substance-use and co-occurring treatment with continuing-care planning. A separately named healthcare-professional track is not established.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.rehabrocky.com/recovery-for-medical-and-healthcare-workers/"
+        }
+      ]
+    },
+    {
+      "state": "New Hampshire",
+      "name": "Discover Health Group Professionals Track",
+      "location": "Nashua",
+      "phone": "603-821-1333",
+      "level": "Structured outpatient professionals track",
+      "eligibility": "Adults 18 and older, including healthcare workers and licensed professionals",
+      "body": "Professional-focused addiction care with virtual/hybrid options. Detox is arranged by outside referral; confirm the appropriate care level.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://discoverhealthgroup.com/program/rehab-for-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "New Jersey",
+      "name": "Enlightened Recovery",
+      "location": "Atlantic City, Egg Harbor City, and Ventnor",
+      "phone": "609-798-0859",
+      "level": "Detox / residential / partial care / IOP / outpatient",
+      "eligibility": "Doctors, nurses, and medical staff",
+      "body": "Healthcare-focused substance-use and co-occurring treatment. Services differ by campus; confirm where the professional-focused care and recommended level are available.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://enlightenedrecovery.com/who-we-help/drug-rehab-for-healthcare-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://enlightenedrecovery.com/"
+        }
+      ]
+    },
+    {
+      "state": "New Jersey",
+      "name": "Liberty Wellness",
+      "location": "Berlin",
+      "phone": "866-558-2635",
+      "level": "PHP / IOP / outpatient",
+      "eligibility": "Physicians, nurses, and other healthcare professionals",
+      "body": "Healthcare-specific addiction treatment addressing burnout, clinical triggers, relapse prevention, and return-to-work concerns.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://libertywellnessnj.com/programs/healthcare-professionals/"
+        }
+      ]
+    },
+    {
+      "state": "New Jersey",
+      "name": "Moving Mountains Recovery",
+      "location": "Randolph",
+      "phone": "862-244-1476",
+      "level": "Partial care / IOP / outpatient",
+      "eligibility": "Physicians, nurses, therapists, pharmacists, and healthcare technicians",
+      "body": "Healthcare-focused mental-health and addiction treatment. Detox placement is a referral service; confirm inpatient arrangements separately.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://movingmountainsrecovery.com/about/who-we-help/healthcare-providers/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://movingmountainsrecovery.com/"
+        }
+      ]
+    },
+    {
+      "state": "New Jersey",
+      "name": "ShoreBreak Recovery",
+      "location": "Manahawkin",
+      "phone": "609-200-5895",
+      "level": "Partial care / IOP / outpatient",
+      "eligibility": "Physicians, nurses, advanced-practice providers, therapists, pharmacists, technicians, and other healthcare professionals",
+      "body": "Healthcare-professional addiction treatment addressing professional stress and recovery. Confirm availability and location-specific services.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://shorebreakrecovery.com/who-we-help/healthcare-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://shorebreakrecovery.com/"
+        }
+      ]
+    },
+    {
       "state": "New York",
       "name": "Wellbridge Healthcare Professionals Treatment",
       "location": "Long Island",
@@ -862,6 +1035,107 @@
         {
           "title": "Location and contact information",
           "url": "https://wellbridge.org/"
+        }
+      ]
+    },
+    {
+      "state": "North Carolina",
+      "name": "Dilworth Center Professionals Treatment Program",
+      "location": "Charlotte",
+      "phone": "704-372-6969",
+      "level": "Outpatient / IOP",
+      "eligibility": "Physicians, nurses, dentists, hygienists, and pharmacists",
+      "body": "Career-specific addiction treatment with professional recovery planning and regulatory or advocacy-program coordination where appropriate.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://dilworthcenter.org/professionals-program/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://dilworthcenter.org/"
+        }
+      ]
+    },
+    {
+      "state": "Ohio",
+      "name": "Ohio Addiction Recovery Center",
+      "location": "Grove City",
+      "phone": "800-481-8457",
+      "level": "Detox / inpatient / PHP / IOP",
+      "eligibility": "Physicians, nurses, EMTs, paramedics, pharmacists, veterinarians, and technicians",
+      "body": "Healthcare-professional addiction treatment and continuing care. The center states it is not affiliated with specific physician or nurse monitoring programs; confirm requirements before admission.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.ohioarc.com/about-oarc/healthcare-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.ohioarc.com/"
+        }
+      ]
+    },
+    {
+      "state": "Ohio",
+      "name": "Ray Recovery Executive IOP",
+      "location": "Hudson",
+      "phone": "888-598-6299",
+      "level": "IOP / virtual IOP",
+      "eligibility": "Physicians, nurses, and other working professionals",
+      "body": "Professional-focused outpatient addiction treatment. Confirm virtual eligibility, schedule, and any monitoring-program requirements.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://rayrecovery.com/recovery-treatment-programs-oh/executive-iop/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://rayrecovery.com/"
+        }
+      ]
+    },
+    {
+      "state": "Ohio",
+      "name": "The Ridge Ohio",
+      "location": "Cincinnati and Columbus; confirm campus",
+      "phone": "513-457-7963",
+      "level": "Detox / residential / PHP / IOP",
+      "eligibility": "Physicians and other working professionals",
+      "body": "Professional-focused addiction care and recovery planning. Available services differ by location; confirm the appropriate campus and physician-program arrangements.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://theridgeohio.com/rehab-guides/executives/doctors/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://theridgeohio.com/"
+        }
+      ]
+    },
+    {
+      "state": "Oklahoma",
+      "name": "Country Road Recovery Center",
+      "location": "Pink",
+      "phone": "",
+      "level": "Residential addiction treatment",
+      "eligibility": "Physicians, nurses, and other working professionals",
+      "body": "Professional-informed substance-use care. A separately named healthcare-only track is not established; confirm other care levels and withdrawal-management needs directly.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.countryroadrc.com/rehab-for-professionals-oklahoma/"
         }
       ]
     },
@@ -913,6 +1187,44 @@
         {
           "title": "Official program information",
           "url": "https://www.marworth.org/programs/healthcare-professionals"
+        }
+      ]
+    },
+    {
+      "state": "South Carolina",
+      "name": "MUSC Addiction Rehabilitation Program for Legal & Medical Professionals",
+      "location": "Charleston",
+      "phone": "843-792-5200",
+      "level": "Addiction evaluation and treatment; confirm level",
+      "eligibility": "Medical and legal professionals",
+      "body": "Professional-focused addiction evaluations and treatment through the Center for Drug and Alcohol Programs at the Institute of Psychiatry. Ask admissions about discipline, trainee eligibility, and care level.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://muschealth.org/medical-services/behavioral-health/cdap"
+        }
+      ]
+    },
+    {
+      "state": "South Dakota",
+      "name": "Keystone Medical and Legal Professionals Treatment Track",
+      "location": "South Dakota; confirm campus",
+      "phone": "",
+      "level": "Detox / residential; confirm track arrangements",
+      "eligibility": "Medical and legal professionals age 18 and older",
+      "body": "Dedicated professional track with individual, group, family, and experiential therapy; continuing care and diversion-program coordination when applicable. Confirm campus and availability before traveling.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.keystonetreatment.com/programs/specialty/medical-legal-professionals/"
+        },
+        {
+          "title": "Location and contact information",
+          "url": "https://www.keystonetreatment.com/"
         }
       ]
     },
@@ -1038,7 +1350,203 @@
           "url": "https://farleycenter.com/professionals-program/"
         }
       ]
+    },
+    {
+      "state": "West Virginia",
+      "name": "Harmony Ridge Recovery Center",
+      "location": "Walker, Barboursville, and Charleston",
+      "phone": "888-771-8372",
+      "level": "Detox / residential / PHP / IOP",
+      "eligibility": "Physicians, nurses, dentists, and other professionals",
+      "body": "Professional-focused addiction and co-occurring treatment. Confirm which campus offers the recommended care level and professional program.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://www.harmonyridgerecovery.com/rehab/professionals/"
+        }
+      ]
+    },
+    {
+      "state": "West Virginia",
+      "name": "Wise Path Recovery Centers",
+      "location": "Morgantown and Williamson",
+      "phone": "866-860-9772",
+      "level": "Detox / residential / IOP / outpatient",
+      "eligibility": "Working professionals including nurses and healthcare workers",
+      "body": "Professionals-focused addiction treatment, not a separately verified healthcare-only track. Confirm campus, profession eligibility, and recommended care level.",
+      "student_eligibility": "Student, trainee, and CAA eligibility is not established by this listing. Ask admissions before arranging care.",
+      "student_confirmed": false,
+      "sources": [
+        {
+          "title": "Official program information",
+          "url": "https://wisepathrecoverycenters.com/professionals/"
+        }
+      ]
     }
   ],
-  "access": "always_free_no_account"
+  "access": "always_free_no_account",
+  "treatment_locators": [
+    {
+      "state": "Alaska",
+      "title": "Alaska treatment search and referral information",
+      "url": "https://health.alaska.gov/en/education/sud-treatment-faqs/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Arkansas",
+      "title": "Arkansas treatment search and referral information",
+      "url": "https://humanservices.arkansas.gov/divisions-shared-services/shared-services/office-of-substance-abuse-and-mental-health/samh-treatment/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Delaware",
+      "title": "Delaware treatment search and referral information",
+      "url": "https://dhss.delaware.gov/dsamh/division-of-substance-abuse-and-mental-health/treatment-connection/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "District of Columbia",
+      "title": "District of Columbia treatment search and referral information",
+      "url": "https://dbh.dc.gov/page/substance-use-disorder-services",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Idaho",
+      "title": "Idaho treatment search and referral information",
+      "url": "https://healthandwelfare.idaho.gov/services-programs/health-behavioral-health-and-substance-use-disorder",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Iowa",
+      "title": "Iowa treatment search and referral information",
+      "url": "https://hhs.iowa.gov/health-prevention/addiction-substance-use-disorders/related-treatment-programs",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Kansas",
+      "title": "Kansas treatment search and referral information",
+      "url": "https://www.kdads.ks.gov/services-programs/behavioral-health/services-and-programs/substance-use-disorder-treatment-services",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Kentucky",
+      "title": "Kentucky treatment search and referral information",
+      "url": "https://hopeandhelp.ky.gov/Pages/findhelpnow-treatment-locator.aspx",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Maine",
+      "title": "Maine treatment search and referral information",
+      "url": "https://www.maine.gov/dhhs/treatment-connection",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Maryland",
+      "title": "Maryland treatment search and referral information",
+      "url": "https://health.maryland.gov/bha/pages/directories.aspx",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Nebraska",
+      "title": "Nebraska treatment search and referral information",
+      "url": "https://dhhs.ne.gov/Pages/Addiction-Treatment-and-Recovery.aspx",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Nevada",
+      "title": "Nevada treatment search and referral information",
+      "url": "https://behavioralhealthnv.org/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "New Mexico",
+      "title": "New Mexico treatment search and referral information",
+      "url": "https://www.nmhealth.org/about/erd/ibeb/pos/awnm/tf/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "North Dakota",
+      "title": "North Dakota treatment search and referral information",
+      "url": "https://www.hhs.nd.gov/behavioral-health/substance-abuse-treatment-programs",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Rhode Island",
+      "title": "Rhode Island treatment search and referral information",
+      "url": "https://health.ri.gov/addiction-overdose/information/physicians-addiction-treatment-recovery",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Utah",
+      "title": "Utah treatment search and referral information",
+      "url": "https://sumh.utah.gov/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Vermont",
+      "title": "Vermont treatment search and referral information",
+      "url": "https://www.healthvermont.gov/alcohol-drugs/how-get-help/find-treatment",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Washington",
+      "title": "Washington treatment search and referral information",
+      "url": "https://www.hca.wa.gov/free-or-low-cost-health-care/i-need-behavioral-health-support/substance-use-treatment",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Wisconsin",
+      "title": "Wisconsin treatment search and referral information",
+      "url": "https://www.dhs.wisconsin.gov/real-talks/get-help.htm",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    },
+    {
+      "state": "Wyoming",
+      "title": "Wyoming treatment search and referral information",
+      "url": "https://health.wyo.gov/behavioralhealth/mhsa/treatment/",
+      "type": "general_treatment_locator",
+      "note": "General substance-use treatment navigation, not a verified healthcare-professional track. Ask providers about your profession, trainee status, and any monitoring requirements.",
+      "checked": "2026-09-26"
+    }
+  ]
 }
