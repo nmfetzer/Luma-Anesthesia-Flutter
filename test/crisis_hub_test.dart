@@ -100,7 +100,8 @@ void main() {
     expect(find.text('View subscription options'), findsNothing);
     expect(find.text('Example action'), findsNothing);
   });
-  testWidgets('owner review checklist resets and sign-out clears content',
+  testWidgets(
+      'reference sections have no checklist and sign-out clears content',
       (t) async {
     final repo = FakeCrisis()..reviewer = true;
     addTearDown(repo.events.close);
@@ -111,17 +112,21 @@ void main() {
         findsOneWidget);
     expect(find.textContaining('Original Base44 content is preserved'),
         findsNothing);
-    await t.ensureVisible(find.byType(CheckboxListTile));
-    await t.tap(find.byType(CheckboxListTile));
-    await t.pumpAndSettle();
-    expect(find.text('Checklist • 1/1 marked'), findsOneWidget);
-    await t.tap(find.text('Reset'));
-    await t.pumpAndSettle();
-    expect(find.text('Checklist • 0/1 marked'), findsOneWidget);
+    expect(find.text('Overview'), findsOneWidget);
+    expect(find.text('Clinical management considerations'), findsOneWidget);
+    expect(find.text('Example action'), findsOneWidget);
+    expect(find.text('Example detail'), findsOneWidget);
+    expect(find.text('Critical clinical consideration'), findsOneWidget);
+    expect(find.byType(CheckboxListTile), findsNothing);
+    expect(find.byType(Checkbox), findsNothing);
+    expect(find.textContaining('Checklist'), findsNothing);
+    expect(find.text('Reset'), findsNothing);
+    expect(find.text('1. Example action'), findsNothing);
     repo.reviewer = false;
     repo.events.add(null);
     await t.pumpAndSettle();
-    expect(find.textContaining('1. Example action'), findsNothing);
+    expect(find.text('Example action'), findsNothing);
+    expect(find.text('Example detail'), findsNothing);
     expect(find.textContaining('not yet released for patient care'),
         findsOneWidget);
   });

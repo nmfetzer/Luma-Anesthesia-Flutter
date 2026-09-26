@@ -42,11 +42,11 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Clear steps. Critical moments.',
+                      Text('Clinical crisis references',
                           style: lumaDisplay(size: 26)),
                       const SizedBox(height: 8),
                       const Text(
-                          'Activate local emergency support. Follow current institutional protocols and clinical judgment.'),
+                          'Topic-based clinical reference material. Use clinical judgment and current institutional protocols; do not delay emergency support.'),
                       const SizedBox(height: 16),
                       TextField(
                           controller: _search,
@@ -161,7 +161,6 @@ class CrisisDetailScreen extends StatefulWidget {
 class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
   late Future<({CrisisAccess access, Map<String, dynamic>? content})> _load;
   StreamSubscription<void>? _auth;
-  final _checked = <int>{};
   var _version = 0;
   @override
   void initState() {
@@ -171,7 +170,6 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
       if (mounted)
         setState(() {
           _version++;
-          _checked.clear();
           _load = _fetch();
         });
     });
@@ -259,7 +257,9 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Back to Crisis Hub')),
                 ]);
-              final steps = (content['steps'] as List? ?? []).cast<Map>();
+              // Preserve the reviewed source content while presenting it as
+              // reference sections, never as an interactive treatment checklist.
+              final sections = (content['steps'] as List? ?? []).cast<Map>();
               final sources = (content['sources'] as List? ?? []).cast<Map>();
               String value(String key) => content[key]?.toString() ?? '';
               return ListView(padding: const EdgeInsets.all(24), children: [
@@ -290,47 +290,40 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                                   child: Text('• $flag')),
                           ])),
                 const SizedBox(height: 16),
-                if (value('summary').isNotEmpty)
-                  Text(value('summary'), style: lumaBody(size: 16)),
-                if (steps.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  Row(children: [
-                    Expanded(
-                        child: Text(
-                            'Checklist • ${_checked.length}/${steps.length} marked',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600))),
-                    TextButton(
-                        onPressed: () => setState(_checked.clear),
-                        child: const Text('Reset')),
-                  ]),
-                  const Text(
-                      'Marks are temporary reading aids, not a treatment record.'),
-                  for (var i = 0; i < steps.length; i++)
-                    Card(
-                        color: LumaColors.creamElevated,
-                        child: CheckboxListTile(
-                            controlAffinity: ListTileControlAffinity.leading,
-                            value: _checked.contains(i),
-                            onChanged: (checked) => setState(() {
-                                  checked == true
-                                      ? _checked.add(i)
-                                      : _checked.remove(i);
-                                }),
-                            title: Text('${i + 1}. ${steps[i]['action'] ?? ''}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600)),
-                            subtitle: steps[i]['details'] == null
-                                ? null
-                                : Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text('${steps[i]['details']}')),
-                            secondary: steps[i]['is_critical'] == true
-                                ? const Tooltip(
-                                    message: 'Critical action',
-                                    child: Icon(Icons.priority_high,
-                                        color: LumaColors.highAlert))
-                                : null)),
+                if (value('summary').isNotEmpty) ...[
+                  Text('Overview', style: lumaDisplay(size: 22)),
+                  const SizedBox(height: 8),
+                  SelectableText(value('summary'), style: lumaBody(size: 16)),
+                ],
+                if (sections.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text('Clinical management considerations',
+                      style: lumaDisplay(size: 22)),
+                  for (final section in sections)
+                    Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Semantics(
+                                  header: true,
+                                  child: Text('${section['action'] ?? ''}',
+                                      style: lumaBody(
+                                          size: 18, weight: FontWeight.w700))),
+                              if (section['details'] != null) ...[
+                                const SizedBox(height: 8),
+                                SelectableText('${section['details']}',
+                                    style: lumaBody(size: 16)),
+                              ],
+                              if (section['is_critical'] == true) ...[
+                                const SizedBox(height: 8),
+                                Text('Critical clinical consideration',
+                                    style: lumaBody(
+                                        size: 13,
+                                        weight: FontWeight.w700,
+                                        color: LumaColors.highAlert)),
+                              ],
+                            ])),
                 ],
                 for (final field in {
                   'key_drugs': 'Key drugs',
@@ -340,7 +333,7 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                     const SizedBox(height: 24),
                     Text(field.value, style: lumaDisplay(size: 22)),
                     const SizedBox(height: 8),
-                    Text(value(field.key), style: lumaBody(size: 16)),
+                    SelectableText(value(field.key), style: lumaBody(size: 16)),
                   ],
                 if (value('body_markdown').isNotEmpty) ...[
                   const SizedBox(height: 24),
