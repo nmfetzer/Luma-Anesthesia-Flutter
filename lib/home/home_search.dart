@@ -173,7 +173,9 @@ class _HomeSearchState extends State<HomeSearch> {
         : <SpecialConsiderationEntry>[];
     final navigator = Navigator.of(this.context);
     final crises = searching
-        ? (data?.crises ?? []).where((e) => e.matches(query)).toList()
+        ? (data?.crises ?? [])
+            .where((e) => e.isVisibleInHub && e.matches(query))
+            .toList()
         : <CrisisEntry>[];
     Widget heading(String text) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),

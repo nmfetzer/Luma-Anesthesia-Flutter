@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/home/home_search.dart';
 import 'package:luma_anesthesia/home/home_screen.dart';
 import 'package:luma_anesthesia/home/home_tile.dart';
+import 'package:luma_anesthesia/crisis/crisis_repository.dart';
 import 'package:luma_anesthesia/models/medication.dart';
 import 'package:luma_anesthesia/special_considerations/special_consideration.dart';
 
@@ -49,6 +50,30 @@ Future<void> openSearch(WidgetTester tester,
 }
 
 void main() {
+  testWidgets('home search hides deferred pediatric topics but retains PALS',
+      (tester) async {
+    await openSearch(tester,
+        loader: () async => const HomeSearchData(crises: [
+              CrisisEntry(
+                  slug: 'child-fixture',
+                  title: 'Pediatric Emergency Fixture',
+                  category: 'pediatric',
+                  searchTerms: 'pediatric child emergency'),
+              CrisisEntry(
+                  slug: 'pals',
+                  title: 'PALS',
+                  category: 'resuscitation',
+                  searchTerms: 'pediatric advanced life support'),
+            ]));
+    await tester.enterText(find.byType(TextField).last, 'pediatric');
+    await tester.pumpAndSettle();
+    expect(find.text('Pediatric Emergency Fixture'), findsNothing);
+    expect(find.text('PALS'), findsOneWidget);
+    expect(find.text('Crisis Hub · 1 results'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).last, 'child emergency');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('No matches yet'), findsOneWidget);
+  });
   testWidgets(
       'live matches update without submitting; names, brands and no results',
       (tester) async {

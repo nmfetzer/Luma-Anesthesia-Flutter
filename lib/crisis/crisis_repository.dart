@@ -9,7 +9,6 @@ const crisisCategories = {
   'regional': 'Regional',
   'metabolic': 'Metabolic & Endocrine',
   'ob': 'OB Emergencies',
-  'pediatric': 'Pediatric Emergencies',
   'mental': 'Mental Emergencies (for Healthcare Providers)',
 };
 
@@ -33,6 +32,9 @@ class CrisisEntry {
         isPublished: json['release_status'] == 'published',
       );
   String get categoryLabel => crisisCategories[category] ?? category;
+  // Temporarily reserved for a future pediatric anesthesia pack.
+  // Presentation-only: preserve database records and existing access rules.
+  bool get isVisibleInHub => category != 'pediatric';
   bool matches(String query) {
     final text = '$title $searchTerms $categoryLabel'.toLowerCase();
     return query
@@ -72,7 +74,9 @@ class SupabaseCrisisRepository implements CrisisDataSource {
           .order('slug')
           .range(offset, offset + 199)
           .timeout(const Duration(seconds: 15));
-      result.addAll(rows.map(CrisisEntry.fromJson));
+      result.addAll(rows
+          .map(CrisisEntry.fromJson)
+          .where((entry) => entry.isVisibleInHub));
       if (rows.length < 200) return result;
     }
   }

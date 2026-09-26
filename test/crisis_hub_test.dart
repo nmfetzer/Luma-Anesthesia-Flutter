@@ -32,6 +32,7 @@ const airway = CrisisEntry(
     searchTerms: "Can't Intubate Can't Oxygenate");
 
 class FakeCrisis implements CrisisDataSource {
+  List<CrisisEntry> entries = [mh, airway];
   bool reviewer = false;
   bool fail = false;
   final events = StreamController<void>.broadcast();
@@ -40,7 +41,7 @@ class FakeCrisis implements CrisisDataSource {
   @override
   Future<List<CrisisEntry>> catalog() async {
     if (fail) throw StateError('offline');
-    return [mh, airway];
+    return entries;
   }
 
   @override
@@ -74,6 +75,36 @@ Widget host(Widget child) => MaterialApp(home: child, routes: {
     });
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
+  testWidgets('pediatric category and search results are hidden, PALS remains',
+      (t) async {
+    final repo = FakeCrisis()
+      ..entries = const [
+        CrisisEntry(
+            slug: 'pediatric-fixture',
+            title: 'Pediatric Emergency Fixture',
+            category: 'pediatric',
+            searchTerms: 'child emergency'),
+        CrisisEntry(
+            slug: 'pals',
+            title: 'PALS',
+            category: 'resuscitation',
+            searchTerms: 'pediatric advanced life support'),
+      ];
+    addTearDown(repo.events.close);
+    await t.pumpWidget(host(CrisisHubScreen(repository: repo)));
+    await t.pumpAndSettle();
+    expect(find.text('Pediatric Emergencies'), findsNothing);
+    expect(find.text('Pediatric Emergency Fixture'), findsNothing);
+    expect(find.text('PALS'), findsOneWidget);
+    await t.enterText(find.byType(TextField), 'child emergency');
+    await t.pumpAndSettle();
+    expect(find.textContaining('No matching emergencies.'), findsOneWidget);
+    await t.enterText(find.byType(TextField), 'pediatric');
+    await t.pumpAndSettle();
+    expect(find.text('PALS'), findsOneWidget);
+    expect(find.text('Pediatric Emergency Fixture'), findsNothing);
+    expect(t.takeException(), isNull);
+  });
   test('Acronyms and multi-word search match metadata only', () {
     expect(mh.matches('MH'), isTrue);
     expect(airway.matches('intubate oxygenate'), isTrue);

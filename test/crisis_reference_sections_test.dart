@@ -36,8 +36,7 @@ const sections = [
 
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
-  test('ten categories retain the requested order and support category search',
-      () {
+  test('nine active categories retain order and support category search', () {
     expect(crisisCategories.keys, [
       'resuscitation',
       'neurological',
@@ -47,7 +46,6 @@ void main() {
       'regional',
       'metabolic',
       'ob',
-      'pediatric',
       'mental'
     ]);
     expect(

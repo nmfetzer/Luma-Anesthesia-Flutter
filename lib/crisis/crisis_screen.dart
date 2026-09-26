@@ -97,6 +97,7 @@ class _CrisisHubScreenState extends State<CrisisHubScreen> {
                         return const Center(child: CircularProgressIndicator());
                       final rows = snapshot.data!
                           .where((e) =>
+                              e.isVisibleInHub &&
                               (_category == null || e.category == _category) &&
                               e.matches(_search.text))
                           .toList();
