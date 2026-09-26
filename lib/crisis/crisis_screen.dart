@@ -6,6 +6,7 @@ import '../theme/luma_theme.dart';
 import '../widgets/luma_home_button.dart';
 import '../widgets/clinical_source_link.dart';
 import 'crisis_repository.dart';
+import 'crisis_reference_sections.dart';
 
 class CrisisHubScreen extends StatefulWidget {
   const CrisisHubScreen({super.key, this.repository, this.initialQuery = ''});
@@ -268,7 +269,8 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                 const SizedBox(height: 8),
                 Text(widget.entry.title, style: lumaDisplay(size: 28)),
                 const SizedBox(height: 20),
-                if (!widget.entry.isPublished)
+                if (!widget.entry.isPublished ||
+                    content['_review_draft'] == true)
                   Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -338,6 +340,13 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                 if (value('body_markdown').isNotEmpty) ...[
                   const SizedBox(height: 24),
                   _markdown(value('body_markdown')),
+                ],
+                if (content['reference_sections'] is List) ...[
+                  const SizedBox(height: 24),
+                  CrisisReferenceSections(
+                    sections:
+                        (content['reference_sections'] as List).cast<Map>(),
+                  ),
                 ],
                 if (value('supplement_markdown').isNotEmpty) ...[
                   const SizedBox(height: 24),

@@ -1,12 +1,16 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const crisisCategories = {
-  'cardiac': 'Cardiac & Circulation',
+  'resuscitation': 'ACLS/PALS/BLS',
+  'neurological': 'Neurological',
+  'cardiac': 'Cardiac/Circulation',
   'airway': 'Airway & Ventilation',
-  'toxicity': 'Toxicity & Reaction',
+  'toxicity': 'Allergy/Toxicity/Reactions',
+  'regional': 'Regional',
+  'metabolic': 'Metabolic & Endocrine',
   'ob': 'OB Emergencies',
   'pediatric': 'Pediatric Emergencies',
-  'metabolic': 'Metabolic & Endocrine',
+  'mental': 'Mental Emergencies (for Healthcare Providers)',
 };
 
 class CrisisEntry {
@@ -77,6 +81,22 @@ class SupabaseCrisisRepository implements CrisisDataSource {
   Future<Map<String, dynamic>?> detail(String slug) async {
     // RLS, not the widget, decides whether this caller can read clinical prose.
     // No persistent cache: signing out immediately removes reviewer content.
+    if (client.auth.currentUser != null &&
+        !client.auth.currentUser!.isAnonymous) {
+      final draft = await client
+          .from('crisis_reference_drafts')
+          .select('content,revision')
+          .eq('slug', slug)
+          .maybeSingle()
+          .timeout(const Duration(seconds: 15));
+      if (draft != null) {
+        return {
+          ...Map<String, dynamic>.from(draft['content'] as Map),
+          '_review_draft': true,
+          '_revision': draft['revision'],
+        };
+      }
+    }
     final row = await client
         .from('crisis_protocols')
         .select('content')
