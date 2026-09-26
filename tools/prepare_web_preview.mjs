@@ -22,4 +22,25 @@ writeFileSync(
   bootstrapPath,
   bootstrap.replace(workerSettings, "config: { canvasKitBaseUrl: 'canvaskit/' }"),
 );
+// Flutter dependencies can retain web-storage code even when Supabase is
+// configured with EmptyLocalStorage. Embedded preview sessions must remain
+// memory-only. Replace those dependency accessors with a real transient adapter;
+// never apply this transformation to the native or production web builds.
+const dartPath = resolve(directory, 'main.dart.js');
+const dart = readFileSync(dartPath, 'utf8');
+const memoryStorage = `(() => {
+  const values = new Map();
+  window.lumaPreviewMemoryStorage = {
+    get length() { return values.size; },
+    key(index) { return Array.from(values.keys())[index] ?? null; },
+    getItem(key) { return values.get(String(key)) ?? null; },
+    setItem(key, value) { values.set(String(key), String(value)); },
+    removeItem(key) { values.delete(String(key)); },
+    clear() { values.clear(); }
+  };
+})();\n`;
+if (dart.includes('localStorage')) {
+  writeFileSync(dartPath,
+    memoryStorage + dart.replaceAll('localStorage', 'lumaPreviewMemoryStorage'));
+}
 console.log('Prepared Flutter preview for nested hosting.');

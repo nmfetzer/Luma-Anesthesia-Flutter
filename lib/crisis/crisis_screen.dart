@@ -7,6 +7,7 @@ import '../widgets/luma_home_button.dart';
 import '../widgets/clinical_source_link.dart';
 import 'crisis_repository.dart';
 import 'crisis_reference_sections.dart';
+import 'crisis_algorithm_links.dart';
 
 class CrisisHubScreen extends StatefulWidget {
   const CrisisHubScreen({super.key, this.repository, this.initialQuery = ''});
@@ -292,6 +293,10 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                                   child: Text('• $flag')),
                           ])),
                 const SizedBox(height: 16),
+                if (crisisAlgorithms.containsKey(widget.entry.slug)) ...[
+                  CrisisAlgorithmLinks(slug: widget.entry.slug),
+                  const SizedBox(height: 24),
+                ],
                 if (value('summary').isNotEmpty) ...[
                   Text('Overview', style: lumaDisplay(size: 22)),
                   const SizedBox(height: 8),
