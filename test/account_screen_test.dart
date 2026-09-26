@@ -67,6 +67,20 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
+  testWidgets('account header uses the symbol-only halo artwork', (tester) async {
+    final account = FakeAccount();
+    await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
+    await tester.pumpAndSettle();
+    final header = tester.widget<Image>(
+      find.byWidgetPredicate((widget) =>
+          widget is Image && widget.semanticLabel == 'Luma symbol and halo'),
+    );
+    expect((header.image as AssetImage).assetName,
+        'assets/branding/luma_symbol_halo.png');
+    expect(header.fit, BoxFit.contain);
+    expect(header.height, 72);
+  });
+
   testWidgets('validates before submitting credentials', (tester) async {
     final account = FakeAccount();
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));

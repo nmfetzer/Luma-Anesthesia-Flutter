@@ -232,7 +232,12 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Image.asset('assets/branding/luma_icon.png', height: 72),
+                      Image.asset(
+                        'assets/branding/luma_symbol_halo.png',
+                        height: 72,
+                        fit: BoxFit.contain,
+                        semanticLabel: 'Luma symbol and halo',
+                      ),
                       const SizedBox(height: 24),
                       Text(
                           _access.email != null
