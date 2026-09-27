@@ -204,6 +204,16 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ACT / Activated Clotting Time'));
     await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('act-procedure-table')), findsOneWidget);
+    expect(find.text('ACT targets by procedure'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('ACT targets by procedure')).dy,
+      lessThan(
+        tester
+            .getTopLeft(find.text('What ACT tells you in the operating room'))
+            .dy,
+      ),
+    );
     expect(
       find.text('Abbott · Device-specific baseline ranges'),
       findsOneWidget,
@@ -214,6 +224,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  for (final width in [320.0, 960.0]) {
+    testWidgets('ACT comparison chart wraps at width $width', (tester) async {
+      await tester.binding.setSurfaceSize(Size(width, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.3),
+            ),
+            child: child!,
+          ),
+          home: const LabValuesScreen(showClinicalDraft: true),
+        ),
+      );
+      await tester.scrollUntilVisible(
+        find.byType(TextField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.enterText(find.byType(TextField), 'activated clotting time');
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('ACT / Activated Clotting Time'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('ACT / Activated Clotting Time'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('act-procedure-table')), findsOneWidget);
+      for (final target in [
+        '>480 seconds',
+        '≥300 seconds',
+        'No universal numeric target',
+        '250–300 seconds: HemoTec / i-STAT\n300–350 seconds: Hemochron',
+      ]) {
+        expect(find.text(target), findsOneWidget);
+      }
+      await tester.ensureVisible(find.text('ESVS · Arterial surgery guidance'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('normal app cannot view draft lab values', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: LabValuesScreen()));

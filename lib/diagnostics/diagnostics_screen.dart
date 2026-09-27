@@ -324,6 +324,8 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                             expandedCrossAxisAlignment:
                                 CrossAxisAlignment.start,
                             children: [
+                              if (entry.id == 'act')
+                                const _ActComparisonChart(),
                               const Divider(),
                               Text(
                                 entry.hasExampleInterval
@@ -359,6 +361,130 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
             ),
     );
   }
+}
+
+class _ActComparisonChart extends StatelessWidget {
+  const _ActComparisonChart();
+
+  static const _rows = [
+    (
+      procedure: 'CPB',
+      target: '>480 seconds',
+      caveat:
+          'Cardiopulmonary bypass. Certain maximally activated or microcuvette systems: >400 seconds. Use the validated device-specific perfusion protocol.',
+      source: 'STS/SCA/AmSECT · CPB guideline',
+      url: actGuidelineSource,
+    ),
+    (
+      procedure: 'PCI (UFH)',
+      target: '250–300 seconds: HemoTec / i-STAT\n'
+          '300–350 seconds: Hemochron',
+      caveat:
+          'With unfractionated heparin. Planned IV GP IIb/IIIa inhibitor: 200–250 seconds. Higher targets may be considered for CTO or ACS; confirm the procedural protocol.',
+      source: 'ACC/AHA/SCAI · PCI guideline',
+      url: pciActSource,
+    ),
+    (
+      procedure: 'AF ablation',
+      target: '≥300 seconds',
+      caveat:
+          'Left atrial ablation. Maintain with unfractionated heparin and regular ACT checks. Some centers use higher targets; follow the electrophysiology protocol.',
+      source: 'EHRA/HRS · AF ablation consensus',
+      url: ablationActSource,
+    ),
+    (
+      procedure: 'Arterial surgery',
+      target: 'No universal numeric target',
+      caveat:
+          'Open or endovascular procedures. ESVS: ACT-guided additional UFH or reversal may be considered (IIb, C). Follow an agreed procedure- and device-specific institutional protocol.',
+      source: 'ESVS · Arterial surgery guidance',
+      url: vascularActSource,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        key: const ValueKey('act-comparison-chart'),
+        padding: const EdgeInsets.only(top: 12, bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'ACT targets by procedure',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Procedural anticoagulation targets, not normal ranges. '
+              'Confirm the procedure, analyzer, medications, and local protocol.',
+            ),
+            const SizedBox(height: 12),
+            Table(
+              key: const ValueKey('act-procedure-table'),
+              columnWidths: const {
+                0: FlexColumnWidth(1),
+                1: FlexColumnWidth(2.3),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              border: TableBorder.all(
+                color: LumaColors.inkMuted.withValues(alpha: 0.25),
+              ),
+              children: [
+                const TableRow(
+                  decoration: BoxDecoration(color: LumaColors.haloGoldLight),
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Procedure',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'ACT target & key qualifications',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                for (final row in _rows)
+                  TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          row.procedure,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              row.target,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: LumaColors.inkNavy,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(row.caveat),
+                            const SizedBox(height: 6),
+                            _SourceLink(label: row.source, url: row.url),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      );
 }
 
 class _LabBullet extends StatelessWidget {
