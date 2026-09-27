@@ -20,8 +20,8 @@ void main() {
   });
 
   test('lab draft has unique IDs, source links, units and working aliases', () {
-    expect(labReferences.length, 33);
-    expect(labReferences.map((e) => e.id).toSet().length, 33);
+    expect(labReferences.length, 35);
+    expect(labReferences.map((e) => e.id).toSet().length, 35);
     for (final entry in labReferences) {
       expect(entry.interval, isNotEmpty);
       expect(entry.bullets, isNotEmpty);
@@ -60,7 +60,7 @@ void main() {
             .having((e) => e.hasUrgentContext, 'has urgent context', isTrue),
       ),
     );
-    expect(labReferences.where((e) => !e.hasExampleInterval).length, 3);
+    expect(labReferences.where((e) => !e.hasExampleInterval).length, 5);
     expect(
       labClinicalGuidance.keys.toSet(),
       labReferences.map((e) => e.id).toSet(),
@@ -73,6 +73,8 @@ void main() {
       'CPK': 'ck',
       'CKMB': 'ck-mb',
       'lactic acid': 'lactate',
+      'BNP': 'bnp',
+      'NTproBNP': 'nt-probnp',
     }.entries) {
       expect(
         searchLabReferences(pair.key).map((e) => e.id),
@@ -86,7 +88,7 @@ void main() {
     expect(
       searchLabReferences('', group: 'Perfusion & Cardiac Markers')
           .map((e) => e.id),
-      containsAll(['lactate', 'troponin', 'ck', 'ck-mb']),
+      containsAll(['lactate', 'troponin', 'ck', 'ck-mb', 'bnp', 'nt-probnp']),
     );
     for (final id in [
       'pt-inr',
@@ -100,6 +102,8 @@ void main() {
       'troponin',
       'ck',
       'ck-mb',
+      'bnp',
+      'nt-probnp',
     ]) {
       final card = labReferences.singleWhere((e) => e.id == id);
       expect(card.clinicalSections.length, greaterThanOrEqualTo(2), reason: id);
@@ -126,9 +130,37 @@ void main() {
       'Excess protamine',
       'antithrombin',
       'fresh sample',
+      '250–300 seconds',
+      '300–350 seconds',
+      '200–250 seconds',
+      '≥300',
+      'class IIb, level C',
+      'not establish one universal numeric ACT goal',
     ]) {
       expect(text, contains(value));
     }
+  });
+
+  test('natriuretic peptides separate HF diagnosis from perioperative risk',
+      () {
+    for (final id in ['bnp', 'nt-probnp']) {
+      final card = labReferences.singleWhere((e) => e.id == id);
+      expect(card.hasExampleInterval, isFalse);
+      expect(card.interval, contains('not a universal normal range'));
+      final text = card.clinicalSections.expand((s) => s.bullets).join(' ');
+      expect(text, contains('elevated-risk noncardiac surgery'));
+      expect(text, contains('renal'));
+      expect(text.toLowerCase(), contains('obesity'));
+      expect(text, contains('fluid responsiveness'));
+      expect(text, contains(id == 'bnp' ? 'BNP >92' : 'NT-proBNP ≥300'));
+      expect(text, contains(id == 'bnp' ? '<35 pg/mL' : '<125 pg/mL'));
+      expect(text, contains(id == 'bnp' ? '<100 pg/mL' : '<300 pg/mL'));
+    }
+    expect(searchDiagnosticCategories('NTproBNP').single.id, 'labs');
+    expect(
+      searchLabReferences('', group: 'Perfusion & Cardiac Markers').length,
+      6,
+    );
   });
 
   test('cardiac and perfusion values retain assay, units and interpretation',
@@ -234,7 +266,7 @@ void main() {
     expect(find.textContaining('No matching lab values.'), findsOneWidget);
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump();
-    expect(find.text('33 matching reference cards'), findsOneWidget);
+    expect(find.text('35 matching reference cards'), findsOneWidget);
     await tester.ensureVisible(find.text('Blood Counts'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Blood Counts'));

@@ -21,7 +21,7 @@ const diagnosticCategories = [
     'labs',
     'Lab Values',
     'Lab interpretation, coagulation, and critical abnormalities.',
-    'CBC BMP CMP sodium potassium hemoglobin platelets electrolytes laboratory INR aPTT ACT heparin coagulation fibrinogen troponin lactate lactic acid CK CPK CK-MB CKMB',
+    'CBC BMP CMP sodium potassium hemoglobin platelets electrolytes laboratory INR aPTT ACT heparin coagulation fibrinogen troponin lactate lactic acid CK CPK CK-MB CKMB BNP NT-proBNP NTproBNP natriuretic heart failure',
   ),
   DiagnosticCategory(
     'abg',
@@ -517,6 +517,40 @@ const labReferences = [
     explanationLabel: 'ACC · Myocardial injury interpretation',
     hasExampleInterval: false,
     aliases: 'hs-cTn cTnI cTnT myocardial injury ischemia',
+  ),
+  LabReference(
+    'bnp',
+    'BNP / B-type Natriuretic Peptide',
+    'Perfusion & Cardiac Markers',
+    'Suspected HF: <35 pg/mL nonacute / <100 pg/mL acute\nESC exclusion thresholds, not a universal normal range',
+    [
+      'A marker of cardiac wall stress that supports heart-failure evaluation and perioperative risk assessment.',
+      'Interpret with symptoms, examination, renal function, rhythm, and imaging; an elevated value alone does not establish heart failure or dictate fluid treatment.',
+    ],
+    heartFailureSource,
+    perioperativeCardiacSource,
+    intervalLabel: 'ESC · Context-specific BNP thresholds',
+    explanationLabel: 'AHA/ACC · Perioperative biomarker guidance',
+    hasExampleInterval: false,
+    aliases:
+        'BNP brain B type natriuretic peptide heart failure ventricular strain',
+  ),
+  LabReference(
+    'nt-probnp',
+    'NT-proBNP / N-terminal pro-BNP',
+    'Perfusion & Cardiac Markers',
+    'Suspected HF: <125 pg/mL nonacute / <300 pg/mL acute\nESC exclusion thresholds, not a universal normal range',
+    [
+      'A natriuretic peptide marker used for heart-failure evaluation and perioperative risk stratification.',
+      'BNP and NT-proBNP have different thresholds and are not numerically interchangeable. Age, renal function, atrial fibrillation, and obesity affect interpretation.',
+    ],
+    heartFailureSource,
+    perioperativeCardiacSource,
+    intervalLabel: 'ESC · Context-specific NT-proBNP thresholds',
+    explanationLabel: 'AHA/ACC · Perioperative biomarker guidance',
+    hasExampleInterval: false,
+    aliases:
+        'NTproBNP NT pro BNP N terminal pro brain natriuretic peptide heart failure',
   ),
   LabReference(
     'ck',

@@ -31,6 +31,15 @@ const actGuidelineSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5850589/';
 const actDeviceSource =
     'https://www.globalpointofcare.abbott/content/dam/ardx/globalpointofcare/apoc/support/i-stat-alinity/cti/english--intl/770716-01A.pdf';
 const actReviewSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9947996/';
+const pciActSource =
+    'https://professional.heart.org/en/-/media/PHD-Files-2/Science-News/2/2021/2021-Coronary-Artery-Revascularization-Guideline-Slide-Set.pdf?sc_lang=en';
+const ablationActSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11000153/';
+const vascularActSource =
+    'https://www.esvs.org/wp-content/uploads/2024/03/Chapter-4B-Article-1.pdf';
+const heartFailureSource =
+    'https://onlinelibrary.wiley.com/doi/10.1002/ejhf.2333';
+const ntProBnpLabSource =
+    'https://www.mayocliniclabs.com/test-catalog/Overview/615901';
 const heparinXaSource = 'https://dlmp.uw.edu/test-guide/view/HIXA';
 const heparinMonitoringSource =
     'https://pmc.ncbi.nlm.nih.gov/articles/PMC4715846/';
@@ -748,6 +757,40 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
       actGuidelineSource,
     ),
     LabClinicalSection(
+      'PCI: the analyzer and adjunct medication change the target',
+      [
+        'For PCI using unfractionated heparin, the 2021 ACC/AHA/SCAI guideline lists an ACT target of 250–300 seconds with HemoTec or i-STAT systems.',
+        'For Hemochron systems, the guideline specifies a target 50 seconds higher: 300–350 seconds. Do not transfer the number between analyzers without checking the method.',
+        'When an intravenous glycoprotein IIb/IIIa inhibitor is planned, the guideline gives an ACT target of 200–250 seconds. More intensive antiplatelet therapy changes the bleeding–thrombosis balance.',
+        'Higher ACT targets may be considered for chronic total occlusion interventions or acute coronary syndromes. Confirm the procedural protocol rather than applying a single cath-lab target to every case.',
+        'These are UFH procedural targets, not interchangeable targets for bivalirudin, argatroban, or an ICU heparin infusion.',
+      ],
+      'ACC/AHA/SCAI · PCI anticoagulation targets (2021)',
+      pciActSource,
+    ),
+    LabClinicalSection(
+      'Left atrial AF ablation: maintain at least 300 seconds',
+      [
+        'The 2024 EHRA/HRS/APHRS/LAHRS consensus recommends intraprocedural unfractionated heparin with ACT maintained at least 300 seconds (≥300), with regular measurements.',
+        'Heparin administration before transseptal puncture and meticulous sheath management are part of the strategy to reduce thromboembolism.',
+        'Some centers target above 350 seconds, but this is practice variation, not a universal requirement in the consensus. Confirm the electrophysiology team’s protocol.',
+        'Preprocedural oral anticoagulants can affect the heparin dose needed to achieve the ACT target. The intraprocedural target should not be confused with criteria for sheath removal.',
+      ],
+      'EHRA/HRS/APHRS/LAHRS · AF ablation consensus (2024)',
+      ablationActSource,
+    ),
+    LabClinicalSection(
+      'Open and endovascular arterial surgery: less definitive guidance',
+      [
+        'The 2023 ESVS guideline does not establish one universal numeric ACT goal for all open or endovascular arterial procedures.',
+        'ACT, aPTT, or aPTT ratio may be considered to guide additional UFH dosing or reversal: recommendation 33, class IIb, level C consensus. This is weaker evidence than a well-validated procedure-specific target.',
+        'Practical application: use an agreed procedure- and device-specific institutional protocol, with the proceduralist and anesthesia team accounting for thrombosis risk, bleeding risk, and anticoagulant exposure.',
+        'A surgeon’s preferred target may inform a local protocol where evidence is limited, but it should not be presented as a universal guideline. Do not label a generic 250-second vascular target as an ESVS requirement.',
+      ],
+      'ESVS · Antithrombotic therapy, recommendation 33 (2023)',
+      vascularActSource,
+    ),
+    LabClinicalSection(
       'Unexpected ACT or an inadequate heparin response',
       [
         'Hypothermia, hemodilution, reduced hematocrit, low fibrinogen, platelet abnormalities, and other anticoagulants can affect ACT independently of the heparin concentration.',
@@ -778,6 +821,100 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
       ],
       'Abbott · Kaolin ACT collection and handling',
       actDeviceSource,
+    ),
+  ],
+  'bnp': [
+    LabClinicalSection(
+      'What BNP means at the bedside',
+      [
+        'BNP is B-type natriuretic peptide, also called brain natriuretic peptide. Increased cardiac wall stress can raise the circulating concentration.',
+        'Use BNP to support a clinical assessment of possible heart failure; it is not a direct measurement of ejection fraction, intravascular volume, or fluid responsiveness.',
+        'An elevated BNP does not distinguish preserved-EF from reduced-EF heart failure. Symptoms, examination, ECG, and echocardiography remain important.',
+        'Units matter: 1 pg/mL equals 1 ng/L numerically. BNP and NT-proBNP are different tests; do not convert one result into the other.',
+      ],
+      'ESC · Natriuretic peptides in heart-failure assessment',
+      heartFailureSource,
+    ),
+    LabClinicalSection(
+      'Numeric thresholds: acute versus nonacute suspected HF',
+      [
+        'Nonacute suspected heart failure: BNP <35 pg/mL makes HF unlikely in the ESC diagnostic pathway.',
+        'Acute suspected heart failure: BNP <100 pg/mL makes acute HF unlikely. This is a diagnostic exclusion threshold, not a perioperative treatment target.',
+        'A value above either threshold does not by itself confirm HF. Interpret the result with the presentation and evidence of cardiac structural or functional abnormality.',
+        'Low values can be misleading in obesity, flash pulmonary edema, or some right-sided acute HF presentations. A low BNP does not override convincing clinical findings.',
+      ],
+      'ESC · Acute and nonacute BNP thresholds',
+      heartFailureSource,
+    ),
+    LabClinicalSection(
+      'Perioperative risk: a different use of the number',
+      [
+        'The 2024 AHA/ACC perioperative algorithm identifies BNP >92 ng/L (>92 pg/mL) as an abnormal risk-stratification biomarker. This is not the same question as diagnosing acute HF.',
+        'Preoperative BNP or NT-proBNP measurement is reasonable for elevated-risk noncardiac surgery in patients with known cardiovascular disease, age ≥65 years, or age ≥45 years with symptoms suggestive of cardiovascular disease.',
+        'The recommendation is class 2a, level B-NR; it is not a mandate to screen every healthy patient having low-risk surgery.',
+        'Practical application: integrate an elevated result with symptoms, functional capacity, surgical risk, and the need for further cardiac assessment. It is not a stand-alone cancellation cutoff or an automatic instruction to diurese.',
+      ],
+      'AHA/ACC · Perioperative BNP risk assessment (2024)',
+      perioperativeCardiacSource,
+    ),
+    LabClinicalSection(
+      'Common perioperative interpretation traps',
+      [
+        'Older age, atrial fibrillation, and renal dysfunction can increase natriuretic peptide levels independently of acute left-sided HF.',
+        'Pulmonary embolism, pulmonary hypertension, acute coronary syndromes, valvular disease, sepsis, and other critical illness can also elevate BNP.',
+        'Obesity can lower BNP, including in HF with preserved ejection fraction. Avoid false reassurance from a low result in a compelling clinical presentation.',
+        'A high result is not proof that hypotension is caused by fluid overload; a low result is not proof that a patient will respond to a fluid bolus. Assess the hemodynamic picture rather than treating the biomarker alone.',
+      ],
+      'ESC · Causes of elevated and unexpectedly low natriuretic peptides',
+      heartFailureSource,
+    ),
+  ],
+  'nt-probnp': [
+    LabClinicalSection(
+      'What the test measures and how to read the units',
+      [
+        'NT-proBNP is N-terminal pro-B-type natriuretic peptide, a circulating marker associated with increased cardiac pressure and wall stress.',
+        'It supports HF evaluation and risk assessment but does not directly report ejection fraction, cardiac output, or fluid responsiveness.',
+        'Results are commonly reported in pg/mL or ng/L; these units are numerically equivalent. NT-proBNP values are not numerically interchangeable with BNP.',
+        'Healthy reference intervals vary by age, sex, and assay. Use the local laboratory interval while keeping diagnostic decision thresholds separate.',
+      ],
+      'Mayo Clinic Laboratories · NT-proBNP interpretation and intervals',
+      ntProBnpLabSource,
+    ),
+    LabClinicalSection(
+      'Numeric thresholds for suspected heart failure',
+      [
+        'Nonacute suspected HF: NT-proBNP <125 pg/mL makes HF unlikely in the ESC diagnostic pathway.',
+        'Acute suspected HF: NT-proBNP <300 pg/mL makes acute HF unlikely; this exclusion threshold is different from age-stratified rule-in values.',
+        'The ESC 2021 acute-HF pathway lists rule-in values of >450 pg/mL for age <55 years, >900 pg/mL for age 55–75 years, and >1,800 pg/mL for age >75 years.',
+        'These are the age bands in this ESC pathway. Other validated pathways or assay references can use different age bands; follow the local pathway rather than mixing cutoffs.',
+        'An elevated value supports, but does not establish, the diagnosis. Correlate with the symptoms, examination, and cardiac imaging.',
+      ],
+      'ESC · NT-proBNP exclusion and age-stratified acute-HF thresholds',
+      heartFailureSource,
+    ),
+    LabClinicalSection(
+      'Perioperative risk threshold: do not confuse it with HF diagnosis',
+      [
+        'The 2024 AHA/ACC perioperative algorithm uses NT-proBNP ≥300 ng/L (≥300 pg/mL) as an abnormal risk-stratification biomarker.',
+        'This is a perioperative risk threshold, not a stand-alone HF diagnosis, cancellation threshold, or diuretic target.',
+        'Testing is reasonable before elevated-risk noncardiac surgery with known cardiovascular disease, age ≥65 years, or age ≥45 years plus symptoms suggestive of cardiovascular disease: class 2a, level B-NR.',
+        'Use the result to refine the overall cardiac assessment and perioperative plan. It should not replace evaluation of new dyspnea, decompensation, or other concerning findings.',
+      ],
+      'AHA/ACC · Perioperative NT-proBNP risk assessment (2024)',
+      perioperativeCardiacSource,
+    ),
+    LabClinicalSection(
+      'Renal dysfunction, rhythm, and misleading results',
+      [
+        'Renal dysfunction, advancing age, and atrial fibrillation can raise NT-proBNP. Do not equate an elevated value in CKD with acute decompensated HF without supporting findings.',
+        'Obesity can lower natriuretic peptide concentrations. HF with preserved EF may still be present despite a value below a usual diagnostic threshold.',
+        'Pulmonary embolism, pulmonary hypertension, valvular disease, acute coronary syndromes, sepsis, and critical illness are additional causes of elevation.',
+        'Very acute or flash pulmonary edema can present before a reassuring low result becomes abnormal. Treat the clinical presentation as the priority.',
+        'Neither serial changes nor one absolute value should be used alone to direct fluids or diuresis. Interpret trends with renal function, rhythm, examination, and imaging.',
+      ],
+      'ESC · NT-proBNP limitations and differential interpretation',
+      heartFailureSource,
     ),
   ],
   'ck': [
