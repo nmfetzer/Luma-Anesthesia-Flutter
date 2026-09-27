@@ -20,7 +20,7 @@ const aliases = {
   'local-anesthetic-maxima': ['local anesthetic maximum dose', 'local anesthetics max dose', 'Marcaine', 'Sensorcaine', 'Naropin', 'Xylocaine', 'LAST', 'lipid rescue', 'intralipid'],
   'ponv': ['postoperative nausea vomiting', 'PONV', 'Zofran', 'Decadron', 'Barhemsys', 'Inapsine', 'Aloxi', 'Emend'],
   'neuromuscular-blockade': ['NMB', 'NMBA', 'succinylcholine', 'sux', 'Anectine', 'Zemuron', 'Norcuron', 'Nimbex', 'Bridion', 'TOF', 'paralytic'],
-  'bronchospasm': ['wheezing', 'high airway pressure', 'albuterol', 'salbutamol', 'Ventolin', 'Proventil', 'asthma'],
+  'bronchospasm': ['wheezing', 'high airway pressure', 'albuterol', 'salbutamol', 'Ventolin', 'Proventil', 'asthma', 'ketamine', 'Ketalar', 'magnesium sulfate', 'magnesium sulphate', 'MgSO4'],
   'anaphylaxis': ['allergic reaction', 'epinephrine', 'adrenaline', 'tryptase'],
   'preop-glucose': ['high glucose', 'hyperglycemia', 'preop diabetes', 'ASA', 'ADA', 'SAMBA', 'GLP1', 'GLP-1', 'SGLT2', 'insulin', 'DKA', 'HHS'],
   'acls-medications': ['ACLS', 'adult code', 'cardiac arrest', 'VF', 'pVT', 'PEA', 'asystole'],

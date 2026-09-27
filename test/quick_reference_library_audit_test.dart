@@ -56,12 +56,38 @@ void main() {
         'local-anesthetic-maxima-adult-single-dose-limits',
     'LAST observation': 'local-anesthetic-maxima-last-rescue',
     'enoxaparin protamine': 'anticoagulants-reversal-emergency-reversal-chart',
+    'bronchospasm ketamine': 'bronchospasm-intraoperative-treatment',
+    'bronchospasm magnesium': 'bronchospasm-intraoperative-treatment',
+    'wheezing MgSO4': 'bronchospasm-intraoperative-treatment',
   }.entries) {
     test('library search ${query.key}', () {
       final row = auditRows.singleWhere((r) => r['id'] == query.value);
       expect(QuickReferenceSection.fromJson(row).matches(query.key), isTrue);
     });
   }
+
+  test('bronchospasm adjunct rows retain approved doses and evidence limits', () {
+    final row = auditRows.singleWhere(
+      (r) => r['id'] == 'bronchospasm-intraoperative-treatment',
+    );
+    final body = row['body'] as String;
+    expect(row['version'], '2026-09-27-r2');
+    for (final phrase in [
+      '**Ketamine: rescue adjunct**',
+      '**10–50 mg IV**',
+      '**Magnesium sulfate: refractory bronchospasm**',
+      '**2 g IV over 20 minutes**',
+      '**not routine first-line therapy**',
+      '**potentiate neuromuscular blockade**',
+      'quantitative neuromuscular monitoring',
+      'PMC9482594',
+      'PMC11702345',
+      'Bronchospasm_during_anaesthesia_Update_2011.pdf',
+    ]) {
+      expect(body, contains(phrase));
+    }
+    expect('10–50 mg'.allMatches(body).length, 1);
+  });
 
   test('audit corrections persist in generated server content', () {
     final bodies = auditRows.map((r) => r['body']).join('\n');

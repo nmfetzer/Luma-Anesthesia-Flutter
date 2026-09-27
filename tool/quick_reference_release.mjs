@@ -25,5 +25,8 @@ export function finalizeRows(rows) {
       .toLowerCase().match(/[a-z][a-z0-9-]{2,}/g) ?? [];
     row.keywords = [...new Set([...row.keywords, ...terms])];
     if (corrected.has(row.id)) row.version = '2026-09-27-audit1';
+    if (row.id === 'bronchospasm-intraoperative-treatment') {
+      row.version = '2026-09-27-r2';
+    }
   }
 }
