@@ -6,8 +6,13 @@ import '../widgets/clinical_source_link.dart';
 /// Compact two-column clinical charts. The protected Markdown remains server
 /// content; this widget only gives the dose column most of the available width.
 class QuickReferenceChart extends StatelessWidget {
-  const QuickReferenceChart({super.key, required this.body});
+  const QuickReferenceChart({
+    super.key,
+    required this.body,
+    this.nameColumnFlex = 1,
+  });
   final String body;
+  final double nameColumnFlex;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +41,10 @@ class QuickReferenceChart extends StatelessWidget {
       );
     }
     return Table(
-      columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
+      columnWidths: {
+        0: FlexColumnWidth(nameColumnFlex),
+        1: const FlexColumnWidth(2),
+      },
       defaultVerticalAlignment: TableCellVerticalAlignment.top,
       border: TableBorder.all(color: const Color(0xFFD8E2EC), width: 0.7),
       children: [
