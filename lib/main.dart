@@ -120,9 +120,8 @@ class LumaApp extends StatelessWidget {
         if (settings.name == '/home') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => cePortal
-                ? const CeCourseScreen()
-                : HomeScreen(showComingSoon: showComingSoon),
+            builder: (_) =>
+                cePortal ? const CeCourseScreen() : const HomeScreen(),
           );
         }
         if (settings.name == '/subscribe') {
