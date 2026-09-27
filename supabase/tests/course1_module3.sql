@@ -10,7 +10,7 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'is_anonymous',false)::text,true);
  -- Only rollback-local state; never write official completions for the owner.
  delete from public.ce_course1_state where user_id=u;
- assert jsonb_array_length(public.ce_course1('catalog')->'modules')=3;
+ assert jsonb_array_length(public.ce_course1('catalog')->'modules')=11;
  perform public.ce_course1('access');
  perform public.ce_course1('profile','{"full_name":"Module Tester","credentials":"CRNA","aana_id":"12345","location":"Rochester, NY, USA"}');
  perform public.ce_course1('read');

@@ -1,8 +1,8 @@
 begin;
 do $$
 declare
- u uuid; m text:='course_1_module_2'; args jsonb; a jsonb; a1 jsonb; r jsonb; h jsonb;
- bank jsonb; answers jsonb; prior jsonb; completed jsonb; denied boolean; n int;
+ u uuid; m text:='course_1_module_4'; args jsonb; a jsonb; a1 jsonb; r jsonb; h jsonb;
+ m2state jsonb; m3state jsonb; bank jsonb; answers jsonb; prior jsonb; completed jsonb; denied boolean; n int;
 begin
  select user_id into u from public.ce_course1_reviewers limit 1;
  assert u is not null;
@@ -15,14 +15,20 @@ begin
  perform public.ce_course1('profile','{"full_name":"Module Tester","credentials":"CRNA","aana_id":"12345","location":"Rochester, NY, USA"}');
  perform public.ce_course1('read');
  a1:=public.ce_course1('quiz');
- select progress into prior from public.ce_course1_state where user_id=u;
+ perform public.ce_course1('read','{"module_id":"course_1_module_2"}');
+ perform public.ce_course1('quiz','{"module_id":"course_1_module_2"}');
+ select progress->'modules'->'course_1_module_2' into m2state from public.ce_course1_state where user_id=u;
+ perform public.ce_course1('read','{"module_id":"course_1_module_3"}');
+ perform public.ce_course1('quiz','{"module_id":"course_1_module_3"}');
+ select progress->'modules'->'course_1_module_3' into m3state from public.ce_course1_state where user_id=u;
+ select progress-'modules' into prior from public.ce_course1_state where user_id=u;
  args:=jsonb_build_object('module_id',m);
  r:=public.ce_course1('access',args);
  assert r->>'read'='false' and r->>'attempts_used'='0';
  r:=public.ce_course1('document',args);
  assert encode(sha256(decode(r->>'base64','base64')),'hex')=r->>'sha256';
  perform public.ce_course1('read',args);
- select data into bank from public.ce_course1_resources where id='glp1_questions';
+ select data into bank from public.ce_course1_resources where id='nmba_sugammadex_questions';
  a:=public.ce_course1('quiz',args);
  assert jsonb_array_length(a->'questions')=15;
  assert a->>'number'='1';
@@ -46,7 +52,7 @@ begin
  denied:=false;
  begin perform public.ce_course1('evaluate',args||'{"ratings":[1,1,1,1,1,1,1,1,1,1,1],"learned":"Individual risk assessment","barriers":"None","attestation":true}'::jsonb);
  exception when others then denied:=true; end;
- assert denied,'Module 2 must require 10, not 11 ratings';
+ assert denied,'Module 4 must require 10, not 11 ratings';
  completed:=public.ce_course1('evaluate',args||'{"ratings":[1,1,1,1,1,1,1,1,1,1],"learned":"Individual risk assessment","barriers":"None","attestation":true}'::jsonb);
  assert completed->>'module_id'=m and completed->>'module_credits'='0';
  assert completed->'learner'->>'full_name'='Module Tester';
@@ -54,6 +60,8 @@ begin
  assert completed->>'user_id'=u::text;
  assert public.ce_course1('evaluate',args)=completed,'Idempotent completion';
  assert (select progress-'modules' from public.ce_course1_state where user_id=u)=prior,'Ketamine state unchanged';
+ assert (select progress->'modules'->'course_1_module_2' from public.ce_course1_state where user_id=u)=m2state,'Module 2 state unchanged';
+ assert (select progress->'modules'->'course_1_module_3' from public.ce_course1_state where user_id=u)=m3state,'Module 3 state unchanged';
  assert public.ce_course1('quiz')->>'attempt_id'=a1->>'attempt_id','Ketamine resume preserved';
  assert public.ce_course1_records(null,false,0)->>'total'='0','Exclude previews by default';
  r:=public.ce_course1_records(null,true,0);
@@ -72,5 +80,5 @@ begin
  assert public.ce_course1('access',args)->>'has_access'='false';
  assert not has_table_privilege('authenticated','public.ce_course1_resources','select');
 end $$;
-select 'PASS: two-module isolation, private PDF hash, 15 questions, approved hints, registration inheritance, 10-rating evaluation, provider ledger authorization and pagination' as result;
+select 'PASS: four-module isolation, private PDF hash, 15 questions, approved hints, registration inheritance, 10-rating evaluation, provider ledger authorization and pagination' as result;
 rollback;

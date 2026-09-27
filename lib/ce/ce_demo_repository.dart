@@ -98,7 +98,10 @@ class _DemoModuleRepository extends CeRepository {
     'course_1_module_1' => demoQuestions,
     'course_1_module_2' => demoGlp1Questions,
     'course_1_module_3' => demoBenzodiazepineQuestions,
-    _ => throw StateError('No preview question bank for $moduleId'),
+    'course_1_module_4' => demoNmbaQuestions,
+    _ =>
+      (demoRemainingQuestions[moduleId] as List<dynamic>?) ??
+          (throw StateError('No preview question bank for $moduleId')),
   };
   @override
   bool get isDemo => true;
