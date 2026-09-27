@@ -7,13 +7,14 @@ const evidence = [
   ...fs.readFileSync(`${dir}/source-evidence.jsonl`, 'utf8').trim().split('\n').map(JSON.parse),
   ...fs.readFileSync(`${dir}/additional-evidence.jsonl`, 'utf8').trim().split('\n').map(JSON.parse),
   ...JSON.parse(fs.readFileSync(`${dir}/additional-label-extracts.json`, 'utf8')).results,
+  ...fs.readFileSync(`${dir}/recheck-evidence.jsonl`, 'utf8').trim().split('\n').map(JSON.parse),
 ];
 const urls = [...new Set(rows.flatMap(r => [...r.body.matchAll(/\]\((https?:\/\/[^)]+)\)/g)].map(m => m[1])))];
 for (const url of urls) {
   assert.ok(evidence.some(e => e.url === url && !e.error && e.content?.length > 250), url);
 }
 const header = '# Luma Anesthesia Quick References: Clinical Sign-off Copy\n\n' +
-  'Review date: September 27, 2026. This is the complete text read back from the live database after the audit corrections: 24 guides and 59 sections. It is a review copy, not a new clinical protocol or evidence of owner approval.\n\n' +
+  'Review date: September 27, 2026. Post-addition recheck: this is the complete text read back from the live database after the audit corrections and the approved ketamine/magnesium bronchospasm addition: 24 guides and 59 sections. It is a review copy, not a new clinical protocol or evidence of owner approval. The separate review report records prior owner approval and subsequent verification.\n\n' +
   'All guides are free. Adult scope applies except the explicitly pediatric PALS guide; individualize treatment and follow institutional policy. The separate audit report describes corrections, local-policy choices and limitations.\n\n';
 let review = header;
 for (const id of [...new Set(rows.map(r => r.reference_id))]) {

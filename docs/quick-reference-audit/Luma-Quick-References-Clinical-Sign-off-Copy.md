@@ -1,6 +1,6 @@
 # Luma Anesthesia Quick References: Clinical Sign-off Copy
 
-Review date: September 27, 2026. This is the complete text read back from the live database after the audit corrections: 24 guides and 59 sections. It is a review copy, not a new clinical protocol or evidence of owner approval.
+Review date: September 27, 2026. Post-addition recheck: this is the complete text read back from the live database after the audit corrections and the approved ketamine/magnesium bronchospasm addition: 24 guides and 59 sections. It is a review copy, not a new clinical protocol or evidence of owner approval. The separate review report records prior owner approval and subsequent verification.
 
 All guides are free. Adult scope applies except the explicitly pediatric PALS guide; individualize treatment and follow institutional policy. The separate audit report describes corrections, local-policy choices and limitations.
 
@@ -415,14 +415,16 @@ Content version: 2026-09-27. Section ID: `beta-blocker-safety`.
 
 ### Intraoperative treatment
 
-Content version: 2026-09-27. Section ID: `bronchospasm-intraoperative-treatment`.
+Content version: 2026-09-27-r2. Section ID: `bronchospasm-intraoperative-treatment`.
 
 | Intervention | Adult dose / action · pertinent details |
 |---|---|
 | **Immediate assessment** | Call for help, give oxygen, hand-ventilate and assess ventilation. Exclude **kink/obstruction, mainstem tube, circuit failure, aspiration, pulmonary edema or anaphylaxis** before attributing high airway pressure solely to bronchospasm. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
 | **Albuterol / salbutamol** | **4–8 puffs via appropriate circuit adapter** or **2.5 mg nebulized**, reassess/repeat according to response and local protocol. Delivery may be limited with severe obstruction. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
-| **Deepen anesthesia** | Use a bronchodilating volatile agent or titrated IV anesthetic as hemodynamics allow. **Ketamine 10–50 mg IV** is an adult rescue adjunct in the cited manual. Monitor BP/HR and depth. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
+| **Deepen anesthesia** | Use a bronchodilating volatile agent or titrated IV anesthetic as hemodynamics allow. Monitor BP/HR and depth; see the separate ketamine adjunct row below. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
 | **Severe / failing ventilation** | Experienced anesthesia clinician: **epinephrine 5–10 mcg IV every 3–5 min**, titrated with ECG/BP monitoring. If bronchospasm is part of anaphylaxis, use the **Anaphylaxis** pathway instead; do not delay systemic epinephrine in that setting. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
+| **Ketamine: rescue adjunct** | **10–50 mg IV**, individualized by the anesthesia clinician for persistent bronchospasm and anesthetic depth. Monitor HR/BP; tachycardia, hypertension and increased secretions may limit use. Evidence for improved severe-asthma outcomes is limited; **not routine first-line therapy**. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf); [Systematic review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9482594/)) |
+| **Magnesium sulfate: refractory bronchospasm** | **2 g IV over 20 minutes** as an adjunct when initial treatment is inadequate. Monitor BP; may cause hypotension and **potentiate neuromuscular blockade**. Use quantitative neuromuscular monitoring and confirm adequate recovery before extubation. ([Anesthesia management reference](https://e-safe-anaesthesia.org/e_library/05/Bronchospasm_during_anaesthesia_Update_2011.pdf); [Perioperative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC11702345/); [ASA neuromuscular monitoring](https://pubs.asahq.org/anesthesiology/article/138/1/13/137379/2023-American-Society-of-Anesthesiologists)) |
 | **Steroid adjunct** | **Hydrocortisone 100 mg IV** in the cited perioperative manual. Delayed effect: not a substitute for bronchodilator, epinephrine when indicated, or ventilation support. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
 | **Ventilation / escalation** | Allow adequate expiratory time and assess air trapping/auto-PEEP; reassess tube/circuit and hemodynamics. Persistent severe obstruction warrants additional bronchodilator strategy and ICU support under local protocol. ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)) |
 
