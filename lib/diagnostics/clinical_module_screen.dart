@@ -138,8 +138,20 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                               ClinicalDifferentialTable(
                                 rows: topic.differential,
                                 title: module.id == 'carotid'
-                                    ? 'Native internal carotid artery criteria'
+                                    ? 'How much is the internal carotid artery narrowed?'
                                     : 'Differential at a glance',
+                                processLabel: module.id == 'carotid'
+                                    ? 'Degree of narrowing'
+                                    : 'Process',
+                                cluesLabel: module.id == 'carotid'
+                                    ? 'Ultrasound findings'
+                                    : 'Distinguishing context',
+                                focusLabel: module.id == 'carotid'
+                                    ? 'How to interpret this'
+                                    : 'Evaluation / management focus',
+                                introduction: module.id == 'carotid'
+                                    ? 'These categories describe artery narrowing, not a percentage risk of stroke. Use the complete vascular-lab interpretation, not one velocity value alone. These criteria do not apply to carotid stents or arteries after surgery.'
+                                    : null,
                               ),
                             for (final section in topic.sections)
                               ClinicalReferenceSection(section: section),

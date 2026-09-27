@@ -142,7 +142,17 @@ void main() {
     await tester.tap(find.text(carotidTopics.first.title));
     await tester.pumpAndSettle();
     expect(
-        find.text('Native internal carotid artery criteria'), findsOneWidget);
+      find.text('How much is the internal carotid artery narrowed?'),
+      findsOneWidget,
+    );
+    expect(find.text('Normal: no plaque'), findsOneWidget);
+    expect(find.text('Mild narrowing: less than 50%'), findsOneWidget);
+    expect(find.text('Ultrasound findings'), findsWidgets);
+    expect(find.text('How to interpret this'), findsWidgets);
+    expect(find.text('Distinguishing context'), findsNothing);
+    expect(find.text('Evaluation / management focus'), findsNothing);
+    expect(carotidTopics.first.differential.length, 6);
+    expect(carotidTopics.first.differential[2].focus, contains('125–180 cm/s'));
     expect(find.byType(Table), findsNothing);
     expect(find.text('Source: IAC 2023 recommendations'), findsWidgets);
     expect(tester.takeException(), isNull);

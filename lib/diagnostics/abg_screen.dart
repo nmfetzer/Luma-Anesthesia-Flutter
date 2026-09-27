@@ -254,9 +254,17 @@ class ClinicalDifferentialTable extends StatelessWidget {
     super.key,
     required this.rows,
     this.title = 'Differential at a glance',
+    this.processLabel = 'Process',
+    this.cluesLabel = 'Distinguishing context',
+    this.focusLabel = 'Evaluation / management focus',
+    this.introduction,
   });
   final List<AbgDifferential> rows;
   final String title;
+  final String processLabel;
+  final String cluesLabel;
+  final String focusLabel;
+  final String? introduction;
 
   Widget _cell(String text, {bool heading = false}) => Padding(
         padding: const EdgeInsets.all(12),
@@ -280,6 +288,10 @@ class ClinicalDifferentialTable extends StatelessWidget {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
+            if (introduction != null) ...[
+              Text(introduction!),
+              const SizedBox(height: 12),
+            ],
             if (constraints.maxWidth >= 640)
               Table(
                 columnWidths: const {
@@ -296,9 +308,9 @@ class ClinicalDifferentialTable extends StatelessWidget {
                     decoration:
                         const BoxDecoration(color: LumaColors.haloGoldLight),
                     children: [
-                      _cell('Process', heading: true),
-                      _cell('Distinguishing context', heading: true),
-                      _cell('Evaluation / management focus', heading: true),
+                      _cell(processLabel, heading: true),
+                      _cell(cluesLabel, heading: true),
+                      _cell(focusLabel, heading: true),
                     ],
                   ),
                   for (final row in rows)
@@ -343,15 +355,15 @@ class ClinicalDifferentialTable extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Distinguishing context',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      Text(
+                        cluesLabel,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       SelectionArea(child: Text(row.clues)),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Evaluation / management focus',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      Text(
+                        focusLabel,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       SelectionArea(child: Text(row.focus)),
                       _AbgSourceButton(label: row.sourceLabel, url: row.url),
