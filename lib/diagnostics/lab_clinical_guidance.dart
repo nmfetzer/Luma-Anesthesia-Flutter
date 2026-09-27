@@ -27,6 +27,31 @@ const troponinLabSource =
     'https://www.acc.org/Latest-in-Cardiology/ten-points-to-remember/2019/01/21/14/44/Fourth-Universal-Definition-of-Myocardial-Infarction';
 const sepsisLabSource =
     'https://www.sccm.org/clinical-resources/guidelines/guidelines/surviving-sepsis-campaign-international-guidelines-for-management-of-sepsis-and-septic-shock-2026';
+const actGuidelineSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5850589/';
+const actDeviceSource =
+    'https://www.globalpointofcare.abbott/content/dam/ardx/globalpointofcare/apoc/support/i-stat-alinity/cti/english--intl/770716-01A.pdf';
+const actReviewSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9947996/';
+const heparinXaSource = 'https://dlmp.uw.edu/test-guide/view/HIXA';
+const heparinMonitoringSource =
+    'https://pmc.ncbi.nlm.nih.gov/articles/PMC4715846/';
+const viscoelasticSource = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10725099/';
+const dDimerIntervalSource =
+    'https://www.mayocliniclabs.com/test-catalog/overview/40936/d-dimer-plasma';
+const lactateIntervalSource =
+    'https://www.mayocliniclabs.com/test-catalog/overview/601685';
+const lactateReviewSource =
+    'https://www.mayoclinicproceedings.org/article/S0025-6196(13)00555-7/fulltext';
+const troponinIntervalSource =
+    'https://www.mayocliniclabs.com/test-catalog/overview/65832';
+const perioperativeCardiacSource =
+    'https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2024/2024-Guideline-for-Perioperative-Cardiovascular-Management-slide-set.pdf?sc_lang=en';
+const ckIntervalSource =
+    'https://www.mayocliniclabs.com/test-catalog/overview/8336';
+const rhabdomyolysisSource = 'https://tsaco.bmj.com/content/7/1/e000836';
+const ckMbIntervalSource =
+    'https://www.globalpointofcare.abbott/content/dam/ardx/globalpointofcare/apoc/support/i-stat-1/cti-ifu/english-us/cti/716675-00P.pdf';
+const cardiacBiomarkerSource =
+    'https://academic.oup.com/eurheartj/article/28/20/2525/416363';
 const _aki =
     'https://www.merckmanuals.com/professional/nephrology/acute-kidney-injury/acute-kidney-injury-aki';
 const _liver =
@@ -331,6 +356,17 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
   ],
   'pt-inr': [
     LabClinicalSection(
+      'Read the pattern, not only the INR',
+      [
+        'PT reflects the extrinsic and common coagulation pathways. An isolated prolonged PT suggests factor VII deficiency or inhibition, but can also occur with warfarin, vitamin K deficiency, liver disease, DIC, or a direct Xa inhibitor.',
+        'When both PT and aPTT are prolonged, consider multiple-factor deficiency, advanced liver disease, DIC, anticoagulant effects, or a common-pathway factor abnormality.',
+        'Compare with platelet count, fibrinogen, bleeding history, medication exposure, and prior values. Recent transfusion or factor replacement can alter the pattern.',
+        'Normal PT and aPTT do not exclude platelet dysfunction, von Willebrand disease, or factor XIII deficiency. They are not a complete screen for surgical bleeding risk.',
+      ],
+      'ARUP Consult · Coagulation patterns and limitations',
+      coagulationLabSource,
+    ),
+    LabClinicalSection(
       'Interpreting a prolonged result',
       [
         'Prolongation may reflect warfarin, vitamin K deficiency, liver disease, factor deficiency, DIC, or anticoagulant interference. Interpret PT with aPTT, platelets, and the bleeding history.',
@@ -361,6 +397,17 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
   ],
   'aptt': [
     LabClinicalSection(
+      'Monitoring an unfractionated-heparin infusion',
+      [
+        'The healthy reference interval is not the therapeutic range. Use the institution’s reagent-specific aPTT range and heparin-adjustment protocol.',
+        'A universal “1.5–2.5 times control” target can misclassify anticoagulation because aPTT reagents differ in heparin sensitivity.',
+        'If baseline aPTT is prolonged or the result seems inconsistent with the heparin dose, compare with a heparin-calibrated anti-Xa level and review assay interference.',
+        'High factor VIII or fibrinogen can blunt aPTT prolongation despite heparin activity. Escalating heparin solely to chase aPTT can over-anticoagulate a patient with altered aPTT responsiveness.',
+      ],
+      'Practical UFH guidance · Assay-specific monitoring',
+      heparinMonitoringSource,
+    ),
+    LabClinicalSection(
       'Pattern, medication, and clinical history',
       [
         'An isolated prolonged aPTT may reflect heparin, an intrinsic factor deficiency or inhibitor, or lupus anticoagulant.',
@@ -381,6 +428,17 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
     ),
   ],
   'fibrinogen': [
+    LabClinicalSection(
+      'Concentration versus functional clot formation',
+      [
+        'Fibrinogen is factor I, the substrate converted to fibrin. A falling level during hemorrhage can reflect consumption, dilution, or reduced production.',
+        'Keep units explicit: 200 mg/dL = 2.0 g/L; 150 mg/dL = 1.5 g/L. A value of “1.5” is uninterpretable without its units.',
+        'Clauss testing reports a fibrinogen concentration. A viscoelastic functional-fibrinogen result assesses its contribution to clot strength; the numbers and units are not interchangeable.',
+        'During major bleeding, interpret fibrinogen with platelet count, PT/aPTT, temperature, ionized calcium, and the clinical rate of hemorrhage rather than waiting for every test to become abnormal.',
+      ],
+      'European trauma guideline · Fibrinogen and hemostatic monitoring',
+      traumaLabSource,
+    ),
     LabClinicalSection(
       'Major bleeding: trauma-specific threshold',
       [
@@ -403,6 +461,18 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
   ],
   'anti-xa': [
     LabClinicalSection(
+      'Heparin anti-Xa: an actual therapeutic-range example',
+      [
+        'UW Medicine’s regular-intensity UFH range is 0.3–0.7 IU/mL. This is a therapeutic monitoring range, not the normal range of an untreated patient.',
+        'Use the ordered local protocol: UFH, LMWH, and different treatment intensities do not share one universal target or sampling schedule.',
+        'A heparin-infusion target is not a target for high-dose heparin during cardiopulmonary bypass and does not establish safety for neuraxial procedures.',
+        'Recent apixaban, rivaroxaban, edoxaban, or LMWH can elevate a heparin anti-Xa result. A falsely reassuring result may lead to underdosing newly started UFH.',
+        'A heparin-contaminated line draw can falsely elevate the result. Confirm collection technique and anticoagulant history when the laboratory value and clinical context disagree.',
+      ],
+      'UW Medicine · Heparin activity assay and interference',
+      heparinXaSource,
+    ),
+    LabClinicalSection(
       'Assay calibration & timing',
       [
         'Drug-specific calibrated anti-Xa assays can quantify the named direct Xa inhibitor. Confirm the drug, assay calibration, units, and timing relative to the last dose.',
@@ -424,6 +494,28 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
   ],
   'viscoelastic': [
     LabClinicalSection(
+      'Read the tracing in four parts',
+      [
+        'Clot initiation: TEG R time or ROTEM CT describes the time to initial clot formation. Prolongation may reflect factor deficiency or an anticoagulant effect.',
+        'Clot build-up: K time/CFT and the alpha angle describe how quickly the clot strengthens. Fibrinogen availability and function are important contributors.',
+        'Clot strength: TEG MA or ROTEM MCF reflects the combined contribution of platelets and fibrin. A low amplitude is not automatically an isolated platelet deficit.',
+        'Clot breakdown: lysis measurements assess loss of clot strength over time. TEG LY30 and ROTEM lysis indices use different definitions; do not transfer cutoffs or interpret their percentages as equivalent.',
+      ],
+      'Viscoelastic testing review · Parameters and interpretation',
+      viscoelasticSource,
+    ),
+    LabClinicalSection(
+      'Which channel helps answer which question?',
+      [
+        'Functional fibrinogen channels such as TEG CFF or ROTEM FIBTEM reduce the platelet contribution to assess fibrin-based clot strength.',
+        'Compare a heparinase channel with its corresponding non-heparinase channel when heparin effect is suspected. Correction with heparinase supports a heparin contribution.',
+        'Tests run under standardized temperature and recalcification conditions may not reproduce the patient’s hypothermia or low ionized calcium. Check and address those separately.',
+        'Interpret the named cartridge or assay, not simply “TEG” or “ROTEM.” Use the institution’s validated transfusion algorithm, not numeric targets copied from another platform.',
+      ],
+      'Viscoelastic testing review · Assays and limitations',
+      viscoelasticSource,
+    ),
+    LabClinicalSection(
       'Hemorrhage assessment',
       [
         'The European trauma guideline supports early repeated hemostatic assessment using conventional tests and/or viscoelastic methods.',
@@ -436,6 +528,17 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
     ),
   ],
   'd-dimer': [
+    LabClinicalSection(
+      'Reference value and perioperative limitations',
+      [
+        'Mayo’s HemosIL D-Dimer HS 500 reference is ≤500 ng/mL FEU. FEU means fibrinogen-equivalent units; verify the reporting units before using a cutoff.',
+        'A positive result is common after surgery, trauma, bleeding or hematoma formation, and during pregnancy, inflammation, malignancy, or liver disease.',
+        'A negative result can help exclude DVT or PE only within a validated pathway using clinical pretest probability and the appropriate assay. It is not a stand-alone rule-out test for every postoperative patient.',
+        'A positive result does not confirm PE, establish clot burden, or by itself justify anticoagulation. Evaluate the suspected diagnosis in its clinical context.',
+      ],
+      'Mayo Clinic Laboratories · D-dimer assay and interpretation',
+      dDimerIntervalSource,
+    ),
     LabClinicalSection(
       'DIC and nonspecific elevation',
       [
@@ -505,6 +608,27 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
   ],
   'lactate': [
     LabClinicalSection(
+      'What the number means',
+      [
+        'Mayo’s adult plasma L-lactate reference interval is 0.5–2.0 mmol/L. Use the interval supplied with the patient’s specimen and analyzer.',
+        'An elevated level reflects increased production, reduced clearance, or both. It is not a direct measurement of blood pressure or intravascular volume.',
+        'Routine lactate assays measure L-lactate, not D-lactate. A normal routine result does not exclude D-lactate accumulation in the appropriate clinical setting.',
+      ],
+      'Mayo Clinic Laboratories · Adult plasma lactate',
+      lactateIntervalSource,
+    ),
+    LabClinicalSection(
+      'High lactate is not always low flow',
+      [
+        'Hypoperfusion causes include hemorrhagic, cardiogenic, obstructive, and distributive shock, as well as regional ischemia.',
+        'Other causes include epinephrine or beta-agonist stimulation, seizures, excessive muscle activity, impaired hepatic clearance, thiamine deficiency, and selected drugs or toxins.',
+        'An epinephrine-associated rise can occur without worsening tissue hypoxia, but do not assume a drug effect before assessing perfusion and other causes.',
+        'Hyperlactatemia and acidemia are not synonymous. Review pH, bicarbonate, and the anion gap; mixed acid–base disorders can obscure the expected pH change.',
+      ],
+      'Mayo Clinic Proceedings · Causes of elevated lactate',
+      lactateReviewSource,
+    ),
+    LabClinicalSection(
       'Perfusion & response to resuscitation',
       [
         'In major trauma, serial lactate helps assess tissue hypoperfusion and bleeding severity and follow response to treatment.',
@@ -523,8 +647,30 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
       'SCCM · Surviving Sepsis Campaign (2026)',
       sepsisLabSource,
     ),
+    LabClinicalSection(
+      'Trend, timing, and a result that does not fit',
+      [
+        'A persistent or rising lactate should prompt reassessment of ongoing bleeding, inadequate flow, regional ischemia, infection, drug effects, and impaired clearance.',
+        'Seizure-related lactate usually falls rapidly after the event; persistence beyond roughly 1–2 hours suggests looking for an additional cause.',
+        'Check specimen collection and processing when a result is unexpected. Delayed processing can falsely elevate lactate; follow the laboratory’s specimen-specific handling instructions.',
+        'Follow serial results with the sampling method documented. Do not interpret an isolated “normal” lactate as proof that all regional tissue perfusion is adequate.',
+      ],
+      'Mayo Clinic Proceedings · Serial interpretation and specimen handling',
+      lactateReviewSource,
+    ),
   ],
   'troponin': [
+    LabClinicalSection(
+      'An actual value: identify the assay first',
+      [
+        'Mayo’s Roche cobas Troponin T Gen 5 plasma test lists reference values of ≤15 ng/L for males and ≤10 ng/L for females.',
+        'These are one laboratory’s assay-specific reference values, not universal diagnostic cutoffs for all high-sensitivity troponin T or troponin I tests. Use the local assay’s reported upper reference limit.',
+        'High-sensitivity results are commonly reported in ng/L. For unit comparison, 15 ng/L = 0.015 ng/mL; confirm units before comparing a result with an older conventional assay.',
+        'Troponin I and troponin T are different assays. Do not compare their numeric results directly or apply another analyzer’s serial-change threshold.',
+      ],
+      'Mayo Clinic Laboratories · Roche Troponin T Gen 5',
+      troponinIntervalSource,
+    ),
     LabClinicalSection(
       'Myocardial injury versus infarction',
       [
@@ -535,6 +681,169 @@ const labClinicalGuidance = <String, List<LabClinicalSection>>{
       'ACC · Fourth Universal Definition of Myocardial Infarction',
       troponinLabSource,
       urgent: true,
+    ),
+    LabClinicalSection(
+      'Acute, chronic, ischemic, or nonischemic?',
+      [
+        'A rise or fall supports acute myocardial injury. Persistently elevated but relatively stable values may represent chronic injury; compare with prior measurements and the validated local sampling pathway.',
+        'Myocardial infarction requires acute injury plus evidence of ischemia, such as ischemic symptoms, new ischemic ECG changes, or new ischemic regional wall-motion abnormalities.',
+        'Type 1 MI involves acute atherothrombosis. Type 2 MI reflects an oxygen supply–demand imbalance with evidence of ischemia; a tachycardic patient with an elevated troponin does not automatically have type 2 MI.',
+        'Heart failure, kidney disease, and critical illness can be associated with myocardial injury. Determine the cause rather than equating every elevation with plaque rupture.',
+      ],
+      'ACC · Myocardial injury and MI classification',
+      troponinLabSource,
+    ),
+    LabClinicalSection(
+      'Perioperative surveillance and follow-through',
+      [
+        'The 2024 AHA/ACC guideline states that troponin measurement at 24 and 48 hours may be reasonable after elevated-risk noncardiac surgery in selected patients with known cardiovascular disease, symptoms of cardiovascular disease, or age ≥65 years with cardiovascular risk factors.',
+        'Routine screening after low-risk noncardiac surgery is not indicated in the absence of signs or symptoms suggesting ischemia or infarction.',
+        'A postoperative elevation needs clinical evaluation even when pain is absent or masked. Distinguish ischemic myocardial injury after noncardiac surgery from nonischemic causes such as PE or sepsis.',
+        'Myocardial injury after noncardiac surgery warrants follow-up and cardiovascular risk optimization. Management must account for the suspected mechanism and postoperative bleeding risk, not the biomarker alone.',
+      ],
+      'AHA/ACC · Perioperative cardiovascular guideline (2024)',
+      perioperativeCardiacSource,
+    ),
+    LabClinicalSection(
+      'Timing and false reassurance',
+      [
+        'A single low value soon after symptom onset does not universally exclude infarction. Use the institution’s assay-specific repeat-sampling and delta criteria.',
+        'Troponin T can remain elevated for days and sometimes 14 days or longer after injury. The time course, baseline, and new serial change matter.',
+        'Do not delay assessment of hemodynamic instability or convincing ischemic findings while waiting for a biomarker to become abnormal.',
+      ],
+      'Mayo Clinic Laboratories · Troponin timing and cautions',
+      troponinIntervalSource,
+    ),
+  ],
+  'act': [
+    LabClinicalSection(
+      'What ACT tells you in the operating room',
+      [
+        'ACT means activated clotting time: a rapid, point-of-care whole-blood test reported in seconds. It is used to assess the anticoagulant effect of high-dose unfractionated heparin, especially during cardiopulmonary bypass.',
+        'A longer ACT generally indicates slower clot formation, but ACT is not a direct heparin concentration. Other changes in coagulation can prolong it.',
+        'Document the device, cartridge or activator, baseline, heparin administration, and sampling time. Values from different ACT systems are not automatically interchangeable.',
+        'During bypass, confirm adequate anticoagulation before starting the circuit and at regular intervals according to the perfusion protocol. A heparin dose alone does not prove adequate anticoagulation.',
+      ],
+      'STS/SCA/AmSECT · Anticoagulation during cardiopulmonary bypass',
+      actGuidelineSource,
+    ),
+    LabClinicalSection(
+      'Baseline is not the intraoperative target',
+      [
+        'Abbott i-STAT Alinity Kaolin ACT lists reference ranges of 74–137 seconds in PREWRM calibration and 82–152 seconds in NONWRM calibration. These are device-specific baseline examples, not universal ACT ranges.',
+        'PREWRM and NONWRM identify calibration modes; they do not describe the patient’s temperature. Use the range for the actual device and configuration in use.',
+        'An untreated reference value is expected to be much lower than the deliberately prolonged ACT sought during high-dose heparinization.',
+      ],
+      'Abbott · i-STAT Alinity Kaolin ACT instructions',
+      actDeviceSource,
+    ),
+    LabClinicalSection(
+      'Cardiopulmonary bypass: target and device exception',
+      [
+        'STS/SCA/AmSECT guidance considers maintaining ACT above 480 seconds during CPB reasonable. This is an approximate procedural target, not a normal range.',
+        'With maximally activated or microcuvette ACT systems, values above 400 seconds are frequently considered therapeutic. This is a device-specific exception, not permission to use 400 seconds with every analyzer.',
+        'Use the institution’s validated device-specific perfusion protocol. Do not copy the CPB target into vascular surgery, catheter-based procedures, dialysis, or an ICU heparin-infusion protocol.',
+      ],
+      'STS/SCA/AmSECT · CPB ACT recommendations',
+      actGuidelineSource,
+    ),
+    LabClinicalSection(
+      'Unexpected ACT or an inadequate heparin response',
+      [
+        'Hypothermia, hemodilution, reduced hematocrit, low fibrinogen, platelet abnormalities, and other anticoagulants can affect ACT independently of the heparin concentration.',
+        'A prolonged ACT during hypothermia or hemodilution may overstate the heparin effect. Interpret it with the clinical setting and the perfusion team’s monitoring strategy.',
+        'If ACT fails to reach the procedural target, verify heparin delivery, dose and timing, sample quality, and the device before attributing the result to resistance.',
+        'Heparin acts through antithrombin. Reduced antithrombin activity is one cause of an inadequate response, but not the only cause; investigate and manage according to the cardiac-anesthesia/perfusion protocol.',
+      ],
+      'BJA Education · Heparin response and ACT limitations',
+      actReviewSource,
+    ),
+    LabClinicalSection(
+      'After protamine: do not treat ACT in isolation',
+      [
+        'A return toward baseline can support reversal assessment, but ACT is relatively insensitive to low residual heparin levels and does not exclude heparin rebound.',
+        'Persistent prolongation can reflect residual heparin or a non-heparin coagulopathy. Excess protamine can itself impair coagulation and prolong ACT.',
+        'When bleeding or an unexplained result persists, use the local reversal assessment strategy; heparin titration or a heparinase comparison may help identify residual heparin.',
+        'Do not give repeated protamine solely because ACT is above baseline without evaluating the cause and the overall bleeding picture.',
+      ],
+      'STS/SCA/AmSECT · Protamine and residual heparin',
+      actGuidelineSource,
+    ),
+    LabClinicalSection(
+      'Collection errors that matter',
+      [
+        'For the cited i-STAT assay, use fresh arterial or venous whole blood in a non-anticoagulated plastic collection device and test immediately.',
+        'Heparin, citrate, EDTA, or another additive in the collection device can invalidate the intended measurement. Follow the instructions for the actual ACT system.',
+        'Avoid line heparin contamination or dilution. If repeating a questionable result, obtain a fresh sample using the local line-clearing and collection procedure.',
+      ],
+      'Abbott · Kaolin ACT collection and handling',
+      actDeviceSource,
+    ),
+  ],
+  'ck': [
+    LabClinicalSection(
+      'CK and CPK are the same test',
+      [
+        'CK means creatine kinase; CPK means creatine phosphokinase. Total CK measures enzyme activity and is reported in U/L or IU/L.',
+        'Mayo’s adult reference intervals are 39–308 U/L for males and 26–192 U/L for females. Muscle mass, activity, and laboratory method affect the expected value.',
+        'Total CK predominantly reflects skeletal muscle CK-MM. It is not a cardiac-specific marker and should not replace troponin when evaluating myocardial injury.',
+      ],
+      'Mayo Clinic Laboratories · Total creatine kinase',
+      ckIntervalSource,
+    ),
+    LabClinicalSection(
+      'Perioperative causes and timing',
+      [
+        'Surgery, muscle trauma or compression, seizures, strenuous exercise, intramuscular injections, burns, and drug-associated muscle injury can elevate CK.',
+        'Malignant hyperthermia can cause marked CK elevation, but CK is a downstream muscle-injury marker; it is not a reason to delay assessment of an evolving intraoperative crisis.',
+        'CK may begin rising within about 12 hours and typically peaks 24–72 hours after muscle injury. An early result can underestimate the eventual magnitude.',
+        'Follow the clinical course and serial measurements rather than interpreting a postoperative CK rise as automatically cardiac in origin.',
+      ],
+      'Mayo Clinic Laboratories · CK causes and kinetics',
+      ckIntervalSource,
+    ),
+    LabClinicalSection(
+      'Rhabdomyolysis: more than an elevated CK',
+      [
+        'CK >5 times the laboratory upper limit or >1,000 IU/L is commonly used as laboratory evidence of rhabdomyolysis in the appropriate clinical setting. These are not automatic dialysis or renal-injury thresholds.',
+        'Assess potassium, creatinine, urine output, acid–base status, and the underlying muscle injury. Hyperkalemia and acute kidney injury are important complications.',
+        'Serial CK can be followed until a peak is identified and values are reliably decreasing. The trend may lag behind the initiating injury.',
+        'Resuscitation must be individualized to renal function and volume status. A high CK alone does not justify unlimited fluid administration, particularly with anuria or volume overload.',
+      ],
+      'AAST · Rhabdomyolysis clinical consensus',
+      rhabdomyolysisSource,
+    ),
+  ],
+  'ck-mb': [
+    LabClinicalSection(
+      'Reference value: mass is not enzyme activity',
+      [
+        'Abbott i-STAT CK-MB mass lists a healthy reference interval of 0.0–3.5 ng/mL, encompassing 95% of the studied reference population.',
+        'This is a platform-specific reference interval, not a universal MI decision limit. Use the reporting laboratory’s validated cutoff.',
+        'CK-MB mass in ng/mL (equivalent to µg/L) is not interchangeable with CK-MB activity in U/L or a relative index reported as a percentage.',
+      ],
+      'Abbott · i-STAT CK-MB reference interval and units',
+      ckMbIntervalSource,
+    ),
+    LabClinicalSection(
+      'Time course and perioperative confounders',
+      [
+        'After myocardial injury, CK-MB may rise at approximately 4–6 hours, peak near 24 hours, and return toward baseline over 36–72 hours. Timing varies with the event and assay.',
+        'Skeletal muscle injury, surgery, burns, or extreme exercise can elevate CK-MB. Postoperative elevation is not automatically a myocardial infarction.',
+        'A single early normal CK-MB does not exclude MI, and an elevated value cannot establish ischemia by itself.',
+      ],
+      'Abbott · CK-MB clinical interpretation and limitations',
+      ckMbIntervalSource,
+    ),
+    LabClinicalSection(
+      'Where it fits alongside troponin',
+      [
+        'Cardiac troponin is the preferred biomarker for myocardial injury because CK-MB is less sensitive and less specific.',
+        'Do not use CK-MB to overrule a concerning clinical presentation or to substitute for the local high-sensitivity troponin pathway.',
+        'If CK-MB is used because troponin is unavailable or a local pathway specifically requires it, interpret the assay-specific result with serial testing and evidence of ischemia.',
+      ],
+      'ESC/ACCF/AHA/WHF · Cardiac biomarker selection',
+      cardiacBiomarkerSource,
     ),
   ],
 };

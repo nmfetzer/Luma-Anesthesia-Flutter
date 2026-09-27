@@ -245,7 +245,7 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                           onChanged: (_) => setState(() {}),
                           decoration: InputDecoration(
                             labelText: 'Search lab values',
-                            hintText: 'Potassium, INR, neuraxial, transfusion…',
+                            hintText: 'ACT, troponin, CPK, lactate…',
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: _search.text.isEmpty
                                 ? null

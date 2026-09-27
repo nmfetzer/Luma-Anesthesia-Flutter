@@ -20,8 +20,8 @@ void main() {
   });
 
   test('lab draft has unique IDs, source links, units and working aliases', () {
-    expect(labReferences.length, 30);
-    expect(labReferences.map((e) => e.id).toSet().length, 30);
+    expect(labReferences.length, 33);
+    expect(labReferences.map((e) => e.id).toSet().length, 33);
     for (final entry in labReferences) {
       expect(entry.interval, isNotEmpty);
       expect(entry.bullets, isNotEmpty);
@@ -44,7 +44,7 @@ void main() {
     expect(searchLabReferences('Hgb').single.id, 'hemoglobin');
     expect(searchLabReferences('K+').single.id, 'potassium');
     expect(searchLabReferences('', group: 'Blood Counts').length, 5);
-    expect(searchLabReferences('', group: 'Coagulation').length, 6);
+    expect(searchLabReferences('', group: 'Coagulation').length, 7);
     expect(
       searchLabReferences('neuraxial').map((e) => e.id),
       containsAll(['pt-inr', 'platelets']),
@@ -60,11 +60,127 @@ void main() {
             .having((e) => e.hasUrgentContext, 'has urgent context', isTrue),
       ),
     );
-    expect(labReferences.where((e) => !e.hasExampleInterval).length, 5);
+    expect(labReferences.where((e) => !e.hasExampleInterval).length, 3);
     expect(
       labClinicalGuidance.keys.toSet(),
       labReferences.map((e) => e.id).toSet(),
     );
+  });
+
+  test('expanded labs support clinical aliases and both requested groups', () {
+    for (final pair in {
+      'activated clotting time': 'act',
+      'CPK': 'ck',
+      'CKMB': 'ck-mb',
+      'lactic acid': 'lactate',
+    }.entries) {
+      expect(
+        searchLabReferences(pair.key).map((e) => e.id),
+        contains(pair.value),
+      );
+    }
+    expect(
+      searchDiagnosticCategories('ACT').map((e) => e.id),
+      contains('labs'),
+    );
+    expect(
+      searchLabReferences('', group: 'Perfusion & Cardiac Markers')
+          .map((e) => e.id),
+      containsAll(['lactate', 'troponin', 'ck', 'ck-mb']),
+    );
+    for (final id in [
+      'pt-inr',
+      'aptt',
+      'fibrinogen',
+      'anti-xa',
+      'viscoelastic',
+      'd-dimer',
+      'act',
+      'lactate',
+      'troponin',
+      'ck',
+      'ck-mb',
+    ]) {
+      final card = labReferences.singleWhere((e) => e.id == id);
+      expect(card.clinicalSections.length, greaterThanOrEqualTo(2), reason: id);
+      expect(
+        card.clinicalSections.expand((s) => s.bullets).length,
+        greaterThanOrEqualTo(7),
+        reason: id,
+      );
+    }
+  });
+
+  test('ACT separates baseline, CPB targets, device exceptions and reversal',
+      () {
+    final card = labReferences.singleWhere((e) => e.id == 'act');
+    expect(card.interval, contains('74–137'));
+    expect(card.interval, contains('82–152'));
+    expect(card.interval, isNot(contains('480')));
+    final text = card.clinicalSections.expand((s) => s.bullets).join(' ');
+    for (final value in [
+      'above 480 seconds',
+      'above 400 seconds',
+      'device-specific exception',
+      'residual heparin',
+      'Excess protamine',
+      'antithrombin',
+      'fresh sample',
+    ]) {
+      expect(text, contains(value));
+    }
+  });
+
+  test('cardiac and perfusion values retain assay, units and interpretation',
+      () {
+    final troponin = labReferences.singleWhere((e) => e.id == 'troponin');
+    expect(troponin.hasExampleInterval, isFalse);
+    expect(troponin.interval, contains('ng/L'));
+    final troponinText =
+        troponin.clinicalSections.expand((s) => s.bullets).join(' ');
+    expect(troponinText, contains('not universal diagnostic cutoffs'));
+    expect(troponinText, contains('99th-percentile'));
+    expect(troponinText, contains('evidence of ischemia'));
+    expect(
+      labReferences.singleWhere((e) => e.id == 'lactate').interval,
+      contains('0.5–2.0 mmol/L'),
+    );
+    expect(
+      labReferences.singleWhere((e) => e.id == 'ck').interval,
+      contains('39–308 U/L'),
+    );
+    expect(
+      labReferences.singleWhere((e) => e.id == 'ck-mb').interval,
+      contains('0.0–3.5 ng/mL'),
+    );
+  });
+
+  testWidgets('ACT expands at mobile width with sources and no overflow',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(375, 812));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      const MaterialApp(home: LabValuesScreen(showClinicalDraft: true)),
+    );
+    await tester.enterText(find.byType(TextField), 'activated clotting time');
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('ACT / Activated Clotting Time'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ACT / Activated Clotting Time'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Abbott · Device-specific baseline ranges'),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(
+      find.text('Cardiopulmonary bypass: target and device exception'),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('normal app cannot view draft lab values', (tester) async {
@@ -118,7 +234,7 @@ void main() {
     expect(find.textContaining('No matching lab values.'), findsOneWidget);
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump();
-    expect(find.text('30 matching reference cards'), findsOneWidget);
+    expect(find.text('33 matching reference cards'), findsOneWidget);
     await tester.ensureVisible(find.text('Blood Counts'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Blood Counts'));
@@ -138,7 +254,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Coagulation'));
     await tester.pumpAndSettle();
-    expect(find.text('6 matching reference cards'), findsOneWidget);
+    expect(find.text('7 matching reference cards'), findsOneWidget);
     await tester.ensureVisible(find.text('Urgent findings'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Urgent findings'));
