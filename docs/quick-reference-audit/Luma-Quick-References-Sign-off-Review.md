@@ -127,3 +127,14 @@ Owner approval was explicitly provided in this conversation on September 27, 202
 - **Remaining requested edits:** None specified with this approval.
 
 The companion “Clinical Sign-off Copy” contains the exact reviewed text of all 59 live sections, with their versions and inline source links. It is the content to review alongside the app, not a substitute for checking how the information is used clinically.
+
+## Final owner sign-off after full-library recheck
+
+Nicole Fetzer explicitly approved the rechecked library on September 27, 2026 at 1:33 PM EDT: “sign off and add to app.” This records the owner's approval, not clinical certification by the AI reviewer.
+
+- **Approved scope:** All 24 guides and 59 sections in the refreshed Clinical Sign-off Copy, including the ketamine and magnesium bronchospasm rows and flexible search.
+- **Review baseline:** Recheck commit `fc7f6e9`, including the clinical addition from `3b0f7e5`.
+- **Publication confirmation:** A fresh live Supabase readback after this approval exactly matched all 59 approved sections, including content, versions, keywords and publication status. The approved content was already published, so no duplicate content write was necessary.
+- **Free access confirmation:** All 59 bodies were available to guests and authenticated unpaid users. Unpublished content remained hidden and client writes remained disallowed.
+- **Release boundary:** The approved content is live in the app's connected database. This does not represent a new native binary or App Store release.
+- **Remaining requested changes:** None specified with this final approval.
