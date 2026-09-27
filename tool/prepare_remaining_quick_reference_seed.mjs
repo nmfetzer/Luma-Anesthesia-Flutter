@@ -10,7 +10,7 @@ const aliases = {
   'drip-quick-reference': ['drip', 'infusion', 'Levophed', 'Vasostrict', 'Precedex', 'Primacor', 'Ultiva', 'Diprivan'],
   'normal-hemodynamics': ['Swan Ganz', 'PA catheter', 'wedge', 'PCWP', 'PAOP', 'CO', 'CI', 'SVR', 'PVR', 'SvO2'],
   'svt-afib-cardioversion': ['AFib', 'AF', 'RVR', 'SVT', 'DCCV', 'cardioversion', 'Cardizem', 'Lopressor'],
-  'wpw-syndrome': ['WPW', 'Wolff Parkinson White', 'preexcited', 'pre excited', 'accessory pathway', 'irregular wide complex'],
+  'wpw-syndrome': ['WPW', 'Wolff Parkinson White', 'preexcited', 'pre excited', 'accessory pathway', 'AVRT', 'orthodromic', 'antidromic', 'delta wave', 'short PR', 'irregular wide complex'],
   'valve-disorders': ['AS', 'AR', 'AI', 'MS', 'MR', 'valvular', 'insufficiency'],
   'antibiotic-redosing': ['Ancef', 'Kefzol', 'Cleocin', 'Flagyl', 'Unasyn', 'Mefoxin', 'Zinacef', 'Zosyn', 'antibiotics', 'redose', 'redosing'],
   'anticoagulants-reversal': ['blood thinner', 'Coumadin', 'Eliquis', 'Xarelto', 'Pradaxa', 'Lovenox', 'Kcentra', 'Praxbind', 'Andexxa'],
@@ -48,10 +48,14 @@ for (const guide of source.split(/^# /m).slice(1)) {
     const terms = body.replace(/\]\(https:\/\/[^)]+\)/g, ']')
       .toLowerCase().match(/[a-z][a-z0-9-]{2,}/g) ?? [];
     rows.push({
-      id: `${referenceId}-${slug(title)}`, reference_id: referenceId,
+      // Preserve the live WPW section ID when broadening its former AF-only title.
+      id: referenceId === 'wpw-syndrome' && index === 0
+        ? 'wpw-syndrome-pre-excitation-treatment'
+        : `${referenceId}-${slug(title)}`, reference_id: referenceId,
       reference_title: referenceTitle, title,
       keywords: [...new Set([...aliases[referenceId], 'dose', 'dosing', ...terms])],
-      sort_order: index, is_published: true, body, version: '2026-09-27',
+      sort_order: index, is_published: true, body,
+      version: referenceId === 'wpw-syndrome' ? '2026-09-27-r2' : '2026-09-27',
     });
   });
 }

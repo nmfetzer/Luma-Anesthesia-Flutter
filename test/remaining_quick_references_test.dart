@@ -74,6 +74,9 @@ void main() {
     'normal wedge': 'normal-hemodynamics',
     'AFib cardioversion': 'svt-afib-cardioversion',
     'WPW amiodarone': 'wpw-syndrome',
+    'WPW orthodromic adenosine': 'wpw-syndrome',
+    'antidromic procainamide': 'wpw-syndrome',
+    'WPW delta wave': 'wpw-syndrome',
     'mitral stenosis': 'valve-disorders',
     'Ancef redose': 'antibiotic-redosing',
     'Eliquis reversal': 'anticoagulants-reversal',
@@ -118,10 +121,44 @@ void main() {
     }
   });
 
+  test(
+    'WPW separates rhythms and retains stable live ID and safety guards',
+    () {
+      final wpw = remainingSource
+          .split('# WPW Syndrome :: wpw-syndrome')
+          .last
+          .split('\n# ')
+          .first;
+      final rows = catalog
+          .where((row) => row.referenceId == 'wpw-syndrome')
+          .toList();
+      expect(rows, hasLength(2));
+      expect(rows.first.id, 'wpw-syndrome-pre-excitation-treatment');
+      expect(rows.first.title, 'Rhythm-Based Assessment & Treatment');
+      for (final phrase in [
+        'WPW pattern: sinus rhythm',
+        'Orthodromic AVRT: stable',
+        'Antidromic AVRT: stable',
+        'Pre-excited AF: stable',
+        '6 mg rapid IV',
+        'treat as VT',
+        'PEA/asystole: nonshockable',
+        'even when a pulse is present',
+        'Stop the infusion when the arrhythmia terminates',
+        'at least 4 h after infusion AND until QTc returns to baseline',
+        'concurrently with ibutilide or within 4 h after ibutilide',
+      ]) {
+        expect(wpw, contains(phrase));
+      }
+      expect(wpw, isNot(contains('If pulseless or polymorphic VT/VF')));
+    },
+  );
+
   for (final id in [
     'pals-medications',
     'normal-hemodynamics',
     'induction-medications',
+    'wpw-syndrome',
   ]) {
     testWidgets('$id renders compact chart with correct scope on mobile', (
       tester,
