@@ -387,7 +387,8 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
                       const SizedBox(height: 20),
                       if (widget.section.referenceId ==
                               'antihypertensive-dosing' ||
-                          widget.section.referenceId == 'hypotension-dosing')
+                          widget.section.referenceId == 'hypotension-dosing' ||
+                          widget.section.referenceId == 'beta-blocker-dosing')
                         QuickReferenceChart(
                           body: _content!.body,
                           nameColumnFlex:

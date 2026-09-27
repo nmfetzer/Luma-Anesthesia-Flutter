@@ -277,8 +277,14 @@ class _CrisisDetailScreenState extends State<CrisisDetailScreen> {
                         !result.access.premium &&
                         !result.access.reviewer)
                       FilledButton(
-                          onPressed: () =>
-                              Navigator.of(context).pushNamed('/subscribe'),
+                          onPressed: () async {
+                            await Navigator.of(context).pushNamed('/subscribe');
+                            if (!mounted) return;
+                            setState(() {
+                              _version++;
+                              _load = _fetch();
+                            });
+                          },
                           child: const Text('View subscription options')),
                     OutlinedButton(
                         onPressed: () =>

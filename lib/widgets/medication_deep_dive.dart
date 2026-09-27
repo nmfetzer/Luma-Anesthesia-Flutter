@@ -76,6 +76,17 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
       if (!mounted || generation != _generation) return;
       if (result['allowed'] != true) {
         await Navigator.of(context).pushNamed('/subscribe');
+        if (!mounted || generation != _generation) return;
+        final refreshed = await _fetch();
+        if (!mounted || generation != _generation) return;
+        if (refreshed['allowed'] == true) {
+          setState(() {
+            _body = refreshed['body'] as String?;
+            if (_body == null || _body!.trim().isEmpty) {
+              _message = 'No Deep Dive is available for this medication yet.';
+            }
+          });
+        }
       } else {
         setState(() {
           _body = result['body'] as String?;
