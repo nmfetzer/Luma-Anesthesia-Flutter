@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../widgets/luma_home_button.dart';
+import '../widgets/account_information.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -442,8 +443,9 @@ class _AccountScreenState extends State<AccountScreen> {
                               ),
                             ),
                             validator: (value) {
-                              if ((value ?? '').isEmpty)
+                              if ((value ?? '').isEmpty) {
                                 return 'Enter your password.';
+                              }
                               if (_create && value!.length < 8) {
                                 return 'Use at least 8 characters.';
                               }
@@ -489,6 +491,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       child: Text(_message!, style: lumaBody()),
                     ),
                   ],
+                  const AccountInformation(),
                 ],
               ),
             ),
