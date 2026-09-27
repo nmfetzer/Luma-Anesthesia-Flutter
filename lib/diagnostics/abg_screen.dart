@@ -51,40 +51,37 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text('REVIEW PREVIEW\n'
-                          'Adult educational reference. Draft content is not '
+                          'Adult perioperative reference. Draft content is not '
                           'released for patient care. Follow clinical judgment '
                           'and institutional protocols.'),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Interpret the whole picture',
+                      'Perioperative acid–base problems',
                       style: lumaDisplay(size: 28),
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                        'Acid–base patterns, compensation and anesthesia '
-                        'context. Reference formulas and teaching cases only; '
-                        'no patient-specific calculator.'),
+                        'Differentials, management considerations and anesthesia '
+                        'pitfalls. Select a clinical problem, or search a finding.'),
                     const SizedBox(height: 20),
-                    Card(
+                    const Card(
                       margin: EdgeInsets.zero,
                       color: LumaColors.creamElevated,
                       child: ExpansionTile(
-                        key: const PageStorageKey('abg-compensation'),
-                        title: const Text('Compensation quick reference'),
-                        subtitle:
-                            const Text('Four patterns · Acute vs chronic'),
-                        childrenPadding:
-                            const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        key: PageStorageKey('abg-compensation'),
+                        title: Text('Formulas & compensation'),
+                        subtitle: Text('Compensation · Anion gap · Delta gap'),
+                        childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
                         children: [
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.symmetric(vertical: 8),
                             child: Text('Approximate responses, not treatment '
                                 'targets. Compare with baseline, time course '
                                 'and clinical context.'),
                           ),
-                          for (final section in compensationReference)
-                            _Section(section: section),
+                          _CompensationTable(),
+                          _Section(section: gapReference),
                         ],
                       ),
                     ),
@@ -94,7 +91,7 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
                         labelText: 'Search ABG references',
-                        hintText: 'Winter, anion gap, EtCO2…',
+                        hintText: 'SGLT2, lactate, hypercapnia…',
                         prefixIcon: const Icon(Icons.search),
                         suffixIcon: _search.text.isEmpty
                             ? null
@@ -157,6 +154,8 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                           childrenPadding:
                               const EdgeInsets.fromLTRB(16, 0, 16, 16),
                           children: [
+                            if (topic.differential.isNotEmpty)
+                              _DifferentialTable(rows: topic.differential),
                             for (final section in topic.sections)
                               _Section(section: section),
                           ],
@@ -174,14 +173,14 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
   }
 }
 
-class _Section extends StatelessWidget {
-  const _Section({required this.section});
-  final AbgSection section;
+class _AbgSourceButton extends StatelessWidget {
+  const _AbgSourceButton({required this.label, required this.url});
+  final String label, url;
 
   Future<void> _openSource(BuildContext context) async {
     try {
       if (await launchUrl(
-        Uri.parse(section.url),
+        Uri.parse(url),
         mode: LaunchMode.externalApplication,
       )) {
         return;
@@ -192,11 +191,174 @@ class _Section extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Unable to open source: ${section.url}'),
+          content: Text('Unable to open source: $url'),
         ),
       );
     }
   }
+
+  @override
+  Widget build(BuildContext context) => TextButton.icon(
+        onPressed: () => _openSource(context),
+        icon: const Icon(Icons.open_in_new, size: 16),
+        label: Text(label),
+      );
+}
+
+class _CompensationTable extends StatelessWidget {
+  const _CompensationTable();
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final section in compensationReference)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: LumaColors.inkNavy.withValues(alpha: .14),
+                  ),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    section.title,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  for (final line in section.bullets)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: SelectionArea(child: Text(line)),
+                    ),
+                ],
+              ),
+            ),
+          const _AbgSourceButton(
+            label: 'Merck Manual · Compensation table',
+            url: compensationSource,
+          ),
+        ],
+      );
+}
+
+class _DifferentialTable extends StatelessWidget {
+  const _DifferentialTable({required this.rows});
+  final List<AbgDifferential> rows;
+
+  Widget _cell(String text, {bool heading = false}) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: SelectionArea(
+          child: Text(
+            text,
+            style:
+                heading ? const TextStyle(fontWeight: FontWeight.w600) : null,
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            const Text(
+              'Differential at a glance',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            if (constraints.maxWidth >= 640)
+              Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(.8),
+                  1: FlexColumnWidth(1.3),
+                  2: FlexColumnWidth(1.5),
+                },
+                border: TableBorder.all(
+                  color: LumaColors.inkNavy.withValues(alpha: .14),
+                ),
+                defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                children: [
+                  TableRow(
+                    decoration:
+                        const BoxDecoration(color: LumaColors.haloGoldLight),
+                    children: [
+                      _cell('Process', heading: true),
+                      _cell('Distinguishing context', heading: true),
+                      _cell('Evaluation / management focus', heading: true),
+                    ],
+                  ),
+                  for (final row in rows)
+                    TableRow(
+                      children: [
+                        _cell(row.process, heading: true),
+                        _cell(row.clues),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SelectionArea(child: Text(row.focus)),
+                              _AbgSourceButton(
+                                label: row.sourceLabel,
+                                url: row.url,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              )
+            else
+              for (final row in rows)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: LumaColors.inkNavy.withValues(alpha: .14),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        row.process,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Distinguishing context',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      SelectionArea(child: Text(row.clues)),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Evaluation / management focus',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      SelectionArea(child: Text(row.focus)),
+                      _AbgSourceButton(label: row.sourceLabel, url: row.url),
+                    ],
+                  ),
+                ),
+          ],
+        ),
+      );
+}
+
+class _Section extends StatelessWidget {
+  const _Section({required this.section});
+  final AbgSection section;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -227,11 +389,7 @@ class _Section extends StatelessWidget {
                   ],
                 ),
               ),
-            TextButton.icon(
-              onPressed: () => _openSource(context),
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: Text(section.sourceLabel),
-            ),
+            _AbgSourceButton(label: section.sourceLabel, url: section.url),
           ],
         ),
       );

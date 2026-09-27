@@ -1,59 +1,52 @@
-# ABG & Acid–Base preview QA
+# ABG & Acid–Base clinician preview QA
 
-## Scope and boundaries
+## Scope
 
-- Fourteen adult reference cards, grouped into Foundations, Primary disorders, Mixed disorders, Perioperative and Teaching cases.
-- Four-pattern compensation panel, including acute versus chronic respiratory responses.
-- Bullets and section-level direct source buttons; seven fetched clinical references.
-- No patient-specific interpreter, ventilator settings, medication calculator or automatic diagnosis.
-- No production Supabase changes, GitHub push, clinical approval, access-rule changes or purchase activation.
-- Default app does not expose draft ABG content. The existing review-preview entry point opts in.
+- Replaces the previous fourteen-card teaching module with twelve adult perioperative references.
+- Removes introductory lessons and synthetic student cases.
+- Adds differential tables for unexplained acidosis, metabolic alkalosis and hypercapnia. Tables become labeled blocks on narrow screens.
+- Keeps compensation, anion-gap and delta-gap formulas in one collapsible panel.
+- Includes management considerations, anesthesia implications and pitfalls with direct source buttons.
+- No patient-specific interpreter, dose calculator or automatic diagnosis.
+- Existing preview-only guard remains. No production Supabase changes, GitHub push, access-rule changes or clinical signoff.
 
-## QA inventory
+## Automated verification
 
-- Hub: ABG opens the new section; its count is accurate; EKG remains excluded.
-- Quick-reference panel: open and close; all four patterns and source buttons render.
-- Search: incremental updates; aliases and Unicode-compatible matching; clear and restore.
-- Group filters: selection and reset; combined search plus group produces the correct subset.
-- Empty state: incompatible query/filter shows no-results message and usable reset.
-- Cards: expand/collapse, bullet wrapping, source action and retained expansion after filtering.
-- Source action: click a rendered source button and confirm exact destination.
-- Navigation: back to Diagnostics; Home returns to the main tile dashboard.
-- Mobile: 375 × 812, wrapped filters and long source labels, expanded clinical text without horizontal clipping.
-- Desktop: 1280 × 900, readable reference column and visible search/quick-access controls.
-- Exploratory: change filters with a card expanded, clear an unmatched query, open/close the quick panel after scrolling.
-- Guard: default screen shows in-preparation notice and no clinical content.
-- Teaching examples: confirm arithmetic and approximate Henderson–Hasselbalch consistency; explicitly synthetic.
+- All 23 targeted Flutter tests passed: seven ABG tests plus Diagnostics, home search and home navigation regressions.
+- Static analysis of Diagnostics and both reference test files: no issues.
+- Release-mode Flutter web build completed.
+- Tests cover source presence, twelve unique topics, differential data, DKA thresholds, current bicarbonate trial citations, search, group filters, empty-state reset, formula panel, mobile layout and the production draft guard.
 
-## Automated checks completed
+## Rendered verification
 
-- Twenty-two targeted Flutter tests passed, including six new ABG tests.
-- Static analysis of Diagnostics and both clinical-reference test files: no issues.
-- Compensation constants are reused between the quick-reference panel and full topics to prevent divergence.
-- Release-mode Flutter web build completed successfully.
-- Synthetic case arithmetic checked independently: Winter ranges 22.5–26.5, 24–28 and 33–37 mmHg; rounded pH values 7.25, 7.40 and 7.10 are internally consistent.
+- Desktop 1280 × 900 and mobile 375 × 812 screenshots inspected.
+- Cream/navy/gold styling preserved; no horizontal clipping observed.
+- Hub count is twelve and opens the rebuilt reference.
+- Formula panel opens and closes.
+- Metabolic filter plus “unexplained” returns two relevant cards. The intraoperative-acidosis reference expands to its table and bulleted content.
+- Desktop renders a three-column differential table. Mobile renders labeled blocks with wrapping source labels.
+- Unmatched search shows reset; reset restores the unfiltered list.
+- Clicked the BJA Education acidosis differential source and confirmed https://pmc.ncbi.nlm.nih.gov/articles/PMC10874758/.
+- Back returns to Diagnostics and Home to the main dashboard.
+- No browser page errors observed. Browser session closed.
 
-## Rendered verification completed
+## Clinical sourcing
 
-- Desktop 1280 × 900 and mobile 375 × 812 screenshots reviewed: readable cream/navy styling, wrapped filters, bullet text and long source labels without horizontal clipping.
-- Hub opens ABG; 14-card count verified; quick panel opens and closes.
-- Primary disorders + Winter returns one metabolic acidosis card; the card expands.
-- EtCO2 alias returns the capnography card; clear restores the list.
-- Unmatched query plus filter produces an empty state; reset restores all 14 references.
-- Expanded card/filter transitions and reopening the quick panel did not cause restoration errors.
-- Clicked the rendered Merck compensation button and confirmed the exact destination URL.
-- Back returned to Diagnostics; Home returned to the dashboard route.
-- No browser page errors observed. The browser QA session was closed.
-- The app's existing single cream/navy theme was preserved; no new dark-mode implementation was introduced.
+Fetched and checked the relevant content from these references. Source verification and software testing are not clinical approval.
 
-## Clinical evidence
-
-- Merck Manual acid–base disorders: https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/acid-base-disorders
-- Merck compensation table: https://www.merckmanuals.com/professional/multimedia/table/primary-changes-and-compensations-in-simple-acid-base-disorders
+- Perioperative metabolic acidosis: https://pmc.ncbi.nlm.nih.gov/articles/PMC10874758/
+- Metabolic alkalosis and mixed disorders: https://pmc.ncbi.nlm.nih.gov/articles/PMC10028421/
+- Adult hyperglycemic crises consensus (2024): https://pmc.ncbi.nlm.nih.gov/articles/PMC11272983/
+- Metabolic alkalosis: https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/metabolic-alkalosis
+- Acid–base disorders: https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/acid-base-disorders
+- Compensation table: https://www.merckmanuals.com/professional/multimedia/table/primary-changes-and-compensations-in-simple-acid-base-disorders
+- Respiratory disorders: https://www.openanesthesia.org/keywords/respiratory-acidosis-and-alkalosis/
+- Tourniquet physiology: https://www.openanesthesia.org/keywords/perioperative-tourniquet-use/
+- BICARICU-2 primary publication: https://pubmed.ncbi.nlm.nih.gov/41159812/
+- SODa-BIC primary publication: https://pubmed.ncbi.nlm.nih.gov/42283370/
 - Adult arterial/venous gas review (2025): https://pmc.ncbi.nlm.nih.gov/articles/PMC12387505/
-- Preanalytical sampling review: https://pmc.ncbi.nlm.nih.gov/articles/PMC3900096/
-- Blood gas context: https://medlineplus.gov/ency/article/003855.htm
-- Capnography physiology: https://www.openanesthesia.org/wp-content/uploads/2024/10/08/ICU_one_pager_end_tidal_co2_v11.pdf
+- Sampling limitations: https://pmc.ncbi.nlm.nih.gov/articles/PMC3900096/
+- Capnography: https://www.openanesthesia.org/wp-content/uploads/2024/10/08/ICU_one_pager_end_tidal_co2_v11.pdf
 - Peri-intubation physiology: https://pmc.ncbi.nlm.nih.gov/articles/PMC4703154/
 
-Only the relevant physiology and limitations were used from the older reviews. This does not assert that all recommendations in those articles remain current. Source checking and software testing do not constitute clinical signoff.
+Older physiology reviews are used for the relevant mechanisms and limitations, not as blanket endorsement of all their recommendations. Bicarbonate content distinguishes the newer trials from older subgroup interpretations and does not generalize their results to every indication.
