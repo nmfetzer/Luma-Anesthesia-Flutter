@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/ce/ce_certificate_pdf.dart';
 import 'package:luma_anesthesia/ce/ce_certificate_screen.dart';
 import 'package:luma_anesthesia/ce/ce_demo_repository.dart';
+import 'package:luma_anesthesia/ce/ce_participation_dates.dart';
 
 Future<DemoCeRepository> registered() async {
   final repo = DemoCeRepository();
@@ -14,12 +15,43 @@ Future<DemoCeRepository> registered() async {
     'credentials': 'DNP, CRNA',
     'aana_id': 'SAMPLE ONLY',
     'location': 'Rochester, New York, USA',
+    'participation_start_on': '2026-10-01',
+    'participation_end_on': '2026-10-03',
   });
   return repo;
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('participation dates validate pairs, calendar, order, period and future dates', () {
+    expect(validateCeParticipationDates('', ''), isNull);
+    expect(validateCeParticipationDates('2026-10-01', ''), isNotNull);
+    expect(validateCeParticipationDates('2026-02-30', '2026-10-03'), isNotNull);
+    expect(validateCeParticipationDates('2026-10-03', '2026-10-01'), isNotNull);
+    expect(validateCeParticipationDates('2026-09-30', '2026-10-03'), isNotNull);
+    expect(validateCeParticipationDates('2029-09-30', '2029-10-01'), isNotNull);
+    expect(
+      validateCeParticipationDates(
+        '2026-10-01',
+        '2026-10-03',
+        now: DateTime(2026, 9, 27),
+      ),
+      isNotNull,
+    );
+    expect(
+      validateCeParticipationDates('2026-10-01', '2026-10-03', preview: true),
+      isNull,
+    );
+    expect(
+      validateCeParticipationDates(
+        '2026-10-01',
+        '2026-10-03',
+        now: DateTime(2026, 10, 3),
+      ),
+      isNull,
+    );
+    expect(certificateDate('2026-10-03'), '10/3/2026');
+  });
   test('unregistered preview cannot generate', () async {
     await expectLater(DemoCeRepository().call('certificate'), throwsException);
   });
@@ -39,6 +71,8 @@ void main() {
       expect(record['is_preview'], true);
       expect(record['credits_awarded'], 0);
       expect(record['learner']['full_name'], 'Jordan Example');
+      expect(record['learner']['participation_start_on'], '2026-10-01');
+      expect(record['learner']['participation_end_on'], '2026-10-03');
       await expectLater(
         repo.call('certificate', {'action': 'issue'}),
         throwsException,

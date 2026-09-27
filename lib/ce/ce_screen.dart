@@ -10,6 +10,7 @@ import '../theme/luma_theme.dart';
 import 'ce_repository.dart';
 import 'ce_records_screen.dart';
 import 'ce_certificate_screen.dart';
+import 'ce_participation_dates.dart';
 
 const ceNavy = Color(0xFF102A3A);
 const ceGold = Color(0xFFE1BD7F);
@@ -36,6 +37,8 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   final credentials = TextEditingController();
   final aanaId = TextEditingController();
   final location = TextEditingController();
+  final participationStart = TextEditingController();
+  final participationEnd = TextEditingController();
   final learned = TextEditingController();
   final barriers = TextEditingController();
   final signature = TextEditingController();
@@ -109,6 +112,8 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           credentials,
           aanaId,
           location,
+          participationStart,
+          participationEnd,
           learned,
           barriers,
           signature,
@@ -128,6 +133,8 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       credentials,
       aanaId,
       location,
+      participationStart,
+      participationEnd,
       learned,
       barriers,
       signature,
@@ -146,6 +153,8 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     credentials.text = p['credentials'] as String? ?? '';
     aanaId.text = p['aana_id'] as String? ?? '';
     location.text = p['location'] as String? ?? '';
+    participationStart.text = p['participation_start_on'] as String? ?? '';
+    participationEnd.text = p['participation_end_on'] as String? ?? '';
   }
 
   Future<void> run(Future<void> Function() action) async {
@@ -552,14 +561,43 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
             copy(
               'Location is saved for your own documentation. It does not establish tax deductibility, business-travel eligibility, or employer reimbursement.',
             ),
+            field(
+              'Participation start date',
+              participationStart,
+              required: false,
+              maxLength: 10,
+              hint: 'YYYY-MM-DD',
+            ),
+            field(
+              'Participation end date',
+              participationEnd,
+              required: false,
+              maxLength: 10,
+              hint: 'YYYY-MM-DD',
+            ),
+            copy(
+              'Enter your actual participation dates for the certificate. You may leave both blank when registering and add them through Edit course registration before requesting your certificate. The app records course completion separately.',
+            ),
             button('Save details & view modules', () {
               if (!formKey.currentState!.validate()) return;
+              final dateError = validateCeParticipationDates(
+                participationStart.text.trim(),
+                participationEnd.text.trim(),
+                preview: preview,
+              );
+              if (dateError != null) {
+                setState(() => error = dateError);
+                if (scroll.hasClients) scroll.jumpTo(0);
+                return;
+              }
               run(() async {
                 await call('profile', {
                   'full_name': fullName.text.trim(),
                   'credentials': credentials.text.trim(),
                   'aana_id': aanaId.text.trim(),
                   'location': location.text.trim(),
+                  'participation_start_on': participationStart.text.trim(),
+                  'participation_end_on': participationEnd.text.trim(),
                 });
                 await refresh();
                 go('modules');

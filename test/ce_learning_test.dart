@@ -74,8 +74,9 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
+      final repo = DemoCeRepository();
       await tester.pumpWidget(
-        MaterialApp(home: CeCourseScreen(repository: DemoCeRepository())),
+        MaterialApp(home: CeCourseScreen(repository: repo)),
       );
       await tester.pumpAndSettle();
       expect(
@@ -90,21 +91,34 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Your course registration'), findsOneWidget);
       expect(find.text('AANA ID (optional)'), findsOneWidget);
+      expect(find.text('Participation start date'), findsOneWidget);
+      expect(find.text('Participation end date'), findsOneWidget);
       final save = find.text('Save details & view modules');
       await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
       await tester.tap(save);
       await tester.pumpAndSettle();
       expect(find.text('This field is required'), findsNWidgets(3));
       expect(tester.takeException(), isNull);
-      await tester.enterText(find.byType(TextFormField).at(0), 'Catalog Tester');
+      await tester.enterText(
+        find.byType(TextFormField).at(0),
+        'Catalog Tester',
+      );
       await tester.enterText(find.byType(TextFormField).at(1), 'CRNA');
       await tester.enterText(find.byType(TextFormField).at(3), 'Rochester, NY');
+      await tester.enterText(find.byType(TextFormField).at(4), '2026-10-01');
+      await tester.enterText(find.byType(TextFormField).at(5), '2026-10-03');
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
       await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
       await tester.tap(save);
       await tester.pumpAndSettle();
       expect(find.textContaining('11 of 11 modules loaded'), findsOneWidget);
       expect(find.text('More modules to come'), findsNothing);
       expect(find.text('REMAINING 0 MODULES'), findsNothing);
+      expect(repo.profile['participation_start_on'], '2026-10-01');
+      expect(repo.profile['participation_end_on'], '2026-10-03');
       expect(tester.takeException(), isNull);
     });
   }

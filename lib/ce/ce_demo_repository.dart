@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'ce_repository.dart';
 import 'ce_demo_data.dart';
+import 'ce_participation_dates.dart';
 
 class DemoCeRepository extends CeRepository {
   final Map<String, _DemoModuleRepository> _modules = {};
@@ -43,7 +44,7 @@ class DemoCeRepository extends CeRepository {
             'pharmacology_credits': 0,
             'pain_credits': 0,
             'provider_city_state': 'Buffalo, New York',
-            'signer_name': 'Nicole M Fetzer, MS, CRNA',
+            'signer_name': 'Nicole M. Fetzer, MS, CRNA',
             'signer_title': 'Owner, CE HALO LLC',
           },
         };
@@ -105,8 +106,21 @@ class DemoCeRepository extends CeRepository {
     );
     state.unlocked = unlocked;
     if (action == 'profile') {
+      final dateError = validateCeParticipationDates(
+        '${payload['participation_start_on'] ?? ''}',
+        '${payload['participation_end_on'] ?? ''}',
+        preview: true,
+      );
+      if (dateError != null) throw Exception(dateError);
       profile = {
-        for (final key in ['full_name', 'credentials', 'aana_id', 'location'])
+        for (final key in [
+          'full_name',
+          'credentials',
+          'aana_id',
+          'location',
+          'participation_start_on',
+          'participation_end_on',
+        ])
           key: payload[key] ?? '',
       };
     }
