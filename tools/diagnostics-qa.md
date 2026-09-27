@@ -24,8 +24,8 @@ Scope: seven-category Flutter hub and 30 adult lab-reference cards. All 19 initi
 - AABB thresholds are limited to stable adult populations; no automatic transfusion trigger or fixed hematocrit target is supplied. No replacement-dose calculator was added.
 - Lactate guidance uses the retrieved 2026 Surviving Sepsis Campaign update, not the older 2021 recommendation.
 - Dedicated platelet page is used for platelet units; the general CBC page has an inconsistent platelet unit.
-- ABG, PFT, Echo/TEE, imaging, POCUS and carotid content are explicitly in preparation.
-- Next content work: ABG & Acid–Base, then the remaining diagnostic categories.
+- At this lab-expansion milestone ABG, PFT, Echo/TEE, imaging, POCUS and carotid were in preparation. The subsequent ABG preview is documented in `abg-qa.md`.
+- Remaining categories after the ABG preview: PFT, Echo/TEE, imaging, POCUS and carotid.
 
 ## Verification results
 
