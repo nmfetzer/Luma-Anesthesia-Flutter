@@ -43,7 +43,9 @@ Files are intentionally under `supabase/billing-draft/`, outside automatic migra
 
 The draft grants at most a 15-minute lease, refreshed while the app is used, so a stale record cannot confer subscription access indefinitely. Canceled auto-renewal retains access through the paid expiration; refund/transfer changes are reflected on refresh or lease expiry. This trades offline paid-reference availability for fail-closed verification. It does not remotely erase clinical content already displayed or downloaded. Existing owner/CE access is independent.
 
-No webhook is deployed. The bounded-lease design avoids depending on webhook delivery for expiration, but live refund/transfer behavior and provider API field shapes must be tested against real sandbox customers before release. Billing retries are user-triggered or periodic; this release draft does not implement grace-period access beyond the verified paid expiry.
+No subscription webhook is deployed. A separate Apple CE-only webhook was deployed with granting disabled on September 27; see [CE webhook setup and verification](CE_REVENUECAT_WEBHOOK.md). It does not process subscription products or activate this subscription draft. The draft SQL now preserves `bonus_starts_at` when checking queued CE bonus windows.
+
+The bounded-lease design avoids depending on webhook delivery for subscription expiration, but live refund/transfer behavior and provider API field shapes must be tested against real sandbox customers before release. Billing retries are user-triggered or periodic; this release draft does not implement grace-period access beyond the verified paid expiry.
 
 ## Activation requirements
 

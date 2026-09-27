@@ -45,7 +45,7 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
           AND e.revoked_at IS NULL AND e.valid_until > now())
       OR EXISTS (SELECT 1 FROM public.luma_ce_bonus_purchases p
         WHERE p.user_id = (SELECT auth.uid()) AND p.bonus_awarded
-          AND p.revoked_at IS NULL AND p.purchased_at <= now() AND p.valid_until > now())
+          AND p.revoked_at IS NULL AND p.bonus_starts_at <= now() AND p.valid_until > now())
       OR EXISTS (SELECT 1 FROM public.luma_revenuecat_access r
         WHERE r.user_id = (SELECT auth.uid()) AND r.active AND r.valid_until > now())
     );
