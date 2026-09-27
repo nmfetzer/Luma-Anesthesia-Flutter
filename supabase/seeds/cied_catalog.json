@@ -292,6 +292,54 @@
     "is_published": true
   },
   {
+    "id": "cied-external-defibrillation",
+    "reference_id": "aicds-pacemakers",
+    "reference_title": "AICDs & Pacemakers",
+    "title": "External Defibrillation & Cardioversion",
+    "keywords": [
+      "AICD",
+      "ICD",
+      "implantable defibrillator",
+      "pacemaker",
+      "PPM",
+      "CIED",
+      "CRT",
+      "CRT-P",
+      "CRT-D",
+      "biventricular",
+      "BiV",
+      "external shock",
+      "shocks",
+      "shock pacemaker",
+      "defibrillate AICD",
+      "defibrillation",
+      "cardioversion ICD",
+      "synchronized",
+      "unsynchronized",
+      "pad placement",
+      "pad position",
+      "pads over pacemaker",
+      "anterior posterior",
+      "anteroposterior",
+      "anterior lateral",
+      "anterolateral",
+      "8 cm",
+      "energy",
+      "joules",
+      "VF",
+      "pulseless VT",
+      "unstable tachycardia",
+      "cardiac arrest",
+      "magnet removal",
+      "disabled therapy",
+      "post shock",
+      "interrogation",
+      "S-ICD"
+    ],
+    "sort_order": 9,
+    "is_published": true
+  },
+  {
     "id": "cied-postop",
     "reference_id": "aicds-pacemakers",
     "reference_title": "AICDs & Pacemakers",
@@ -317,7 +365,7 @@
       "discharge",
       "follow up"
     ],
-    "sort_order": 9,
+    "sort_order": 10,
     "is_published": true
   },
   {
@@ -345,7 +393,7 @@
       "external pacing",
       "defibrillation"
     ],
-    "sort_order": 10,
+    "sort_order": 11,
     "is_published": true
   }
 ]

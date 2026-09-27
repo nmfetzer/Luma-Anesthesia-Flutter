@@ -14,6 +14,7 @@ const definitions = [
   ['exceptions', 'Magnet exceptions that change the plan', ['magnet', 'magnet not working', 'magnet response off', 'leadless', 'Micra', 'AVEIR', 'Biotronik', 'Medtronic', 'Abbott', 'Boston Scientific', 'St Jude', 'MicroPort', 'Sorin', 'S-ICD', 'MRI SureScan', 'telemetry', '10 beats', '8 hours', 'interrogation delay']],
   ['electrocautery', 'Electrocautery and EMI precautions', ['bipolar', 'monopolar', 'cautery', 'electrocautery', 'electrosurgery', 'Bovie', 'ultrasonic', 'EMI', 'electromagnetic interference', 'return electrode', 'return pad', 'grounding pad', 'dispersive pad', 'below umbilicus', 'abdominal generator', 'whole body electrode', 'RF ablation', 'argon plasma']],
   ['intraop', 'Intraoperative monitoring and troubleshooting', ['monitoring', 'ECG', 'pulse', 'capture', 'pacing inhibition', 'bradycardia', 'external pacing', 'inappropriate shock', 'repeated shocks', 'VT', 'VF', 'cardiac arrest', 'defibrillation', 'cardioversion', 'pad position']],
+  ['external-defibrillation', 'External Defibrillation & Cardioversion', ['external shock', 'shocks', 'shock pacemaker', 'defibrillate AICD', 'defibrillation', 'cardioversion ICD', 'synchronized', 'unsynchronized', 'pad placement', 'pad position', 'pads over pacemaker', 'anterior posterior', 'anteroposterior', 'anterior lateral', 'anterolateral', '8 cm', 'energy', 'joules', 'VF', 'pulseless VT', 'unstable tachycardia', 'cardiac arrest', 'magnet removal', 'disabled therapy', 'post shock', 'interrogation', 'S-ICD']],
   ['postop', 'Post-op restoration and handoff', ['postop', 'PACU', 'reactivation', 'restore settings', 'interrogation', 'handoff', 'discharge', 'follow up']],
   ['urgent', 'Urgent case with incomplete device information', ['emergency', 'urgent', 'unknown device', 'missing records', 'interrogation', 'external pacing', 'defibrillation']],
 ];
@@ -22,6 +23,14 @@ const bodies = new Map(chunks.map(chunk => {
   const at = chunk.indexOf('\n');
   return [chunk.slice(0, at).trim(), chunk.slice(at + 1).trim()];
 }));
+const externalTitle = 'External Defibrillation & Cardioversion';
+bodies.set(externalTitle, fs.readFileSync(
+  new URL('../supabase/seeds/cied_external_defibrillation.md', import.meta.url),
+  'utf8',
+).replace(/^# .*\n+/, '').trim());
+for (const title of ['ICD/AICD and CRT-D magnet protocol', 'Intraoperative monitoring and troubleshooting']) {
+  bodies.set(title, `${bodies.get(title)}\n\nRelated section: **${externalTitle}** in this guide covers emergency shocks, pad placement, and post-shock device checks.`);
+}
 const deviceAliases = ['AICD', 'ICD', 'implantable defibrillator', 'pacemaker', 'PPM', 'CIED', 'CRT', 'CRT-P', 'CRT-D', 'biventricular', 'BiV'];
 const scope = 'Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.';
 const rows = definitions.map(([slug, title, keywords], index) => {

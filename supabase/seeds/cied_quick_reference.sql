@@ -135,7 +135,9 @@ values ('cied-icd-magnet','Adult perioperative clinical reference. Individualize
 - **Confirm the device-specific response:** Verify that magnet response is enabled and that the intended therapy suspension occurs; tones and their absence are model-dependent. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
 - **Maintain placement:** Keep the magnet continuously in the correct position throughout the period requiring therapy suspension; prone/lateral positioning, deep implants, or a nearby sterile field may favor reprogramming. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
 - **Separate treatment from detection:** Boston Scientific transvenous ICDs may continue detecting/recording arrhythmias while magnet application inhibits ATP and shocks; do not label all magnet responses as “detection off.” ([Boston Scientific](https://www.bostonscientific.com/content/dam/bostonscientific/quality/education-resources/english/US_ACL_Magnet%20Use%20with%20BSC%20CIED_20210421.pdf))
-- **Confirm recovery:** Magnet removal usually restores the prior treatment state, but model-specific delays and older-device exceptions exist; explicitly verify restoration rather than assuming every system reactivates immediately. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))','2026-09-27')
+- **Confirm recovery:** Magnet removal usually restores the prior treatment state, but model-specific delays and older-device exceptions exist; explicitly verify restoration rather than assuming every system reactivates immediately. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+
+Related section: **External Defibrillation & Cardioversion** in this guide covers emergency shocks, pad placement, and post-shock device checks.','2026-09-27')
 on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
 
 insert into public.quick_reference_catalog
@@ -216,13 +218,61 @@ values ('cied-intraop','Adult perioperative clinical reference. Individualize wi
 
 - **Suspected inappropriate shocks:** Stop EMI, rapidly assess the actual rhythm and pulse, and seek device-team assistance; verified magnet application can temporarily suppress inappropriate ICD therapy while external rescue capability is maintained. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
 - **True unstable VT/VF or cardiac arrest:** Follow the appropriate resuscitation pathway without delaying indicated external cardioversion/defibrillation for a programmer, device confirmation, or an ideal pad position; remove an ICD magnet when restoring native therapy, but do not wait for internal therapy if external treatment is needed now. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
-- **After rescue:** Arrange interrogation following external cardioversion/defibrillation, arrest, suspected ICD therapy, or device malfunction/reset. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+- **After rescue:** Arrange interrogation following external cardioversion/defibrillation, arrest, suspected ICD therapy, or device malfunction/reset. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+Related section: **External Defibrillation & Cardioversion** in this guide covers emergency shocks, pad placement, and post-shock device checks.','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-external-defibrillation','aicds-pacemakers','AICDs & Pacemakers',
+  'External Defibrillation & Cardioversion',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','external shock','shocks','shock pacemaker','defibrillate AICD','defibrillation','cardioversion ICD','synchronized','unsynchronized','pad placement','pad position','pads over pacemaker','anterior posterior','anteroposterior','anterior lateral','anterolateral','8 cm','energy','joules','VF','pulseless VT','unstable tachycardia','cardiac arrest','magnet removal','disabled therapy','post shock','interrogation','S-ICD'],9,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-external-defibrillation','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+### Emergency priority
+
+**Do not delay an indicated external shock because a pacemaker or ICD is present.** Follow the appropriate resuscitation pathway; do not wait for a programmer or restoration of disabled ICD therapies if they cannot be restored promptly. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+
+### Choose the correct treatment
+
+- **VF or pulseless VT:** Deliver unsynchronized defibrillation and immediately resume CPR according to the cardiac-arrest algorithm; an ICD that has not terminated the rhythm is not a reason to withhold external shocks. ([ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+- **Unstable tachyarrhythmia with a pulse:** Use synchronized cardioversion for appropriate rhythms such as monomorphic VT, SVT, or AF/flutter when the arrhythmia is causing instability; synchronize to the R wave, and if synchronization fails in unstable VT, give an unsynchronized shock rather than prolonging the delay. ([AHA adult ALS guidelines, 2025](https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support); [ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+- **Sustained polymorphic VT:** Use an immediate high-energy unsynchronized shock, even if a pulse is initially present; the changing QRS complexes cannot be synchronized reliably. ([AHA adult ALS guidelines, 2025](https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support))
+- **Conscious patient:** Provide appropriate sedation/anesthesia for cardioversion when feasible, accounting for the risk of hemodynamic deterioration and the urgency of treatment. ([ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+- **Planned cardioversion:** This emergency device-safety reference does not replace assessment of anticoagulation and thromboembolic risk before elective cardioversion of atrial fibrillation. ([ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+
+### Pad placement
+
+- **Never directly over the generator:** Position pads to minimize current through the generator and leads while maintaining an effective transthoracic shock vector. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Distance:** Aim for more than 8 cm between the pad and the implanted generator, consistent with ERC 2025 guidance; use an alternative pad position when needed and do not delay lifesaving treatment while seeking an ideal position. ([ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+- **Orientation:** ASA perioperative guidance favors anterior–posterior placement when feasible; anterior–lateral placement remains an alternative when it avoids the device and permits prompt effective treatment. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+- **S-ICD location:** A subcutaneous ICD generator may be in the left lateral chest where a lateral pad would normally go; identify the actual generator location rather than assuming a left infraclavicular implant. ([ERC adult ALS guidelines, 2025](https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf))
+
+### Energy selection
+
+- **Use the indicated energy:** Follow the current ACLS rhythm-specific algorithm and external-defibrillator instructions; use clinically appropriate energy regardless of the implanted device and do not reduce it solely to protect a pacemaker or ICD. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+
+### Magnet or disabled ICD therapies
+
+- **Magnet-suspended ICD:** Stop sources of EMI and remove the magnet to allow native ICD tachyarrhythmia therapy to resume, observing for an appropriate response; do not wait for an internal shock when external treatment is needed immediately. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Programmed-off ICD:** Removing a magnet does not reverse programmer-disabled therapies; arrange reprogramming, but proceed with emergency external cardioversion/defibrillation if restoration cannot occur promptly. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Pacemaker distinction:** A pacing-only device does not provide ICD shock therapy, and an ICD magnet generally does not convert its pacing to an asynchronous mode; pacing support and tachyarrhythmia treatment remain separate considerations. ([AHA CIED scientific statement, 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+### After external cardioversion or defibrillation
+
+- **Immediate device assessment:** Arrange immediate CIED interrogation following external cardioversion/defibrillation, without interrupting ongoing resuscitation; assess for reset, programming changes, and impaired pacing or defibrillator function. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [AHA CIED scientific statement, 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Continue monitoring and rescue readiness:** Keep cardiac rate/rhythm monitoring and backup pacing/defibrillation available until permanent device settings are restored. ([ASA practice advisory, 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Before leaving monitored care:** Confirm ICD tachyarrhythmia detection and therapies are re-enabled, document the device plan and changes, and communicate them in the handoff. ([AHA CIED scientific statement, 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
 on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
 
 insert into public.quick_reference_catalog
   (id,reference_id,reference_title,title,keywords,sort_order,is_published)
 values ('cied-postop','aicds-pacemakers','AICDs & Pacemakers',
-  'Post-op restoration and handoff',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','postop','PACU','reactivation','restore settings','interrogation','handoff','discharge','follow up'],9,true)
+  'Post-op restoration and handoff',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','postop','PACU','reactivation','restore settings','interrogation','handoff','discharge','follow up'],10,true)
 on conflict (id) do update set reference_id=excluded.reference_id,
   reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
   sort_order=excluded.sort_order,is_published=excluded.is_published;
@@ -240,7 +290,7 @@ on conflict (id) do update set body=excluded.body,version=excluded.version,updat
 insert into public.quick_reference_catalog
   (id,reference_id,reference_title,title,keywords,sort_order,is_published)
 values ('cied-urgent','aicds-pacemakers','AICDs & Pacemakers',
-  'Urgent case with incomplete device information',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','emergency','urgent','unknown device','missing records','interrogation','external pacing','defibrillation'],10,true)
+  'Urgent case with incomplete device information',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','emergency','urgent','unknown device','missing records','interrogation','external pacing','defibrillation'],11,true)
 on conflict (id) do update set reference_id=excluded.reference_id,
   reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
   sort_order=excluded.sort_order,is_published=excluded.is_published;

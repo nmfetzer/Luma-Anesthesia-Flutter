@@ -20,9 +20,38 @@ void main() {
   List<String> results(String query) =>
       catalog.where((s) => s.matches(query)).map((s) => s.id).toList();
 
-  test('approved guide has 11 uniquely identified searchable sections', () {
-    expect(catalog.length, 11);
-    expect(catalog.map((s) => s.id).toSet().length, 11);
+  test('approved guide has 12 uniquely identified searchable sections', () {
+    expect(catalog.length, 12);
+    expect(catalog.map((s) => s.id).toSet().length, 12);
+  });
+  for (final query in [
+    'shock pacemaker',
+    'defibrillate AICD',
+    'cardioversion ICD',
+    'pad placement',
+    'external shock',
+    'pads over pacemaker',
+    'AICD and 8 cm',
+    'post shock interrogation',
+  ]) {
+    test('external shock reference is discoverable: $query', () {
+      expect(results(query), contains('cied-external-defibrillation'));
+    });
+  }
+  testWidgets('pad placement opens external defibrillation section', (
+    tester,
+  ) async {
+    final repo = FakeReferences()..rows.addAll(catalog);
+    await tester.pumpWidget(
+      MaterialApp(home: QuickReferencesScreen(repository: repo)),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'pad placement');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('External Defibrillation & Cardioversion'));
+    await tester.pumpAndSettle();
+    expect(repo.requestedId, 'cied-external-defibrillation');
+    expect(tester.takeException(), isNull);
   });
   for (final query in [
     'bipolar and AICD',

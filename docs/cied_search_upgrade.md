@@ -6,7 +6,8 @@ work. It does not change clinical access, purchases, or existing pre-op content.
 
 ## Content
 
-- Eleven separately searchable sections from the approved combined guide.
+- Twelve separately searchable sections, including the owner-authorized
+  External Defibrillation & Cardioversion addition.
 - Approved clinical paragraphs, tables, qualifications, and inline source URLs
   are retained; only draft/editorial publication notes are excluded.
 - Every section carries the adult perioperative scope reminder.
@@ -45,7 +46,7 @@ New topics still need curated section metadata; this is not unrestricted AI sear
 
 ## QA inventory
 
-- Metadata fixture matches the published 11-section seed; unique stable IDs.
+- Metadata fixture matches the published 12-section seed; unique stable IDs.
 - Search phrases, reverse order, synonyms, punctuation, filler words, typo list.
 - GLP1 / GLP-1 / GLP 1 and existing pre-op aliases remain supported.
 - Unknown terms, filler-only queries, and unrelated drug combinations fail closed.
@@ -57,6 +58,32 @@ New topics still need curated section metadata; this is not unrestricted AI sear
 - Full Flutter tests, targeted analysis, and release web build.
 
 ## Release verification
+
+### External shock section addition
+
+- Authorized September 27, 2026, after the owner reviewed the proposed scope.
+- Adds emergency shock priority, rhythm/treatment distinction, generator-safe
+  pad placement, clinically appropriate energy, magnet/programming distinctions,
+  immediate post-shock interrogation, and monitored restoration of therapies.
+- Pad-distance advice is attributed to ERC 2025, not incorrectly to AHA.
+- Source Markdown: `supabase/seeds/cied_external_defibrillation.md`.
+- Magnet and intraoperative sections name the related section for navigation.
+- Search metadata includes `shock pacemaker`, `defibrillate AICD`,
+  `cardioversion ICD`, `pad placement`, `external shock`, and
+  `pads over pacemaker`.
+- Content/metadata update only: no Flutter runtime, schema, RLS, or billing changes.
+- Published to the same Supabase project; catalog now has 12 CIED and 12 pre-op
+  sections. Only the new section, two related-section notes, and following section
+  ordering were included in the incremental publication.
+- All 195 Flutter tests passed on the synced app; 34 focused reference tests
+  passed and targeted analysis reported no issues.
+- RLS verification: 24 public metadata rows and 24 eligible-user bodies;
+  anonymous, unpaid, and anonymous-authenticated users read zero bodies;
+  client write permission remains false.
+- Existing flexible-search builds receive this section from Supabase on catalog
+  reload; no native binary or embedded-preview rebuild is needed for this content.
+
+### Original guide release
 
 - The 11 CIED sections were published atomically to Supabase project
   `xuckkusbbcxplpqclbxt`; the existing 12 pre-op rows were not changed.
