@@ -8,6 +8,15 @@ import 'ce_demo_data.dart';
 import 'ce_participation_dates.dart';
 
 class DemoCeRepository extends CeRepository {
+  DemoCeRepository({
+    this.courseNumber = 1,
+    Map<String, dynamic>? catalog,
+    this.questionBanks,
+  }) : previewCatalog = catalog ?? demoCatalog;
+  @override
+  final int courseNumber;
+  final Map<String, dynamic> previewCatalog;
+  final Map<String, dynamic>? questionBanks;
   final Map<String, _DemoModuleRepository> _modules = {};
   Map<String, dynamic> profile = {};
   bool unlocked = false;
@@ -20,7 +29,11 @@ class DemoCeRepository extends CeRepository {
     String action, [
     Map<String, dynamic> payload = const {},
   ]) async {
-    if (action == 'catalog') return demoCatalog;
+    if (action == 'catalog') return previewCatalog;
+    if (action == 'certificate_records') {
+      if (!unlocked) throw Exception('Provider access required');
+      return {'rows': <Map<String, dynamic>>[], 'total': 0};
+    }
     if (action == 'demo_unlock') {
       unlocked = true;
       return {};
@@ -38,7 +51,7 @@ class DemoCeRepository extends CeRepository {
           'certificate': {
             'id': 'PREVIEW-NOT-VALID',
             'is_preview': true,
-            'course_id': '1047239',
+            'course_id': courseId,
             'learner': Map.of(profile),
             'credits_awarded': 0,
             'pharmacology_credits': 0,
@@ -55,7 +68,7 @@ class DemoCeRepository extends CeRepository {
         'can_preview': true,
         'reason': 'Provider preview only. No CE credit is awarded.',
         'modules': [
-          for (final m in (demoCatalog['modules'] as List))
+          for (final m in (previewCatalog['modules'] as List))
             {
               'id': m['id'],
               'title': m['title'],
@@ -82,8 +95,8 @@ class DemoCeRepository extends CeRepository {
                       m.completion['learner'] as Map,
                     ),
                     'account_id': 'design-preview',
-                    'course_id': '1047239',
-                    'reporting_class': '196397',
+                    'course_id': courseId,
+                    'reporting_class': courseNumber == 2 ? '196400' : '196397',
                     'quiz_attempts': [
                       {'score': m.lastScore, 'number': m.number},
                     ],
@@ -96,13 +109,17 @@ class DemoCeRepository extends CeRepository {
           : <Map<String, dynamic>>[];
       return {'rows': rows, 'total': rows.length};
     }
-    final id = payload['module_id'] as String? ?? 'course_1_module_1';
-    final metadata = (demoCatalog['modules'] as List)
+    final id =
+        payload['module_id'] as String? ?? 'course_${courseNumber}_module_1';
+    final metadata = (previewCatalog['modules'] as List)
         .cast<Map<String, dynamic>>()
         .firstWhere((m) => m['id'] == id);
     final state = _modules.putIfAbsent(
       id,
-      () => _DemoModuleRepository(metadata),
+      () => _DemoModuleRepository(
+        metadata,
+        customBank: questionBanks?[id] as List?,
+      ),
     );
     state.unlocked = unlocked;
     if (action == 'profile') {
@@ -144,18 +161,21 @@ class DemoCeRepository extends CeRepository {
 }
 
 class _DemoModuleRepository extends CeRepository {
-  _DemoModuleRepository(this.metadata);
+  _DemoModuleRepository(this.metadata, {this.customBank});
+  final List<dynamic>? customBank;
   final Map<String, dynamic> metadata;
   String get moduleId => metadata['id'] as String;
-  List<dynamic> get bank => switch (moduleId) {
-    'course_1_module_1' => demoQuestions,
-    'course_1_module_2' => demoGlp1Questions,
-    'course_1_module_3' => demoBenzodiazepineQuestions,
-    'course_1_module_4' => demoNmbaQuestions,
-    _ =>
-      (demoRemainingQuestions[moduleId] as List<dynamic>?) ??
-          (throw StateError('No preview question bank for $moduleId')),
-  };
+  List<dynamic> get bank =>
+      customBank ??
+      switch (moduleId) {
+        'course_1_module_1' => demoQuestions,
+        'course_1_module_2' => demoGlp1Questions,
+        'course_1_module_3' => demoBenzodiazepineQuestions,
+        'course_1_module_4' => demoNmbaQuestions,
+        _ =>
+          (demoRemainingQuestions[moduleId] as List<dynamic>?) ??
+              (throw StateError('No preview question bank for $moduleId')),
+      };
   @override
   bool get isDemo => true;
   @override

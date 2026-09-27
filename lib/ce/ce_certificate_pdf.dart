@@ -24,11 +24,19 @@ String certificateDate(dynamic value) {
 /// Renderer only. Award authorization lives exclusively in the Supabase RPC.
 /// The uploaded sample's signature artwork is a PREVIEW-ONLY fallback.
 /// Official records must contain their own provider-approved signature.
-Future<Uint8List> buildCeCertificatePdf(Map<String, dynamic> record) async {
+Future<Uint8List> buildCeCertificatePdf(
+  Map<String, dynamic> record, {
+  bool serverTemplate = false,
+}) async {
+  final course2 = record['course_id'] == '1047241';
+  final courseNumber = course2 ? 2 : 1;
+  final courseTitle = course2
+      ? 'Uncommon but Catastrophic Anesthesia Events'
+      : 'A Medication Review for the Experienced CRNA';
   final preview = record['is_preview'] != false;
   if (!preview &&
       (record['id'] == null ||
-          record['template_version'] != 'cehalo-course1-v1' ||
+          record['template_version'] != 'cehalo-course$courseNumber-v1' ||
           record['credits_awarded'] != 20 ||
           record['completed_on'] == null ||
           (record['signature_png_base64'] as String? ?? '').isEmpty)) {
@@ -70,7 +78,7 @@ Future<Uint8List> buildCeCertificatePdf(Map<String, dynamic> record) async {
   final end = record['participation_end_on'] ?? learner['participation_end_on'];
   final doc = pw.Document(
     title: preview
-        ? 'CE HALO Course 1 Certificate Preview'
+        ? 'CE HALO Course $courseNumber Certificate Preview'
         : 'CE HALO Certificate of Completion',
     author: 'Perplexity Computer',
     theme: pw.ThemeData.withFont(base: regular, bold: bold),
@@ -119,7 +127,28 @@ Future<Uint8List> buildCeCertificatePdf(Map<String, dynamic> record) async {
                 bottom: pw.BorderSide(color: PdfColors.grey400, width: .5),
               ),
             ),
-            child: text(value, size: compact ? 9 : 10),
+            child: serverTemplate
+                ? pw.Annotation(
+                    builder: pw.AnnotationTextField(
+                      name: label,
+                      value: '',
+                      textStyle: pw.TextStyle(
+                        font: regular,
+                        fontSize: compact ? 9 : 10,
+                        color: navy,
+                      ),
+                    ),
+                    child: pw.SizedBox(
+                      width: double.infinity,
+                      height:
+                          label == 'Name:' || label == 'Location of Completion:'
+                          ? (compact ? 80 : 28)
+                          : label == 'AANA ID Number:'
+                          ? 28
+                          : 16,
+                    ),
+                  )
+                : text(value, size: compact ? 9 : 10),
           ),
         ),
       ],
@@ -172,10 +201,7 @@ Future<Uint8List> buildCeCertificatePdf(Map<String, dynamic> record) async {
               pw.SizedBox(height: compact ? 9 : 13),
               centered('Certificate of Completion', size: 22, strong: true),
               pw.SizedBox(height: 8),
-              centered(
-                'Course 1: "A Medication Review for the Experienced CRNA"',
-                size: 10.5,
-              ),
+              centered('Course $courseNumber: "$courseTitle"', size: 10.5),
               pw.SizedBox(height: 4),
               centered('Independent Study', color: gray),
               if (preview) ...[
@@ -253,20 +279,40 @@ Future<Uint8List> buildCeCertificatePdf(Map<String, dynamic> record) async {
               pw.SizedBox(height: compact ? 12 : 27),
               pw.Divider(color: PdfColors.grey400, thickness: .5),
               for (final statement in [
-                ceApprovalStatement,
-                cePharmacologyStatement,
-                cePainStatement,
+                course2
+                    ? ceApprovalStatement.replaceFirst('1047239', '1047241')
+                    : ceApprovalStatement,
+                course2
+                    ? cePharmacologyStatement.replaceFirst('17.50', '10.50')
+                    : cePharmacologyStatement,
+                course2
+                    ? cePainStatement.replaceFirst('2.50', '1.00')
+                    : cePainStatement,
                 ceCaliforniaStatement,
               ]) ...[
                 text(statement, size: 9, color: PdfColors.black),
                 pw.SizedBox(height: 5),
               ],
               pw.SizedBox(height: 3),
-              text(
-                'Certificate ID: ${preview ? 'PREVIEW-NOT-VALID' : record['id']}',
-                size: 9,
-                color: gray,
-              ),
+              if (serverTemplate)
+                pw.Annotation(
+                  builder: pw.AnnotationTextField(
+                    name: 'certificate_id',
+                    value: '',
+                    textStyle: pw.TextStyle(
+                      font: regular,
+                      fontSize: 9,
+                      color: gray,
+                    ),
+                  ),
+                  child: pw.SizedBox(width: double.infinity, height: 14),
+                )
+              else
+                text(
+                  'Certificate ID: ${preview ? 'PREVIEW-NOT-VALID' : record['id']}',
+                  size: 9,
+                  color: gray,
+                ),
               if (preview)
                 text(
                   'Design review only. No completion or CE award is recorded.',

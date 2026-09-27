@@ -53,8 +53,12 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
         final record = Map<String, dynamic>.from(
           response['certificate'] as Map,
         );
-        pdf = await buildCeCertificatePdf(record);
         preview = record['is_preview'] != false;
+        // Previews remain local and zero-credit. Official downloads always use
+        // the server-rendered, immutable archive, never a client-rendered copy.
+        pdf = preview
+            ? await buildCeCertificatePdf(record)
+            : await widget.repository.certificatePdf();
       }
       if (mounted) {
         setState(() {
@@ -80,8 +84,8 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
       await Printing.sharePdf(
         bytes: bytes!,
         filename: preview
-            ? 'CE_HALO_Course1_Certificate_PREVIEW.pdf'
-            : 'CE_HALO_Course1_Certificate.pdf',
+            ? 'CE_HALO_Course${widget.repository.courseNumber}_Certificate_PREVIEW.pdf'
+            : 'CE_HALO_Course${widget.repository.courseNumber}_Certificate.pdf',
       );
     } catch (_) {
       if (mounted) {
@@ -114,7 +118,8 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
               Expanded(
                 child: PdfViewer.data(
                   bytes!,
-                  sourceName: 'CE HALO Course 1 certificate',
+                  sourceName:
+                      'CE HALO Course ${widget.repository.courseNumber} certificate',
                 ),
               ),
               if (error != null)
@@ -129,8 +134,14 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                     runSpacing: 8,
                     children: [
                       OutlinedButton(
-                        onPressed: busy ? null : () => load('status'),
-                        child: const Text('Back to requirements'),
+                        onPressed: busy
+                            ? null
+                            : () => preview
+                                  ? load('status')
+                                  : Navigator.of(context).pop(),
+                        child: Text(
+                          preview ? 'Back to requirements' : 'Back to course',
+                        ),
                       ),
                       FilledButton.icon(
                         onPressed: busy ? null : download,
@@ -158,9 +169,9 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Course 1 · A Medication Review for the Experienced CRNA\n20.00 MAC Ed CE credits (17.50 Pharmacology & Therapeutics; 2.50 Pain Management).',
-                    style: TextStyle(height: 1.6),
+                  Text(
+                    'Course ${widget.repository.courseNumber} · ${widget.repository.courseTitle}\n20.00 MAC Ed CE credits (${widget.repository.pharmacologyCredits} Pharmacology & Therapeutics; ${widget.repository.painCredits} Pain Management).',
+                    style: const TextStyle(height: 1.6),
                   ),
                   const SizedBox(height: 20),
                   if (busy) const LinearProgressIndicator(),
@@ -191,13 +202,19 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                              'Your saved registration supplies your name, credentials, AANA ID (if provided), and completion location. You will not need to enter these again.',
+                              'Your saved registration supplies your name, credentials, AANA ID (if provided), location of completion, and participation dates. Your actual course completion date is recorded separately.',
                               style: TextStyle(height: 1.5),
                             ),
                             const SizedBox(height: 10),
                             const Text(
                               'Certificates are for the entire program, not individual modules. Generating a certificate does not submit credits to AANA.',
                               style: TextStyle(height: 1.5),
+                            ),
+                            TextButton(
+                              onPressed: busy
+                                  ? null
+                                  : () => Navigator.of(context).pop(true),
+                              child: const Text('Edit course registration'),
                             ),
                             if (status!['can_preview'] == true) ...[
                               const SizedBox(height: 16),

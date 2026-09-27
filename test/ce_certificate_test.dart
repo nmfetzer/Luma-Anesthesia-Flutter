@@ -6,6 +6,7 @@ import 'package:luma_anesthesia/ce/ce_certificate_pdf.dart';
 import 'package:luma_anesthesia/ce/ce_certificate_screen.dart';
 import 'package:luma_anesthesia/ce/ce_demo_repository.dart';
 import 'package:luma_anesthesia/ce/ce_participation_dates.dart';
+import 'package:luma_anesthesia/ce/ce_records_screen.dart';
 
 Future<DemoCeRepository> registered() async {
   final repo = DemoCeRepository();
@@ -23,6 +24,27 @@ Future<DemoCeRepository> registered() async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test(
+    'certificate ledger is distinct from modules and protects CSV cells',
+    () async {
+      final repo = await registered();
+      expect((await repo.call('certificate_records'))['total'], 0);
+      final csv = ceRecordsCsv([
+        {
+          'certificate_id': 'TEST',
+          'full_name': '=1+1',
+          'credits_awarded': 20,
+          'participation_start_on': '2026-10-01',
+          'participation_end_on': '2026-10-03',
+        },
+      ], certificates: true);
+      expect(csv, contains('"credits_awarded"'));
+      expect(csv, contains('"participation_end_on"'));
+      expect(csv, contains("\"'=1+1\""));
+      expect(csv, isNot(contains('"module_credits"')));
+      await expectLater(repo.certificatePdf(), throwsUnsupportedError);
+    },
+  );
   test('participation dates validate pairs, calendar, order, period and future dates', () {
     expect(validateCeParticipationDates('', ''), isNull);
     expect(validateCeParticipationDates('2026-10-01', ''), isNotNull);

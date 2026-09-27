@@ -45,7 +45,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   final formKey = GlobalKey<FormState>();
   final evalKey = GlobalKey<FormState>();
   List<int?> ratings = List<int?>.filled(11, null);
-  String selectedModuleId = 'course_1_module_1';
+  late String selectedModuleId = 'course_${repo.courseNumber}_module_1';
   bool attestation = false;
   final scroll = ScrollController();
   StreamSubscription<String?>? accountSubscription;
@@ -83,9 +83,16 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
 
   bool get preview => repo.isDemo || status['is_preview'] == true;
 
-  void openCertificate() => Navigator.of(context).push(
-    MaterialPageRoute(builder: (_) => CeCertificateScreen(repository: repo)),
-  );
+  Future<void> openCertificate() async {
+    final edit = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => CeCertificateScreen(repository: repo)),
+    );
+    if (!mounted) return;
+    if (edit == true) {
+      await run(refresh);
+      if (mounted) go('details');
+    }
+  }
 
   @override
   void initState() {
@@ -379,9 +386,13 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
             ],
           ),
           const SizedBox(height: 32),
-          const Text(
-            'COURSE 01',
-            style: TextStyle(color: ceGold, fontSize: 12, letterSpacing: 2),
+          Text(
+            'COURSE ${repo.courseNumber.toString().padLeft(2, '0')}',
+            style: const TextStyle(
+              color: ceGold,
+              fontSize: 12,
+              letterSpacing: 2,
+            ),
           ),
           const SizedBox(height: 14),
           Text(
@@ -400,9 +411,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'AANA prior approved  •  Course ID 1047239',
-            style: TextStyle(color: Colors.white, fontSize: 13),
+          Text(
+            'AANA prior approved  •  Course ID ${repo.courseId}',
+            style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -413,6 +424,22 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       ),
     ),
     const SizedBox(height: 20),
+    if (!repo.isDemo)
+      button(
+        repo.courseNumber == 1
+            ? 'Browse Course 2: Uncommon but Catastrophic Anesthesia Events'
+            : 'Browse Course 1: A Medication Review for the Experienced CRNA',
+        () => Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => CeCourseScreen(
+              repository: SupabaseCeRepository(
+                courseNumber: repo.courseNumber == 1 ? 2 : 1,
+              ),
+            ),
+          ),
+        ),
+        secondary: true,
+      ),
     panel([
       label('YOUR LEARNING PATH'),
       copy(
@@ -421,13 +448,18 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       const SizedBox(height: 14),
       Row(
         children: [
-          Expanded(child: stat('11', 'course modules')),
-          Expanded(child: stat('17.50', 'Pharmacology &\nTherapeutics')),
-          Expanded(child: stat('2.50', 'Pain Management')),
+          Expanded(child: stat('${repo.moduleCount}', 'course modules')),
+          Expanded(
+            child: stat(
+              repo.pharmacologyCredits,
+              'Pharmacology &\nTherapeutics',
+            ),
+          ),
+          Expanded(child: stat(repo.painCredits, 'Pain Management')),
         ],
       ),
       copy(
-        '${availableModules.length} of 11 modules are loaded for provider preview. The remaining ${11 - availableModules.length} modules are awaiting updated content. The full program is not yet available for purchase.',
+        '${availableModules.length} of ${repo.moduleCount} modules are loaded for provider preview. The full program is not yet available for purchase.',
       ),
       if (status['has_access'] == true)
         button(
@@ -490,7 +522,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         copy(catalog!['pharmacology_statement'] as String),
         copy(catalog!['pain_statement'] as String),
         copy(
-          'The 20.00-credit approval applies to the complete program, not to an individual module. Certificates will be added in a later release.',
+          'The 20.00-credit approval applies to the complete program, not an individual module. Use Course certificate to review requirements and retrieve your certificate when eligible. Creator previews do not award credit.',
         ),
       ],
     ),
@@ -614,7 +646,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     const SizedBox(height: 12),
     title('Build on your expertise.'),
     copy(
-      '${availableModules.length} of 11 modules loaded. Complete each module’s content, assessment and evaluation.',
+      '${availableModules.length} of ${repo.moduleCount} modules loaded. Complete each module’s content, assessment and evaluation.',
     ),
     button('Course certificate', openCertificate, secondary: true),
     const SizedBox(height: 22),
@@ -732,9 +764,11 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         ),
       ),
     ]),
-    if (availableModules.length < 11)
+    if (availableModules.length < repo.moduleCount)
       panel([
-        label('REMAINING ${11 - availableModules.length} MODULES'),
+        label(
+          'REMAINING ${repo.moduleCount - availableModules.length} MODULES',
+        ),
         const SizedBox(height: 10),
         title('More modules to come', size: 22),
         copy(
@@ -1108,7 +1142,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           'Module allocation: ${module['credits']} CE credits (${module['pharmacology_credits']} Pharmacology & Therapeutics; ${module['pain_credits']} Pain Management). This is not the full 20.00-credit program.',
         ),
         copy(
-          'Your full-program certificate requires all 11 modules. Creator previews do not earn credit; AANA submission is handled separately by the provider.',
+          'Your full-program certificate requires all ${repo.moduleCount} modules. Creator previews do not earn credit; AANA submission is handled separately by the provider.',
         ),
         button('Course certificate', openCertificate, secondary: true),
         button('Return to modules', () => go('modules')),
