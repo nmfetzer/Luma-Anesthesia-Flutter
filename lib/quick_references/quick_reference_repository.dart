@@ -86,8 +86,9 @@ class QuickReferenceSection {
     final tokens = _referenceTokens(query);
     if (tokens.isEmpty) return false;
     final fields = [title, referenceTitle, ...keywords];
-    if (fields
-        .any((field) => normalizeReferenceQuery(field).contains(normalized))) {
+    if (fields.any(
+      (field) => normalizeReferenceQuery(field).contains(normalized),
+    )) {
       return true;
     }
     final fieldTokens = fields.expand(_referenceTokens).toSet();
@@ -109,7 +110,7 @@ class QuickReferenceContent {
 abstract class QuickReferenceDataSource {
   Future<List<QuickReferenceSection>> catalog();
 
-  /// Null means unavailable under the current user's RLS permissions.
+  /// Published bodies are free for everyone; null means unavailable/unpublished.
   Future<QuickReferenceContent?> content(String id);
   Stream<void> get authChanges;
 }
@@ -125,7 +126,7 @@ class SupabaseQuickReferenceRepository implements QuickReferenceDataSource {
   Future<List<QuickReferenceSection>> catalog() async {
     final entries = <QuickReferenceSection>[];
     const pageSize = 200;
-    for (var offset = 0;; offset += pageSize) {
+    for (var offset = 0; ; offset += pageSize) {
       final rows = await client
           .from('quick_reference_catalog')
           .select('id,reference_id,reference_title,title,keywords')

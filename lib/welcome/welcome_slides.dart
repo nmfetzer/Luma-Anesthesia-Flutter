@@ -117,7 +117,7 @@ class WelcomeSlideThree extends StatelessWidget {
           Text('Quick References', style: LumaText.featureTitle()),
           const SizedBox(height: 6),
           Text(
-            'Tap Quick Ref for searchable, source-linked guidance. Start with Pre-Op Clearance Guidelines, including GLP-1 considerations.',
+            'Tap Quick Ref for free, searchable, source-linked clinical charts and guidance. No subscription required.',
             style: LumaText.body(),
           ),
           const SizedBox(height: 18),

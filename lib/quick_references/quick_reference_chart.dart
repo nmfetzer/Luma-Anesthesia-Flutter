@@ -3,7 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import '../widgets/clinical_source_link.dart';
 
-/// Compact two-column clinical charts. The protected Markdown remains server
+/// Compact two-column clinical charts. The published Markdown remains server
 /// content; this widget only gives the dose column most of the available width.
 class QuickReferenceChart extends StatelessWidget {
   const QuickReferenceChart({
