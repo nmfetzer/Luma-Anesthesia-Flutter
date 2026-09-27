@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+import 'quick_reference_screen.dart';
+
+/// Observes the active route, including unnamed detail routes and dialogs.
+class QuickReferenceRouteObserver extends NavigatorObserver {
+  final visible = ValueNotifier<bool>(false);
+  final List<Route<dynamic>> _routes = [];
+  static const _hidden = {
+    '/',
+    '/account',
+    '/subscribe',
+    '/ce-halo',
+    '/quick-references',
+    '/quick-reference-detail',
+  };
+
+  void _update() {
+    final route = _routes.isEmpty ? null : _routes.last;
+    final show = route is PageRoute && !_hidden.contains(route.settings.name);
+    // Navigator can notify during build; defer the overlay update.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      visible.value = show;
+    });
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.add(route);
+    _update();
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.remove(route);
+    _update();
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _routes.remove(route);
+    _update();
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    final index = oldRoute == null ? -1 : _routes.indexOf(oldRoute);
+    if (index >= 0) {
+      if (newRoute == null) {
+        _routes.removeAt(index);
+      } else {
+        _routes[index] = newRoute;
+      }
+    } else if (newRoute != null) {
+      _routes.add(newRoute);
+    }
+    _update();
+  }
+}
+
+class QuickReferenceShortcut extends StatefulWidget {
+  const QuickReferenceShortcut({
+    super.key,
+    required this.child,
+    required this.observer,
+    required this.navigatorKey,
+  });
+  final Widget child;
+  final QuickReferenceRouteObserver observer;
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  @override
+  State<QuickReferenceShortcut> createState() => _QuickReferenceShortcutState();
+}
+
+class _QuickReferenceShortcutState extends State<QuickReferenceShortcut> {
+  late final OverlayEntry _entry = OverlayEntry(builder: _buildContents);
+
+  @override
+  void didUpdateWidget(QuickReferenceShortcut oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _entry.markNeedsBuild();
+  }
+
+  @override
+  void dispose() {
+    _entry.remove();
+    _entry.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Overlay(initialEntries: [_entry]);
+
+  Widget _buildContents(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: widget.observer.visible,
+        builder: (context, visible, _) => Stack(
+          children: [
+            widget.child,
+            if (visible && MediaQuery.viewInsetsOf(context).bottom == 0)
+              Positioned(
+                right: 18,
+                bottom: MediaQuery.paddingOf(context).bottom + 18,
+                child: FloatingActionButton(
+                  heroTag: 'quick-reference-shortcut',
+                  tooltip: 'Quick References',
+                  backgroundColor: quickReferenceBlue,
+                  foregroundColor: Colors.white,
+                  elevation: 5,
+                  onPressed: () => widget.navigatorKey.currentState
+                      ?.pushNamed('/quick-references'),
+                  child: const Icon(Icons.bolt_rounded, size: 32),
+                ),
+              ),
+          ],
+        ),
+      );
+}

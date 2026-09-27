@@ -20,6 +20,8 @@ import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
 import 'welcome/welcome_carousel.dart';
+import 'quick_references/quick_reference_screen.dart';
+import 'quick_references/quick_reference_shortcut.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +54,12 @@ class LumaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLumaTheme(),
       navigatorKey: _navKey,
+      navigatorObservers: [_quickReferenceObserver],
+      builder: (context, child) => QuickReferenceShortcut(
+        observer: _quickReferenceObserver,
+        navigatorKey: _navKey,
+        child: child ?? const SizedBox.shrink(),
+      ),
       home: kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : WelcomeCarousel(
@@ -61,6 +69,15 @@ class LumaApp extends StatelessWidget {
               },
             ),
       onGenerateRoute: (settings) {
+        if (settings.name == '/quick-references') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => QuickReferencesScreen(
+              initialQuery: settings.arguments is String
+                  ? settings.arguments as String : '',
+            ),
+          );
+        }
         if (settings.name == '/crisis-guidelines' ||
             settings.name == '/crisis') {
           return MaterialPageRoute(
@@ -145,3 +162,4 @@ class LumaApp extends StatelessWidget {
 }
 
 final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+final _quickReferenceObserver = QuickReferenceRouteObserver();
