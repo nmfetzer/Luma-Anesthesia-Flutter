@@ -4,7 +4,7 @@ publish_to: "none"
 version: 0.1.0+1
 
 environment:
-  sdk: ">=3.4.0 <4.0.0"
+  sdk: ">=3.13.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -18,6 +18,8 @@ dependencies:
   http: ^1.6.0
   flutter_markdown_plus: ^1.0.12
   markdown: ^7.3.0
+  # Tested PDF viewer version; requires the Dart 3.13 toolchain.
+  pdfrx: 2.6.5
 dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:

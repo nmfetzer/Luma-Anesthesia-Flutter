@@ -20,6 +20,7 @@ import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
 import 'welcome/welcome_carousel.dart';
+import 'ce/ce_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 
@@ -43,9 +44,13 @@ Future<void> main() async {
 
 class LumaApp extends StatelessWidget {
   const LumaApp(
-      {super.key, this.allowSocialSignIn = true, this.showEkgDraft = false});
+      {super.key,
+      this.allowSocialSignIn = true,
+      this.showEkgDraft = false,
+      this.cePortal = false});
   final bool allowSocialSignIn;
   final bool showEkgDraft;
+  final bool cePortal;
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +67,14 @@ class LumaApp extends StatelessWidget {
       ),
       home: kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
-          : WelcomeCarousel(
-              onFinish: () {
-                final navigator = _navKey.currentState;
-                navigator?.pushReplacementNamed('/home');
-              },
-            ),
+          : cePortal
+              ? const CeCourseScreen()
+              : WelcomeCarousel(
+                  onFinish: () {
+                    final navigator = _navKey.currentState;
+                    navigator?.pushReplacementNamed('/home');
+                  },
+                ),
       onGenerateRoute: (settings) {
         if (settings.name == '/quick-references') {
           return MaterialPageRoute(
@@ -104,7 +111,8 @@ class LumaApp extends StatelessWidget {
         if (settings.name == '/home') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => const HomeScreen(),
+            builder: (_) =>
+                cePortal ? const CeCourseScreen() : const HomeScreen(),
           );
         }
         if (settings.name == '/special-considerations') {
@@ -122,10 +130,11 @@ class LumaApp extends StatelessWidget {
             builder: (_) => const SubscriptionScreen(),
           );
         }
-        if (settings.name == '/ce-halo') {
+        if (settings.name == '/ce-halo' ||
+            settings.name == '/ce-halo/courses') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => const CeAccessScreen(),
+            builder: (_) => const CeCourseScreen(),
           );
         }
         if (settings.name == '/account') {
