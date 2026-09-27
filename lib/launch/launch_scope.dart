@@ -5,7 +5,6 @@ abstract final class LaunchScope {
     '/luma-ai': 'Luma AI',
     '/surgical-prep': 'Surgical Case Prep',
     '/diagnostics': 'Diagnostics',
-    '/special-considerations': 'Pathophysiology & Anesthesia Considerations',
     '/regional-procedures': 'Regional & Procedures',
     '/practice-guidelines': 'Practice Guidelines',
     '/luma-academy': 'Luma Academy',

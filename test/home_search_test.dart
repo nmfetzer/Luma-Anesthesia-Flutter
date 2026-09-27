@@ -107,8 +107,8 @@ void main() {
       expect(find.text('Propofol'), findsOneWidget);
       await tester.enterText(find.byType(TextField).last, 'aortic');
       await tester.pumpAndSettle();
-      expect(find.text('Aortic Stenosis'), findsNothing);
-      expect(find.textContaining('No matches yet'), findsOneWidget);
+      expect(find.text('Aortic Stenosis'), findsOneWidget);
+      expect(find.textContaining('No matches yet'), findsNothing);
       await tester.enterText(find.byType(TextField).last, 'draft');
       await tester.pumpAndSettle();
       expect(find.text('Draft condition'), findsNothing);
@@ -119,14 +119,24 @@ void main() {
     },
   );
 
-  testWidgets('deferred aliases do not reopen hidden content', (tester) async {
+  testWidgets('special considerations alias opens the restored library', (tester) async {
     await openSearch(tester);
     await tester.enterText(
       find.byType(TextField).last,
       'special considerations',
     );
     await tester.pumpAndSettle();
-    expect(find.text(pathophysiologyTitle), findsNothing);
+    expect(find.text(pathophysiologyTitle), findsOneWidget);
+    await tester.tap(find.text(pathophysiologyTitle));
+    await tester.pumpAndSettle();
+    expect(find.text('Condition library opened'), findsOneWidget);
+  });
+
+  testWidgets('other deferred sections stay excluded from search', (tester) async {
+    await openSearch(tester);
+    await tester.enterText(find.byType(TextField).last, 'academy');
+    await tester.pumpAndSettle();
+    expect(find.text('Luma Academy'), findsNothing);
     expect(find.textContaining('No matches yet'), findsOneWidget);
   });
 
@@ -145,7 +155,7 @@ void main() {
     const Size(768, 1024),
     const Size(1280, 800),
   ]) {
-    testWidgets('five launch tiles replace deferred areas at $size', (
+    testWidgets('six launch tiles include pathophysiology at $size', (
       tester,
     ) async {
       tester.view.physicalSize = size;
@@ -156,17 +166,17 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       Finder tile(String route) =>
           find.byWidgetPredicate((w) => w is HomeTile && w.data.route == route);
-      expect(find.byType(HomeTile), findsNWidgets(5));
+      expect(find.byType(HomeTile), findsNWidgets(6));
       for (final path in [
         '/drug-library',
         '/crisis-guidelines',
         '/vasopressors-infusions',
         '/ce-halo',
         '/quick-references',
+        '/special-considerations',
       ]) {
         expect(tile(path), findsOneWidget);
       }
-      expect(tile('/special-considerations'), findsNothing);
       expect(tile('/diagnostics'), findsNothing);
       expect(find.text('Coming soon'), findsOneWidget);
       expect(tester.takeException(), isNull);

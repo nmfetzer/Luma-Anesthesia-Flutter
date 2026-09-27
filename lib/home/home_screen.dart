@@ -45,6 +45,12 @@ const _tiles = [
     route: '/vasopressors-infusions',
   ),
   HomeTileData(
+    titlePlain: 'Pathophysiology &',
+    titleAccent: 'Anesthesia Considerations',
+    subtitle: 'Conditions, perioperative planning & sources',
+    route: '/special-considerations',
+  ),
+  HomeTileData(
     eyebrow: 'Continuing Education',
     titlePlain: 'CE',
     titleAccent: 'Halo',
@@ -100,6 +106,7 @@ class HomeScreen extends StatelessWidget {
                             keywords:
                                 '${tile.subtitle ?? ''} '
                                 '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia ACLS PALS BLS emergency' : ''} '
+                                '${tile.route == '/special-considerations' ? 'special considerations patho comorbidities conditions perioperative' : ''} '
                                 '${tile.route == '/quick-references' ? 'preop pre-op clearance GLP1 GLP-1 guidelines' : ''}',
                           ),
                         const HomeSearchSection(

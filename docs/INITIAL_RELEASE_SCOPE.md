@@ -4,18 +4,26 @@ User decision: September 27, 2026. Focus the initial release on Drug Library,
 Crisis Hub, Vasopressors / Infusions / Transfusions, CE HALO, and Quick References.
 Provider mental health and recovery support remains free without an account.
 
+Update authorized September 27, 2026: restore the completed
+Pathophysiology & Anesthesia Considerations library for launch as the sixth
+home section. Restore its menu destination, published-condition search,
+welcome feature and subscription benefit. Keep existing Supabase access rules
+and detail/deep-dive subscription enforcement unchanged. No clinical records,
+purchase settings, or other deferred sections are changed by this restoration.
+
 ## Implemented presentation and navigation
 
-- Home shows only the five selected sections, plus the existing account and
+- Home shows the six selected sections, plus the existing account and
   Quick Ref controls. It no longer greets every user with the owner's name.
-- AI, Case Prep, Diagnostics, Pathophysiology & Anesthesia Considerations,
+- AI, Case Prep, Diagnostics,
   Regional & Procedures, Practice Guidelines, Luma Academy and EKG are deferred.
 - Deferred routes and their subpaths return an unavailable screen. Neither
   subscriptions, search results, query strings, nor the private preview open
   their clinical or AI implementations.
 - The launch app does not import the deferred screens. Their development source
   and clinical records are preserved for later work, not deleted.
-- Home search no longer fetches or displays the condition catalog.
+- Home search includes published condition titles, categories and search tags.
+  It does not fetch protected condition prose or deep dives.
 - Welcome, account and paywall copy no longer advertise deferred features as
   current subscription benefits.
 - Production `lib/main.dart` omits future-feature teasers.
@@ -61,6 +69,25 @@ before subsequent edits. Do not restore old home layouts or enable deferred
 features accidentally when working on CE or billing.
 
 ## Verification
+
+### Pathophysiology restoration
+
+- Preserved shared main through `789ec49`, including the latest CE certificate
+  work and Quick References owner sign-off.
+- All 51 targeted Flutter tests passed after the merge, including published
+  condition search, six home tiles, deferred-route guards, protected content,
+  subscription prompts, welcome layouts and account information.
+- Private release web build completed successfully. Targeted analysis reported
+  no errors or warnings, with ten existing informational lint/deprecation notices.
+- Browser checks confirmed the live catalog loads 240 entries across 12
+  categories, Cardiac navigation works, condition search populates results,
+  and both catalog and home-search detail entry points show the guest paywall.
+- Mobile and desktop home layouts, mobile catalog/paywall/welcome feature,
+  drawer navigation, Home return and no-match search were inspected.
+- No clinical data, access rules, native purchase configuration or store
+  submission changed as part of this restoration.
+
+### Earlier initial-scope verification
 
 - Incorporated shared main through `0011409`, including the CIED Quick Reference
   and flexible search update, before final builds.

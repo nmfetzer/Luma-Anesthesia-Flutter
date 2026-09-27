@@ -34,6 +34,7 @@ void main() {
         'Vasopressors & Infusions',
         'CE HALO',
         'Provider Support',
+        'Pathophysiology & Anesthesia Considerations',
       ]) {
         expect(find.text(name), findsOneWidget);
       }
@@ -42,7 +43,6 @@ void main() {
         'Case Setup',
         'Board Prep',
         'Flashcards',
-        'Pathophysiology & Anesthesia Considerations',
         'Diagnostics',
         'Luma AI',
         '778 MEDICATIONS · 23 CATEGORIES',

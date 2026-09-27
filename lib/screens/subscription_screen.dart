@@ -151,6 +151,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 'and provider recovery support always remain free.',
                           ),
                           _benefit(
+                            Icons.account_tree_outlined,
+                            'Pathophysiology & Anesthesia Considerations',
+                            'Condition-specific clinical references, perioperative '
+                                'considerations, and extended reading.',
+                          ),
+                          _benefit(
                             Icons.medication_outlined,
                             'Explore Drug Library Deep Dives',
                             'Extended medication reading is subscription-only. '

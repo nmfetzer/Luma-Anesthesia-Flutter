@@ -9,6 +9,8 @@ import '../models/medication.dart';
 import '../screens/drug_detail_screen.dart';
 import '../launch/launch_scope.dart';
 import '../special_considerations/special_consideration.dart';
+import '../special_considerations/special_consideration_repository.dart';
+import '../special_considerations/special_consideration_detail_screen.dart';
 
 const pathophysiologyTitle = 'Pathophysiology & Anesthesia Considerations';
 
@@ -32,8 +34,8 @@ class HomeSearchData {
   final List<String> unavailable;
 }
 
-/// Launch search indexes free medication fields and public crisis metadata.
-/// Deferred sections and condition records are deliberately excluded.
+/// Search indexes free medication fields and public crisis/condition metadata.
+/// Protected clinical prose is fetched only by the access-controlled detail view.
 class HomeSearch extends StatefulWidget {
   const HomeSearch({super.key, required this.sections, this.loadData});
   final List<HomeSearchSection> sections;
@@ -56,9 +58,21 @@ class _HomeSearchState extends State<HomeSearch> {
       }
     }
     var medications = <Medication>[];
+    var conditions = <SpecialConsiderationEntry>[];
     var crises = <CrisisEntry>[];
     final unavailable = <String>[];
     await Future.wait([
+      () async {
+        try {
+          if (LumaConfig.supabaseConfigured) {
+            conditions = await SupabaseSpecialConsiderationRepository(
+              Supabase.instance.client,
+            ).catalog().timeout(const Duration(seconds: 20));
+          }
+        } catch (_) {
+          unavailable.add(pathophysiologyTitle);
+        }
+      }(),
       () async {
         try {
           if (LumaConfig.supabaseConfigured) {
@@ -81,6 +95,7 @@ class _HomeSearchState extends State<HomeSearch> {
     ]);
     return HomeSearchData(
       medications: medications,
+      conditions: conditions.where((entry) => entry.isPublished).toList(),
       crises: crises,
       unavailable: unavailable,
     );
@@ -107,12 +122,12 @@ class _HomeSearchState extends State<HomeSearch> {
     constraints: const BoxConstraints(maxWidth: 560),
     child: SearchAnchor(
       searchController: _controller,
-      viewHintText: 'Search drugs, crises, or sections',
+      viewHintText: 'Search drugs, conditions, crises, or sections',
       viewBackgroundColor: const Color(0xFFF7F1E6),
       viewConstraints: const BoxConstraints(maxWidth: 640, maxHeight: 620),
       builder: (context, controller) => SearchBar(
         controller: controller,
-        hintText: 'Search drugs, crises & references',
+        hintText: 'Search drugs, conditions & references',
         textStyle: const WidgetStatePropertyAll(TextStyle(fontSize: 14)),
         backgroundColor: const WidgetStatePropertyAll(Color(0xFFF7F1E6)),
         constraints: const BoxConstraints(minHeight: 48),
@@ -165,6 +180,18 @@ class _HomeSearchState extends State<HomeSearch> {
               .where((e) => e.isVisibleInHub && e.matches(query))
               .toList()
         : <CrisisEntry>[];
+    final conditions = searching
+        ? (data?.conditions ?? [])
+              .where(
+                (entry) =>
+                    entry.isPublished &&
+                    matches(
+                      '${entry.title} ${entry.category} ${entry.searchTags.join(' ')}',
+                    ),
+              )
+              .toList()
+        : <SpecialConsiderationEntry>[];
+    final navigator = Navigator.of(context);
     Widget heading(String text) => Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -202,7 +229,27 @@ class _HomeSearchState extends State<HomeSearch> {
             leading: const Icon(Icons.medication_outlined),
             onTap: () => _open(DrugDetailScreen(medication: medication)),
           ),
-        if (medications.length > 30 || crises.length > 30)
+        if (conditions.isNotEmpty)
+          heading('$pathophysiologyTitle · ${conditions.length} results'),
+        for (final entry in conditions.take(30))
+          ListTile(
+            title: Text(entry.title),
+            subtitle: Text(entry.category),
+            leading: const Icon(Icons.menu_book_outlined),
+            onTap: () => _open(
+              SpecialConsiderationDetailScreen(
+                entry: entry,
+                repository: SupabaseSpecialConsiderationRepository(
+                  Supabase.instance.client,
+                ),
+                onSignIn: () => navigator.pushNamed('/account'),
+                onSubscribe: () => navigator.pushNamed('/subscribe'),
+              ),
+            ),
+          ),
+        if (medications.length > 30 ||
+            crises.length > 30 ||
+            conditions.length > 30)
           const Padding(
             padding: EdgeInsets.all(16),
             child: Text(
@@ -242,11 +289,14 @@ class _HomeSearchState extends State<HomeSearch> {
             searching &&
             sections.isEmpty &&
             medications.isEmpty &&
+            conditions.isEmpty &&
             crises.isEmpty &&
             (data?.unavailable.isEmpty ?? true))
           const Padding(
             padding: EdgeInsets.all(24),
-            child: Text('No matches yet. Try a drug name, crisis, or section.'),
+            child: Text(
+              'No matches yet. Try a drug, condition, crisis, or section.',
+            ),
           ),
       ],
     );

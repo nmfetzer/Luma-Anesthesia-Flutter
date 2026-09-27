@@ -89,7 +89,7 @@ class WelcomeSlideTwo extends StatelessWidget {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Slide 3 — A complete anesthesia companion (6-tile feature grid)
+// Slide 3 — Launch references and free provider support
 // ────────────────────────────────────────────────────────────────────────────
 
 class WelcomeSlideThree extends StatelessWidget {
@@ -293,6 +293,11 @@ class _FeatureGrid extends StatelessWidget {
         Icons.menu_book_outlined,
         'Quick References',
         'Searchable, source-linked guidance.',
+      ),
+      _FeatureData(
+        Icons.account_tree_outlined,
+        'Pathophysiology & Anesthesia Considerations',
+        'Conditions and perioperative planning.',
       ),
       _FeatureData(
         Icons.school_outlined,

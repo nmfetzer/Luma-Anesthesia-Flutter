@@ -13,6 +13,7 @@ import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
+import 'special_considerations/special_considerations_screen.dart';
 import 'launch/launch_scope.dart';
 import 'launch/deferred_section_screen.dart';
 import 'crisis/crisis_screen.dart';
@@ -122,6 +123,15 @@ class LumaApp extends StatelessWidget {
             settings: settings,
             builder: (_) =>
                 cePortal ? const CeCourseScreen() : const HomeScreen(),
+          );
+        }
+        if (path == '/special-considerations') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => SpecialConsiderationsScreen(
+              onSignIn: () => _navKey.currentState?.pushNamed('/account'),
+              onSubscribe: () => _navKey.currentState?.pushNamed('/subscribe'),
+            ),
           );
         }
         if (settings.name == '/subscribe') {

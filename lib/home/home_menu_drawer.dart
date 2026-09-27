@@ -52,6 +52,11 @@ class HomeMenuDrawer extends StatelessWidget {
                   _sectionLabel('CLINICAL'),
                   _link(
                     context,
+                    'Pathophysiology & Anesthesia Considerations',
+                    '/special-considerations',
+                  ),
+                  _link(
+                    context,
                     'Quick References',
                     '/quick-references',
                     accent: const Color(0xFF69AAFF),

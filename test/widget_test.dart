@@ -7,6 +7,7 @@ import 'package:luma_anesthesia/crisis/provider_support_screen.dart';
 import 'package:luma_anesthesia/launch/deferred_section_screen.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
 import 'package:luma_anesthesia/quick_references/quick_reference_screen.dart';
+import 'package:luma_anesthesia/special_considerations/special_considerations_screen.dart';
 
 void main() {
   test('production defaults preserve clinical review and normal app entry', () {
@@ -34,6 +35,11 @@ void main() {
       }
 
       expect(screen('/provider-support'), isA<ProviderSupportScreen>());
+      expect(LaunchScope.isDeferred('/special-considerations'), isFalse);
+      final considerations = screen('/special-considerations')
+          as SpecialConsiderationsScreen;
+      expect(considerations.onSubscribe, isNotNull);
+      expect(considerations.onSignIn, isNotNull);
       final quick =
           screen('/quick-references', 'GLP1') as QuickReferencesScreen;
       expect(quick.initialQuery, 'GLP1');
