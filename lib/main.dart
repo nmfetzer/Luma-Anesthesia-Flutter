@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
+import 'billing/revenuecat_billing.dart';
 import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
@@ -38,6 +39,7 @@ Future<void> main() async {
       url: LumaConfig.supabaseUrl,
       anonKey: LumaConfig.supabaseAnonKey,
     );
+    LumaBilling.instance.start(Supabase.instance.client);
   }
 
   runApp(const LumaApp());

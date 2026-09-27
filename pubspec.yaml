@@ -7,6 +7,7 @@ environment:
   sdk: ">=3.13.0 <4.0.0"
 
 dependencies:
+  purchases_flutter: 10.13.2
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8

@@ -7,11 +7,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../welcome/luma_theme.dart' as brand;
 import '../welcome/welcome_background.dart';
+import '../billing/subscription_billing.dart';
+import '../billing/revenuecat_billing.dart';
 
-/// Presentation only until store products and verified billing are connected.
-/// This screen never grants access or changes a subscription.
+/// Custom native-store paywall. Access is granted only by server verification.
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key, this.openExternal});
+  const SubscriptionScreen({super.key, this.openExternal, this.billing});
+  final SubscriptionBilling? billing;
 
   /// Optional launcher for testing legal links without opening a real browser.
   final Future<bool> Function(Uri)? openExternal;
@@ -22,6 +24,29 @@ class SubscriptionScreen extends StatefulWidget {
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool _annual = true;
+  late final SubscriptionBilling _billing =
+      widget.billing ?? LumaBilling.instance.controller;
+  SubscriptionTerm get _term =>
+      _annual ? SubscriptionTerm.annual : SubscriptionTerm.monthly;
+  @override
+  void initState() {
+    super.initState();
+    _billing.addListener(_changed);
+    _billing.refresh();
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _billing.removeListener(_changed);
+    super.dispose();
+  }
+
+  String _price(SubscriptionTerm term) =>
+      _billing.plan(term)?.price ?? 'Unavailable';
   static const _ink = brand.LumaColors.navy;
   static const _muted = Color(0xFF52606A);
 
@@ -133,9 +158,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           ),
                           _benefit(
                             Icons.account_tree_outlined,
-                            'Find Quick References',
-                            'Search source-linked guidance, including '
-                                'Pre-Op Clearance Guidelines.',
+                            'Free tools stay free',
+                            'Basic Drug Library content, Quick References, and '
+                                'provider mental health support do not require a subscription.',
                           ),
                           _benefit(
                             Icons.fact_check_outlined,
@@ -150,14 +175,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 _plan(
                                   true,
                                   'Annual',
-                                  '\$69.99',
+                                  _price(SubscriptionTerm.annual),
                                   '/ year',
                                   'Billed annually. Auto-renews.',
                                 ),
                                 _plan(
                                   false,
                                   'Monthly',
-                                  '\$9.99',
+                                  _price(SubscriptionTerm.monthly),
                                   '/ month',
                                   'Billed monthly. Auto-renews.',
                                 ),
@@ -183,11 +208,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            _annual
-                                ? 'Luma Premium Annual: a 1-year auto-renewable '
-                                      'subscription at the preview price of \$69.99 per year.'
-                                : 'Luma Premium Monthly: a 1-month auto-renewable '
-                                      'subscription at the preview price of \$9.99 per month.',
+                            _billing.plan(_term) == null
+                                ? 'Store pricing is unavailable here. No payment will be taken.'
+                                : 'Luma Premium ${_annual ? 'Annual' : 'Monthly'}: '
+                                      'a ${_annual ? '1-year' : '1-month'} auto-renewable subscription '
+                                      'at ${_price(_term)} per ${_annual ? 'year' : 'month'}. '
+                                      'Any eligible store offer is shown in the confirmation sheet.',
                             style: _body(size: 12),
                           ),
                           const SizedBox(height: 8),
@@ -206,14 +232,29 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             style: _body(size: 12),
                           ),
                           const SizedBox(height: 12),
-                          const FilledButton(
-                            onPressed: null,
-                            child: Text('Purchases coming soon'),
+                          FilledButton(
+                            onPressed:
+                                _billing.canPurchase &&
+                                    _billing.plan(_term) != null
+                                ? () => _billing.purchase(_term)
+                                : null,
+                            child: Text(
+                              _billing.busy
+                                  ? 'Please wait…'
+                                  : _billing.verified
+                                  ? 'Premium access verified'
+                                  : !_billing.available
+                                  ? 'Purchases coming soon'
+                                  : 'Subscribe ${_annual ? 'annually' : 'monthly'}',
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Plan preview only. Checkout and purchase restoration '
-                            'are not connected yet. No payment will be taken.',
+                            _billing.message ??
+                                (_billing.available
+                                    ? 'Payment is completed securely through your app store. '
+                                          'Access begins after server verification.'
+                                    : _billing.unavailableMessage),
                             textAlign: TextAlign.center,
                             style: _body(size: 12),
                           ),
@@ -223,14 +264,34 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             spacing: 8,
                             children: [
                               TextButton(
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, '/account'),
+                                onPressed: _billing.busy
+                                    ? null
+                                    : () async {
+                                        await Navigator.pushNamed(
+                                          context,
+                                          '/account',
+                                        );
+                                        if (mounted) await _billing.refresh();
+                                      },
                                 child: const Text('Sign in / My account'),
                               ),
-                              const TextButton(
-                                onPressed: null,
-                                child: Text('Restore purchases'),
+                              TextButton(
+                                onPressed:
+                                    _billing.available &&
+                                        _billing.signedIn &&
+                                        _billing.serverReady &&
+                                        !_billing.busy
+                                    ? _billing.restore
+                                    : null,
+                                child: const Text('Restore purchases'),
                               ),
+                              if (_billing.available)
+                                TextButton(
+                                  onPressed: _billing.busy
+                                      ? null
+                                      : _billing.refresh,
+                                  child: const Text('Refresh access'),
+                                ),
                             ],
                           ),
                           Wrap(

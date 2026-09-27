@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
+import 'package:luma_anesthesia/billing/subscription_billing.dart';
+
+import 'subscription_billing_test.dart' show FakeStore;
 
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
@@ -10,7 +13,9 @@ void main() {
       MaterialApp(
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(
-              disableAnimations: true, textScaler: TextScaler.linear(scale)),
+            disableAnimations: true,
+            textScaler: TextScaler.linear(scale),
+          ),
           child: child!,
         ),
         home: SubscriptionScreen(openExternal: openExternal),
@@ -20,36 +25,72 @@ void main() {
         },
       );
 
-  testWidgets('paywall previews plans without pretending checkout is live',
-      (tester) async {
+  testWidgets('paywall previews plans without pretending checkout is live', (
+    tester,
+  ) async {
     await tester.pumpWidget(app());
     await tester.pump();
     final logo = tester.widget<Image>(find.byType(Image));
-    expect((logo.image as AssetImage).assetName,
-        'assets/branding/luma_symbol_halo.png');
+    expect(
+      (logo.image as AssetImage).assetName,
+      'assets/branding/luma_symbol_halo.png',
+    );
     expect(logo.fit, BoxFit.contain);
     expect(find.text('LUMA PREMIUM'), findsOneWidget);
-    expect(find.text('\$69.99'), findsOneWidget);
-    expect(find.text('\$9.99'), findsOneWidget);
-    expect(find.textContaining('1-year auto-renewable'), findsOneWidget);
-    expect(find.textContaining('automatically renew unless canceled'),
-        findsOneWidget);
+    expect(find.text('Unavailable'), findsNWidgets(2));
+    expect(find.textContaining('Store pricing is unavailable'), findsOneWidget);
+    expect(
+      find.textContaining('automatically renew unless canceled'),
+      findsOneWidget,
+    );
     final checkout = find.widgetWithText(FilledButton, 'Purchases coming soon');
     expect(tester.widget<FilledButton>(checkout).onPressed, isNull);
     await tester.ensureVisible(find.text('Monthly'));
     await tester.tap(find.text('Monthly'));
     await tester.pump();
-    expect(find.textContaining('1-month auto-renewable'), findsOneWidget);
+    expect(find.textContaining('Store pricing is unavailable'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('legal links open the verified terms and privacy destinations',
-      (tester) async {
+  testWidgets('configured paywall uses localized price and selected plan', (
+    tester,
+  ) async {
+    final store = FakeStore();
+    final billing = SubscriptionBilling(gateway: store);
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(disableAnimations: true),
+          child: child!,
+        ),
+        home: SubscriptionScreen(billing: billing),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('€65,99'), findsOneWidget);
+    expect(find.text('€8,49'), findsOneWidget);
+    expect(find.textContaining('1-year auto-renewable'), findsOneWidget);
+    await tester.ensureVisible(find.text('Subscribe annually'));
+    await tester.tap(find.text('Subscribe annually'));
+    await tester.pumpAndSettle();
+    expect(store.purchases, 1);
+    expect(find.textContaining('Do not buy again'), findsOneWidget);
+    expect(billing.verified, false);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('legal links open the verified terms and privacy destinations', (
+    tester,
+  ) async {
     final opened = <Uri>[];
-    await tester.pumpWidget(app(openExternal: (uri) async {
-      opened.add(uri);
-      return true;
-    }));
+    await tester.pumpWidget(
+      app(
+        openExternal: (uri) async {
+          opened.add(uri);
+          return true;
+        },
+      ),
+    );
     for (final label in ['Terms of Use / EULA', 'Privacy Policy']) {
       await tester.ensureVisible(find.text(label));
       await tester.tap(find.text(label));
@@ -61,22 +102,27 @@ void main() {
     ]);
   });
 
-  testWidgets('failed legal link shows a readable fallback address',
-      (tester) async {
+  testWidgets('failed legal link shows a readable fallback address', (
+    tester,
+  ) async {
     await tester.pumpWidget(app(openExternal: (_) async => false));
     await tester.ensureVisible(find.text('Privacy Policy'));
     await tester.tap(find.text('Privacy Policy'));
     await tester.pump();
-    expect(find.textContaining('Could not open this page. Please visit'),
-        findsOneWidget);
+    expect(
+      find.textContaining('Could not open this page. Please visit'),
+      findsOneWidget,
+    );
   });
 
   test('billing notices distinguish native stores from the web preview', () {
     final ios = subscriptionBillingNotice(TargetPlatform.iOS, isWeb: false);
     expect(ios, contains('Apple Account'));
     expect(ios, isNot(contains('Google Play')));
-    final android =
-        subscriptionBillingNotice(TargetPlatform.android, isWeb: false);
+    final android = subscriptionBillingNotice(
+      TargetPlatform.android,
+      isWeb: false,
+    );
     expect(android, contains('Google Play'));
     expect(android, isNot(contains('Apple Account')));
     final web = subscriptionBillingNotice(TargetPlatform.iOS, isWeb: true);
@@ -85,22 +131,30 @@ void main() {
     expect(web, contains('not available in this Chrome preview'));
   });
 
-  testWidgets('CE is separate, describes both bonuses and opens without login',
-      (tester) async {
-    await tester.pumpWidget(app());
-    await tester.pump();
-    expect(
-        find.textContaining('No app subscription is required'), findsOneWidget);
-    expect(find.textContaining('bonus activation are coming soon'),
-        findsOneWidget);
-    await tester.ensureVisible(find.text('Explore CE access'));
-    await tester.tap(find.text('Explore CE access'));
-    await tester.pumpAndSettle();
-    expect(find.text('CE HALO'), findsOneWidget);
-    expect(find.byType(CeAccessScreen), findsOneWidget);
-    expect(
-        find.textContaining('No app subscription is required'), findsOneWidget);
-  });
+  testWidgets(
+    'CE is separate, describes both bonuses and opens without login',
+    (tester) async {
+      await tester.pumpWidget(app());
+      await tester.pump();
+      expect(
+        find.textContaining('No app subscription is required'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('bonus activation are coming soon'),
+        findsOneWidget,
+      );
+      await tester.ensureVisible(find.text('Explore CE access'));
+      await tester.tap(find.text('Explore CE access'));
+      await tester.pumpAndSettle();
+      expect(find.text('CE HALO'), findsOneWidget);
+      expect(find.byType(CeAccessScreen), findsOneWidget);
+      expect(
+        find.textContaining('No app subscription is required'),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('account link remains separate from checkout', (tester) async {
     await tester.pumpWidget(app());
@@ -111,8 +165,9 @@ void main() {
     expect(find.text('Account destination'), findsOneWidget);
   });
 
-  testWidgets('small screen and enlarged text remain scrollable',
-      (tester) async {
+  testWidgets('small screen and enlarged text remain scrollable', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(375, 812);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
