@@ -138,7 +138,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                           padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
                           children: [
                             const Text(
-                              'Search a topic or browse a guide.',
+                              'Free access · Search a topic or browse a guide.',
                               style: TextStyle(color: LumaColors.inkSecondary),
                             ),
                             const SizedBox(height: 16),
@@ -159,7 +159,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                                   subtitle: Padding(
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Text(
-                                      '${all.where((s) => s.referenceId == reference.referenceId).length} sections · Tap to browse',
+                                      '${all.where((s) => s.referenceId == reference.referenceId).length} ${all.where((s) => s.referenceId == reference.referenceId).length == 1 ? 'section' : 'sections'} · Tap to browse',
                                     ),
                                   ),
                                   trailing: const Icon(Icons.chevron_right),
@@ -278,7 +278,7 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
 
   Future<void> _load() async {
     final request = ++_request;
-    // Never leave a previous user's protected body on screen while rechecking.
+    // Reload current published content; Quick References do not require a plan.
     setState(() {
       _content = null;
       _loading = true;
@@ -329,17 +329,9 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
                   )
                 : _content == null
                 ? _Notice(
-                    text: 'This clinical reference requires eligible Luma clinical access. Sign in to your account, or review access options.',
-                    action: 'Sign in',
-                    onAction: () async {
-                      await Navigator.of(context).pushNamed('/account');
-                      if (mounted) _load();
-                    },
-                    secondaryAction: 'Access options',
-                    onSecondaryAction: () async {
-                      await Navigator.of(context).pushNamed('/subscribe');
-                      if (mounted) _load();
-                    },
+                    text: 'This section is not currently available. Quick References are free and do not require a subscription.',
+                    action: 'Try again',
+                    onAction: _load,
                   )
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(22, 12, 22, 36),
@@ -359,7 +351,11 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
                       const SizedBox(height: 10),
                       Text(
                         'Content version ${_content!.version} · '
-                        '${widget.section.referenceId == 'pre-op-clearance-guidelines' ? 'Adult noncardiac surgery' : 'Adult perioperative reference'}',
+                        '${widget.section.referenceId == 'pals-medications'
+                            ? 'Pediatric resuscitation · not neonatal'
+                            : widget.section.referenceId == 'pre-op-clearance-guidelines'
+                            ? 'Adult noncardiac surgery'
+                            : 'Adult clinical reference'}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 16),
@@ -379,16 +375,24 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
                               ? 'Clinical reference, not a patient-specific device prescription. '
                                     'Confirm the exact device and magnet response with the CIED team; '
                                     'follow manufacturer instructions and local policy.'
-                              : 'Adult monitored IV reference. Verify dose, units, concentration, '
-                                    'contraindications and patient-specific BP/HR targets; follow local policy.',
+                              : widget.section.referenceId == 'pals-medications'
+                              ? 'Pediatric resuscitation reference, not neonatal resuscitation. '
+                                    'Use weight in kg; verify dose limits, route and concentration. '
+                                    'Follow the complete PALS algorithm and local emergency protocol.'
+                              : const {
+                                  'antihypertensive-dosing',
+                                  'hypotension-dosing',
+                                  'beta-blocker-dosing',
+                                }.contains(widget.section.referenceId)
+                              ? 'Adult monitored IV reference. Verify dose, units, concentration, '
+                                    'contraindications and patient-specific BP/HR targets; follow local policy.'
+                              : 'Adult clinical reference. Verify indication, route, dose, units, '
+                                    'concentration and contraindications. Individualize care and follow local policy.',
                           style: const TextStyle(fontSize: 13, height: 1.5),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (widget.section.referenceId ==
-                              'antihypertensive-dosing' ||
-                          widget.section.referenceId == 'hypotension-dosing' ||
-                          widget.section.referenceId == 'beta-blocker-dosing')
+                      if (_content!.body.trimLeft().startsWith('|'))
                         QuickReferenceChart(
                           body: _content!.body,
                           nameColumnFlex:
@@ -443,14 +447,10 @@ class _Notice extends StatelessWidget {
     required this.text,
     this.action,
     this.onAction,
-    this.secondaryAction,
-    this.onSecondaryAction,
   });
   final String text;
   final String? action;
   final VoidCallback? onAction;
-  final String? secondaryAction;
-  final VoidCallback? onSecondaryAction;
   @override
   Widget build(BuildContext context) => Center(
     child: SingleChildScrollView(
@@ -469,11 +469,6 @@ class _Notice extends StatelessWidget {
             const SizedBox(height: 18),
             FilledButton(onPressed: onAction, child: Text(action!)),
           ],
-          if (secondaryAction != null)
-            TextButton(
-              onPressed: onSecondaryAction,
-              child: Text(secondaryAction!),
-            ),
         ],
       ),
     ),

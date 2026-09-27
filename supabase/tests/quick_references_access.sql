@@ -1,47 +1,43 @@
--- Read-only RLS checks. All session claims are local and rolled back.
+-- Free published content, private drafts, no client writes. All fixtures roll back.
 begin;
+insert into public.quick_reference_catalog
+ (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('_qa_private_draft','_qa_private_draft','QA','Private draft','{}',0,false);
+insert into public.quick_reference_sections (id,body,version)
+values ('_qa_private_draft','Never public','QA');
+select set_config('luma.qa.expected',
+ (select count(*)::text from public.quick_reference_sections s
+ join public.quick_reference_catalog c using(id) where c.is_published), true);
 set local role anon;
-select set_config('luma.qa.anon_catalog',
-  (select count(*)::text from public.quick_reference_catalog), true);
-select set_config('luma.qa.anon_body',
-  (select count(*)::text from public.quick_reference_sections), true);
+select set_config('luma.qa.guest',(select count(*)::text from public.quick_reference_sections),true);
+do $$ begin
+ if exists(select 1 from public.quick_reference_sections where id='_qa_private_draft')
+ then raise exception 'Guest can see unpublished body'; end if;
+ if exists(select 1 from public.quick_reference_catalog where id='_qa_private_draft')
+ then raise exception 'Guest can see unpublished catalog'; end if;
+end $$;
 reset role;
-
 select set_config('request.jwt.claims',
-  '{"sub":"00000000-0000-0000-0000-000000000001","role":"authenticated","is_anonymous":false}',true);
+ '{"sub":"00000000-0000-0000-0000-000000000001","role":"authenticated","is_anonymous":false}',true);
 set local role authenticated;
-select set_config('luma.qa.unpaid_body',
-  (select count(*)::text from public.quick_reference_sections), true);
-select set_config('luma.qa.client_can_write',
-  (has_table_privilege('authenticated','public.quick_reference_sections','INSERT')
-   or has_table_privilege('authenticated','public.quick_reference_sections','UPDATE')
-   or has_table_privilege('authenticated','public.quick_reference_catalog','UPDATE'))::text, true);
+select set_config('luma.qa.unpaid',(select count(*)::text from public.quick_reference_sections),true);
+do $$ begin
+ if exists(select 1 from public.quick_reference_sections where id='_qa_private_draft')
+ then raise exception 'Unpaid user can see unpublished body'; end if;
+end $$;
 reset role;
-
--- Choose an existing eligible account; do not create or change any entitlement.
-select set_config('request.jwt.claims',
-  jsonb_build_object('sub',user_id,'role','authenticated','is_anonymous',false)::text, true)
-from public.luma_content_entitlements
-where entitlement='clinical_premium' and revoked_at is null and valid_until>now()
-order by valid_until desc limit 1;
-set local role authenticated;
-select set_config('luma.qa.premium_body',
-  (select count(*)::text from public.quick_reference_sections),true);
-reset role;
-
-select set_config('request.jwt.claims',
-  (current_setting('request.jwt.claims')::jsonb || '{"is_anonymous":true}'::jsonb)::text,true);
-set local role authenticated;
-select set_config('luma.qa.anonymous_auth_body',
-  (select count(*)::text from public.quick_reference_sections),true);
-reset role;
-
+do $$ begin
+ if current_setting('luma.qa.guest') <> current_setting('luma.qa.expected')
+ or current_setting('luma.qa.unpaid') <> current_setting('luma.qa.expected')
+ then raise exception 'Published Quick References are not free for everyone'; end if;
+ if exists(select 1 from pg_policies where schemaname='public'
+ and tablename in ('quick_reference_catalog','quick_reference_sections') and cmd <> 'SELECT')
+ then raise exception 'Unexpected client write policy'; end if;
+end $$;
 select jsonb_build_object(
-  'public_catalog_count',current_setting('luma.qa.anon_catalog')::int,
-  'anonymous_body_count',current_setting('luma.qa.anon_body')::int,
-  'unpaid_body_count',current_setting('luma.qa.unpaid_body')::int,
-  'premium_body_count',current_setting('luma.qa.premium_body')::int,
-  'anonymous_authenticated_body_count',current_setting('luma.qa.anonymous_auth_body')::int,
-  'client_can_write',current_setting('luma.qa.client_can_write')::boolean
-) as quick_reference_access_checks;
+ 'published_bodies',current_setting('luma.qa.expected')::int,
+ 'guest_bodies',current_setting('luma.qa.guest')::int,
+ 'unpaid_bodies',current_setting('luma.qa.unpaid')::int,
+ 'unpublished_hidden',true,'no_client_write_policies',true
+) as free_access_checks;
 rollback;

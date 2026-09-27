@@ -82,7 +82,7 @@ void main() {
       }
       expect(find.text('Quick References'), findsWidgets);
       final copy = find.text(
-        'Tap Quick Ref for searchable, source-linked guidance. Start with Pre-Op Clearance Guidelines, including GLP-1 considerations.',
+        'Tap Quick Ref for free, searchable, source-linked clinical charts and guidance. No subscription required.',
       );
       expect(copy, findsOneWidget);
       await tester.ensureVisible(copy);
