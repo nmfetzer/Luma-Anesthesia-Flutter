@@ -3,15 +3,17 @@
 ## Implementation status
 
 The CE bonus migration is applied to production Supabase and tested, but
-purchase activation is not connected. No CE store product IDs are invented,
-no customer access is granted, and no purchase is initiated.
-The Flutter paywall still disables checkout and restoration. Luma AI is a
+CE purchase activation is not connected. No customer access is granted,
+and no purchase is initiated by this policy update.
+CE checkout remains disabled. Luma AI is a
 visual preview, not a connected AI service.
 
 ## Complimentary app access
 
 - **Single course:** one calendar month of clinical premium access, one time.
-- **Bundle:** a one-time three-calendar-month bonus, not repeatable.
+- **Bundle:** three calendar months if no bonus was awarded; otherwise two
+  additional months after a course's one-month bonus. Three months maximum
+  per permanent account across stores, including expired or revoked awards.
 - **No subscription required:** CE purchase/access remains separate.
 - **No automatic subscription:** expiry never initiates a charge.
 - **Automatic grant:** a trusted receipt-verification service invokes
@@ -27,18 +29,48 @@ visual preview, not a connected AI service.
 - **Paid access preserved:** CE grants are separate from subscription/owner
   grants. Refunding a course does not cancel an independently paid subscription.
 
-Nicole confirmed on September 24, 2026 that repeat purchases do not add more
-free months. The implementation permits one course bonus and one bundle bonus
-per account, with a lifetime uniqueness constraint; refunds do not reset that
-eligibility. It uses original purchase-date activation and UTC calendar months.
-A bundle bonus starts at its purchase date rather than stacking after the course
-bonus. Paid subscriptions are not paused or rebilled by this mechanism; do not
-promise a billing pause to a currently paying subscriber.
+Nicole approved the maximum-three-month rule on September 27, 2026. Additional
+individual courses grant zero months. A bundle-first purchase grants three
+months; a bundle after a course grants only two more. `bonus_months` records
+product kind; `awarded_months` records the actual award, even after refund.
+The account advisory lock serializes purchases across stores before summing
+lifetime awards. Course ownership records are retained even with zero bonus.
+
+An upgrade follows the unexpired, unrevoked CE window, or starts on the
+original verified bundle purchase date if that window has ended. Calendar
+months are calculated in UTC and clamped at month-end. Restoring never uses
+today as a new start date. Queued bundle access has its own start date: refunding
+the earlier course does not make the queued interval begin early.
+Paid subscriptions are not paused, reimbursed or rebilled by this mechanism.
+Do not promise deferred paid billing to a currently paying subscriber.
+
+The cap migration stops for manual review if legacy awards already exceed
+three months; it never silently removes existing customer benefits. Product
+enablement and Google configuration are unchanged. The shared cap applies
+to any future verified purchase adapter using the same Supabase account UUID;
+web/Stripe purchase ingestion is not implemented by this change.
 
 Database checks passed locally and on Supabase for month-end expiry, repeat
 purchase limits, restores, identity mismatches, refunds, refund-first delivery,
 RLS and preservation of independent paid access. Test fixtures were rolled back.
 At verification there were zero enabled CE products and zero customer bonus rows.
+
+### September 27 three-month-cap verification
+
+- Applied `20260927154627_ce_bonus_three_month_cap.sql` to production.
+- Passed both `supabase/tests/ce_bonus_access.sql` and
+  `supabase/tests/ce_bonus_three_month_cap.sql` on isolated PostgreSQL and
+  production Supabase. Production fixtures were rolled back.
+- Concurrent local course/bundle transactions produced awards of 1 and 2
+  months, with the bundle following the course expiry.
+- Verified production still has zero purchase/refund rows and zero enabled
+  CE products; anonymous/authenticated clients cannot invoke the grant RPC.
+- Updated Flutter policy wording, bundled course metadata, seed metadata and
+  paywall widget assertions. Flutter widget tests were not executed in this
+  environment because the required Flutter/Dart toolchain is not installed.
+- No Google products, paid entitlements, subscription billing, or native
+  purchase feature flags were changed. Automatic CE receipt verification and
+  activation remain a separate unfinished integration.
 
 Before launch: connect native billing, server receipt verification and refund
 notifications; test purchase, restore, duplicate events, account switching,

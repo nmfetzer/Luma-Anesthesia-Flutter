@@ -477,12 +477,16 @@ class CeAccessMessage extends StatelessWidget {
       const SizedBox(height: 16),
       _bonus('1 course purchase', '1 complimentary month, one time'),
       const SizedBox(height: 12),
-      _bonus('Bundle purchase', '3 complimentary months, one time'),
+      _bonus('Bundle purchase', 'Up to 3 complimentary months total'),
       const SizedBox(height: 12),
       Text(
         'Planned activation: access is added to your account after a '
         'verified course purchase. No code and no automatic subscription '
-        'charge. Repeat purchases do not add more free months. '
+        'charge. Maximum 3 bonus months per account across stores. '
+        'If you already received the course month, the bundle adds only '
+        '2 more months after any remaining CE bonus access. Additional '
+        'course purchases and restores add no months. Existing paid '
+        'subscription billing is unchanged. '
         'Course purchases and bonus activation are coming soon.',
         style: brand.LumaText.body(size: 12, color: const Color(0xFF52606A)),
       ),
