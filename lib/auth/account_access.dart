@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 
@@ -30,7 +29,12 @@ abstract class AccountAccess {
   Future<void> signOut();
 }
 
-class SupabaseAccountAccess implements AccountAccess {
+abstract interface class PasswordRecoveryAccess {
+  Future<void> requestPasswordReset(String email);
+  Future<void> updatePassword(String password);
+}
+
+class SupabaseAccountAccess implements AccountAccess, PasswordRecoveryAccess {
   SupabaseAccountAccess(this.client, {this.settingsClient});
   final SupabaseClient client;
   final http.Client? settingsClient;
@@ -48,10 +52,12 @@ class SupabaseAccountAccess implements AccountAccess {
     final transport = settingsClient ?? http.Client();
     try {
       // Public provider availability only. Never read provider secrets.
-      final response = await transport.get(
-        Uri.parse('${LumaConfig.supabaseUrl}/auth/v1/settings'),
-        headers: {'apikey': LumaConfig.supabaseAnonKey},
-      ).timeout(const Duration(seconds: 12));
+      final response = await transport
+          .get(
+            Uri.parse('${LumaConfig.supabaseUrl}/auth/v1/settings'),
+            headers: {'apikey': LumaConfig.supabaseAnonKey},
+          )
+          .timeout(const Duration(seconds: 12));
       if (response.statusCode != 200) {
         throw const AuthException('Unable to check sign-in availability.');
       }
@@ -80,15 +86,50 @@ class SupabaseAccountAccess implements AccountAccess {
   }
 
   @override
-  Future<bool> submit(String email, String password,
-      {required bool create}) async {
+  Future<bool> submit(
+    String email,
+    String password, {
+    required bool create,
+  }) async {
     final result = create
         ? await client.auth.signUp(email: email, password: password)
-        : await client.auth
-            .signInWithPassword(email: email, password: password);
+        : await client.auth.signInWithPassword(
+            email: email,
+            password: password,
+          );
     return result.session != null;
   }
 
   @override
   Future<void> signOut() => client.auth.signOut();
+
+  @override
+  Future<void> requestPasswordReset(String email) {
+    final redirect = Uri.parse(
+      accountAuthRedirect(isWeb: kIsWeb, base: Uri.base),
+    );
+    return client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: kIsWeb
+          ? redirect
+                .replace(
+                  queryParameters: {
+                    ...redirect.queryParameters,
+                    'recovery': '1',
+                  },
+                )
+                .toString()
+          : mobileAuthRedirect,
+    );
+  }
+
+  @override
+  Future<void> updatePassword(String password) async {
+    if (client.auth.currentSession == null) {
+      throw const AuthException(
+        'This reset link has expired. Request a new link.',
+      );
+    }
+    await client.auth.updateUser(UserAttributes(password: password));
+  }
 }

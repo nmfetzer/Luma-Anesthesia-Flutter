@@ -8,13 +8,21 @@ import '../widgets/account_information.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../auth/account_access.dart';
+import '../billing/revenuecat_billing.dart';
+import '../billing/subscription_billing.dart';
 import '../theme/luma_theme.dart';
 
 export '../auth/account_access.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key, this.access, this.allowSocialSignIn = true});
+  const AccountScreen({
+    super.key,
+    this.access,
+    this.allowSocialSignIn = true,
+    this.billing,
+  });
   final AccountAccess? access;
+  final SubscriptionBilling? billing;
 
   /// Embedded previews have no persistent PKCE storage or valid callback origin.
   final bool allowSocialSignIn;
@@ -234,6 +242,103 @@ class _AccountScreenState extends State<AccountScreen> {
     } else {
       navigator.pushReplacementNamed('/home');
     }
+  }
+
+  Future<void> _forgotPassword() async {
+    if (_access is! PasswordRecoveryAccess) return;
+    final controller = TextEditingController(
+      text: _access.email ?? _email.text.trim(),
+    );
+    final key = GlobalKey<FormState>();
+    final email = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset your password'),
+        content: Form(
+          key: key,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Enter your account email. Apple or Google users can continue signing in with their provider.',
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'Account email'),
+                validator: (v) =>
+                    RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                        .hasMatch((v ?? '').trim())
+                    ? null
+                    : 'Enter a valid email address.',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (key.currentState!.validate())
+                Navigator.pop(context, controller.text.trim());
+            },
+            child: const Text('Send reset email'),
+          ),
+        ],
+      ),
+    );
+    // Dispose after the dialog route finishes its closing transition.
+    Future<void>.delayed(const Duration(seconds: 1), controller.dispose);
+    if (email == null || !mounted) return;
+    setState(() {
+      _busy = true;
+      _message = null;
+    });
+    try {
+      await (_access as PasswordRecoveryAccess).requestPasswordReset(email);
+      if (mounted)
+        setState(
+          () => _message = 'If an eligible account exists for that email, you will receive a password-reset link. Check your inbox and spam folder, and open the link on this device.',
+        );
+    } catch (_) {
+      if (mounted)
+        setState(
+          () => _message = 'Unable to request a reset email right now. Check your connection and try again shortly.',
+        );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _restorePurchases() async {
+    final billing = widget.billing ?? LumaBilling.instance.controller;
+    if (_access.email == null) {
+      setState(
+        () => _message = 'Sign in to the Luma account used for your purchase, then restore purchases.',
+      );
+      return;
+    }
+    if (!billing.available) {
+      setState(
+        () => _message = 'Restore Purchases is available in the configured iOS or Android app. Use the same Apple or Google account used for the original purchase. Web access uses purchases already linked to your Luma account.',
+      );
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _message = null;
+    });
+    await billing.refresh();
+    await billing.restore();
+    if (mounted)
+      setState(() {
+        _busy = false;
+        _message = billing.message ?? 'Purchase verification is still in progress. Please try again shortly.';
+      });
   }
 
   @override
@@ -484,6 +589,21 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 16),
+                  if (_access is PasswordRecoveryAccess)
+                    TextButton(
+                      onPressed: _busy ? null : _forgotPassword,
+                      child: Text(
+                        _access.email == null
+                            ? 'Forgot password?'
+                            : 'Reset password',
+                      ),
+                    ),
+                  OutlinedButton.icon(
+                    onPressed: _busy ? null : _restorePurchases,
+                    icon: const Icon(Icons.restore),
+                    label: const Text('Restore Purchases'),
+                  ),
                   if (_message != null) ...[
                     const SizedBox(height: 20),
                     Semantics(

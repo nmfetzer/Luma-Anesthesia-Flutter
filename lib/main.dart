@@ -2,6 +2,8 @@
 // Luma Anesthesia — app entry point.
 // -----------------------------------------------------------------------------
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +22,8 @@ import 'crisis/crisis_screen.dart';
 import 'crisis/provider_support_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
-import 'welcome/welcome_carousel.dart';
+import 'welcome/welcome_gate.dart';
+import 'screens/password_recovery_screen.dart';
 import 'ce/ce_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
@@ -46,7 +49,7 @@ Future<void> main() async {
   runApp(const LumaApp());
 }
 
-class LumaApp extends StatelessWidget {
+class LumaApp extends StatefulWidget {
   const LumaApp({
     super.key,
     this.allowSocialSignIn = true,
@@ -56,6 +59,52 @@ class LumaApp extends StatelessWidget {
   final bool allowSocialSignIn;
   final bool showComingSoon;
   final bool cePortal;
+
+  @override
+  State<LumaApp> createState() => _LumaAppState();
+}
+
+class _LumaAppState extends State<LumaApp> {
+  StreamSubscription<AuthState>? _recovery;
+  bool _recoveryOpen = false;
+  bool get allowSocialSignIn => widget.allowSocialSignIn;
+  bool get showComingSoon => widget.showComingSoon;
+  bool get cePortal => widget.cePortal;
+  @override
+  void initState() {
+    super.initState();
+    _recoveryOpen = kIsWeb && Uri.base.queryParameters['recovery'] == '1';
+    try {
+      _recovery = Supabase.instance.client.auth.onAuthStateChange.listen(
+        (state) {
+          if (state.event != AuthChangeEvent.passwordRecovery ||
+              _recoveryOpen) {
+            return;
+          }
+          _recoveryOpen = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (!mounted) return;
+            await _navKey.currentState?.push(
+              MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
+            );
+            _recoveryOpen = false;
+          });
+        },
+        onError: (Object error, StackTrace stack) {
+          // The account/recovery form handles actionable errors. A background
+          // token-refresh failure must not become an unhandled app exception.
+        },
+      );
+    } catch (_) {
+      /* Offline previews have no initialized Supabase client. */
+    }
+  }
+
+  @override
+  void dispose() {
+    _recovery?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,16 +119,13 @@ class LumaApp extends StatelessWidget {
         navigatorKey: _navKey,
         child: child ?? const SizedBox.shrink(),
       ),
-      home: kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
+      home: kIsWeb && Uri.base.queryParameters['recovery'] == '1'
+          ? const PasswordRecoveryScreen()
+          : kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : cePortal
           ? const CeCourseScreen()
-          : WelcomeCarousel(
-              onFinish: () {
-                final navigator = _navKey.currentState;
-                navigator?.pushReplacementNamed('/home');
-              },
-            ),
+          : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
         if (LaunchScope.isDeferred(path)) {

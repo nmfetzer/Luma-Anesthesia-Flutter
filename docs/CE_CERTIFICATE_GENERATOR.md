@@ -1,41 +1,51 @@
-# CE HALO Course 1 certificate generator
+# CE HALO Course 1 · Certificate Generator Handoff
 
-The first generator version adds an account-linked certificate screen, a downloadable branded PDF preview, and a server-authoritative award-record foundation. Official issuance remains disabled while the provider approves the certificate and supplies the signature image.
+The approved certificate design is integrated with server-authorized award records, private PDF archives, and provider-only reporting. Course 2 uses the same layout with its own title, approval, credit designations, records, and archive.
 
-## Available now
+## Using the certificate area
 
-- **Certificate area:** Open Course 1, choose “Course certificate,” then choose “Preview certificate design” as the creator. No purchase or module completion is needed for the creator's design preview.
-- **Autofill:** Full name, credentials, optional AANA ID, completion location, and participation start/end dates come from saved course registration. The certificate label is “Location of Completion,” without “learner-reported.” The preview does not write a completion or award.
-- **Participation form:** Learners can enter both dates as YYYY-MM-DD, or leave both blank when registering and add them through “Edit course registration” before requesting a certificate. Dates must be valid, in order, inside the approval period, and not in the future for actual learners. Creator previews may use sample dates in the approval period. Certificate dates display as month/day/year.
-- **Branding:** Revised to follow the supplied Course 2 sample: portrait US Letter, white background, centered original CE HALO logo and provider heading, double navy border, thin gold rule, labeled fields, and signature above the approval statements. Course 1's title, code and credit designations replace the sample's Course 2 metadata. The sample carries a prominent “PREVIEW ONLY / NOT VALID FOR CE CREDIT” label and awards zero credits.
-- **Program:** A Medication Review for the Experienced CRNA; 20.00 MAC Ed CE credits, including 17.50 Pharmacology & Therapeutics and 2.50 Pain Management. Code 1047239; expiration 9/30/2029. Reporting class 196397 stays out of the learner certificate.
-- **Download:** PDF download in the Chrome portal, with the printing package's share/save integration for native platforms. Browser behavior is tested; native device validation is still required.
+- **Creator preview:** Open a course, complete the single course registration, and choose “Course certificate” followed by “Preview certificate design.” Creator access does not require a purchase and awards no credits.
+- **Registration:** Name, credentials, optional AANA ID, completion location, and participation dates are saved once per account and course. Evaluations do not repeat those identity fields.
+- **Location:** The certificate says “Location of Completion,” without “learner-reported.”
+- **Dates:** Learners enter their participation range. The actual completion date comes from recorded activity, not the date the PDF is downloaded.
+- **Design:** Portrait US Letter, original CE HALO logo, double navy border, gold rule, signature above approval wording, and provider identity “Nicole M. Fetzer, MS, CRNA.”
 
-## Official issuance foundation
+## Official records and downloads
 
-The `ce_course1_certificate` RPC accepts only `status`, `preview`, or `issue`, never a caller-supplied learner ID, credit amount, or verified completion timestamp. Participation dates are explicitly entered through the separate authenticated registration API and validated on the server.
+An award requires a non-preview account, a verified course entitlement, released course, enabled and approved certificate settings, validated participation dates, and completion of every required module, quiz, and evaluation. Course 1 requires eleven modules; Course 2 requires ten.
 
-An official award requires a non-preview learner, a verified and unrevoked course purchase, a released course, approved certificate settings/signature, and all 11 modules with read acknowledgment, a passing quiz attempt, evaluation, and official completion record. Participation must fall within October 1, 2026 through September 30, 2029. The entered range must include recorded course activity through completion. The separate completion date and reporting timestamp still come from stored activity, not learner input or the PDF-generation date.
+The server saves an immutable award snapshot. The authenticated download function renders the approved template, stores the PDF in a private bucket, and records its SHA-256 checksum. Subsequent downloads retrieve those archived bytes rather than regenerating a certificate from edited registration details.
 
-The award table has one row per account/course. The RPC locks the learner state before issuance and returns the same stored snapshot on repeat requests. Snapshot details do not change when registration is edited later. Existing awards can be retrieved after program expiration. No learner has direct table access; no public certificate URL or public personal-information lookup has been added.
+- **Monthly records:** Choose “Provider records” inside the relevant course, then “Full-course certificates,” select the month, and export CSV. Module activity and evaluations are a separate view.
+- **Reporting:** Course 1 uses Course ID 1047239 and reporting class 196397. Course 2 uses Course ID 1047241 and reporting class 196400. Class numbers remain in provider records, not learner certificates.
+- **Manual AANA submission:** Exporting a CSV or generating a certificate does not submit credits to AANA. Confirm the portal’s current import requirements before uploading.
+- **Corrections:** Do not overwrite issued awards or archived PDFs. A formal correction/revocation workflow has not been added.
 
-## Approval and next implementation step
+## Current release state
 
-- **Provider identity:** The draft uses the previously supplied “Nicole M Fetzer, MS, CRNA,” “Owner, CE HALO LLC,” and “Buffalo, New York.” Confirm these before official release.
-- **Signature:** The preview reuses the exact signature artwork embedded in the user-supplied certificate sample. This image is a preview-only fallback; official rendering still requires the approved signature held in the server's award snapshot. No signature was fabricated and no live signature approval was enabled.
-- **Archival and reporting:** The database stores the immutable application-level award snapshot; the app renders the PDF from it. Exact PDF-byte archival, provider certificate-ledger export, automated email delivery, correction/revocation workflow, and AANA submission are not implemented in this first version. The existing provider module ledger remains separate and is not an AANA-formatted upload.
-- **Release:** `enabled=false` and `approved_at=null` in certificate settings; Course 1 remains `released=false`. No store sales or official CE awards have been enabled. No official certificates were issued by testing.
-- **Activation review:** Before turning issuance on, finish archival/reporting integration, confirm provider identity and signature, validate a complete paid-learner flow in staging during the approved period, and test native device save/share.
+The approved design and signature are stored for both courses. Both courses remain unreleased for ordinary learners, official issuance is disabled, and there are zero official awards.
 
-## Requirements reference
+The backend certificate functions and private archives are deployed. Local PDF rendering, browser previews/downloads, database authorization, immutable records, provider exports, and anonymous-download rejection were tested. No real certificate was issued and no learner email was sent during testing.
 
-AANA's current provider responsibilities specify digitally populated certificate information, including learner name and AANA ID, provider name/city/state, program title/location/date, credits awarded, approval code/expiration/approved credits, provider signature, and the California BRN statement ([AANA Program Provider Responsibilities, August 2026](https://www.aana.com/wp-content/uploads/2023/04/Program-Provider-Responsibilities-August-2026.pdf)). The exact three approval/designation statements from the program approval letter are retained; the California statement uses AANA's CEP #10862, not a claim that CE HALO has that provider number.
+Native iOS/Android purchase and download/share testing, end-to-end authorized official issuance in a controlled test environment, and launch configuration remain required. Course 2 store-product mapping and price have deliberately not been invented.
 
-## Verification
+## Account changes
 
-- Six certificate-specific Flutter tests cover participation-date validation, preview registration, zero-credit behavior, blocked issuance, PDF generation, missing official data, long fields, and 375/1280-pixel requirements screens.
-- The full Flutter suite passed 314 tests before the final PDF-layout refinements; the certificate-specific tests were rerun after those refinements.
-- Live SQL safety tests run inside a rolled-back transaction: anonymous access denied, direct client table writes denied, provider preview allowed, no preview awards, non-provider preview denied, unpaid/incomplete issuance denied, immutable snapshot retrieval, and cross-account isolation.
-- Additional rolled-back SQL tests verify date validation, persistence, preview mapping, old-client compatibility and clearing, with no award or release changes. The additive participation-date migration is applied to the connected Supabase project.
-- Desktop (1280px) and mobile (390px) browser checks passed registration-to-certificate navigation, creator preview, PDF download, and return to requirements, with no page errors. Long recipient/location fields were rendered and visually inspected.
-- Production purchases, clinical content, module quizzes, evaluations, and reviewer access were not modified.
+- **Forgot password:** My Account offers an email-reset request and a new-password screen reached by the Supabase recovery callback. Request confirmation is generic to avoid disclosing account existence.
+- **Restore Purchases:** My Account uses the existing signed-in RevenueCat/store restoration and server verification flow. It never starts a new purchase. Web users are directed to the configured mobile app.
+- **Welcome screens:** Completing onboarding is remembered locally. Routine reopening or signing out does not clear it; new devices/browser profiles or cleared local storage can show onboarding again.
+- **Remaining verification:** Test a real reset email on iOS, Android, and the intended web origin. Supabase’s permitted redirect URLs must include `com.luma.anesthesia://login-callback/` and the chosen web origins. The future CE domain is not configured in this update.
+
+## Mac preview
+
+From the existing Luma Anesthesia Flutter repository folder:
+
+```bash
+git switch main && git pull --ff-only origin main && flutter pub get && flutter run -d chrome
+```
+
+For the CE portal instead:
+
+```bash
+git switch main && git pull --ff-only origin main && flutter pub get && flutter run -d chrome -t lib/ce_portal_main.dart
+```
