@@ -2,7 +2,7 @@
 
 ## Status
 
-Flutter integration is implemented with checkout disabled by default. This is not a claim of a completed real-device purchase, deployed billing backend, or store-submission readiness. Existing CE and Quick Reference work was preserved; no RevenueCat dashboard products, offerings, entitlements, or live Supabase data were changed.
+Flutter integration is implemented with checkout disabled by default. The subscription verifier and reviewed access migration were deployed September 27, 2026 with owner approval; no customer sales were enabled. This is not a claim of a completed real-device purchase or store-submission readiness. Existing CE and Quick Reference work was preserved; no RevenueCat dashboard products, offerings or entitlements were changed.
 
 ## Existing configuration used
 
@@ -32,9 +32,9 @@ The September 27 RevenueCat Apps screenshot confirms `com.base6a35a143e93e5ed18a
 
 The SDK uses app-specific public keys, configured separately for Apple and Google, as described in [RevenueCat’s configuration documentation](https://www.revenuecat.com/docs/getting-started/configuring-sdk). Customer identity follows the explicit app-user-ID approach in [RevenueCat’s customer identification documentation](https://www.revenuecat.com/docs/customers/identifying-customers).
 
-## Backend draft, not deployed
+## Backend deployed with customer sales disabled
 
-Files are intentionally under `supabase/billing-draft/`, outside automatic migrations and functions deployment directories.
+The original design files under `supabase/billing-draft/` are now historical inputs. The canonical implementation is `supabase/functions/revenuecat-sync/` and `supabase/migrations/20260927193822_apple_purchase_wiring.sql`. Do not apply both SQL versions. See [Apple purchase wiring](APPLE_PURCHASE_WIRING.md) for the exact scope, tests, disabled flags and unresolved launch gates.
 
 - `revenuecat_access.sql`: adds an isolated, server-owned subscription table and extends the existing access function without changing manual/owner entitlements or CE grants.
 - `revenuecat-sync/index.ts`: validates the Supabase JWT, derives the user UUID from Auth, fetches the RevenueCat subscriber server-to-server, records a verified snapshot, then checks the real premium-access RPC.
@@ -53,7 +53,7 @@ The bounded-lease design avoids depending on webhook delivery for subscription e
 2. Obtain the Luma Anesthesia Apple and Google public SDK keys. Do not use Nurse keys, a test-store key, or a secret REST key in Flutter.
 3. Select the correct saved RevenueCat REST credential. Two saved entries currently have the same name/host, so neither was chosen arbitrarily.
 4. Review and approve the exact SQL and Edge Function deployment. Set the server-only secret through Supabase secrets, never commit it.
-5. Use a separate test Supabase environment for sandbox grants. This draft explicitly blocks sandbox grants in production project `xuckkusbbcxplpqclbxt`.
+5. Implement and test a secure sandbox/App Review path for the actual submission build. The current production handler explicitly blocks sandbox grants in project `xuckkusbbcxplpqclbxt`; testing only a separate debug environment does not make the submission build ready.
 6. Test purchase and restore on signed iOS/Android builds, then enable the production build flag only after acceptance.
 
 Apple requires the In-App Purchase capability and supported platform setup; Android purchase activity configuration must also be correct, per [RevenueCat’s Flutter installation guide](https://www.revenuecat.com/docs/getting-started/installation/flutter). Current Android activity uses `singleTop`; actual signing, store-app matching, and native capability checks remain pending.

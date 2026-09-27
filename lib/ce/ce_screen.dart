@@ -11,6 +11,7 @@ import 'ce_repository.dart';
 import 'ce_records_screen.dart';
 import 'ce_certificate_screen.dart';
 import 'ce_participation_dates.dart';
+import 'ce_purchase_screen.dart';
 
 const ceNavy = Color(0xFF102A3A);
 const ceGold = Color(0xFFE1BD7F);
@@ -479,7 +480,15 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           }),
         )
       else ...[
-        button('Course purchase coming soon', null),
+        button(
+          'View CE purchase options',
+          () => run(() async {
+            await Navigator.of(context).push<void>(
+              MaterialPageRoute(builder: (_) => const CePurchaseScreen()),
+            );
+            await refresh();
+          }),
+        ),
         if (!repo.signedIn)
           button(
             'Sign in to check course access',
@@ -490,6 +499,17 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
             secondary: true,
           ),
       ],
+      if (!repo.isDemo && status['has_access'] == true)
+        button(
+          'CE purchases & restore',
+          () => run(() async {
+            await Navigator.of(context).push<void>(
+              MaterialPageRoute(builder: (_) => const CePurchaseScreen()),
+            );
+            await refresh();
+          }),
+          secondary: true,
+        ),
       if (status['is_provider'] == true)
         button(
           'Provider records & exports',

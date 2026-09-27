@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'ce_billing.dart';
+
 enum SubscriptionTerm { monthly, annual }
 
 class BillingPlan {
@@ -42,6 +44,104 @@ class SubscriptionBilling extends ChangeNotifier {
   int _identityVersion = 0;
   bool _refreshPending = false;
   bool _disposed = false;
+  bool _ceRefreshPending = false;
+  List<CeStoreProduct> ceProducts = const [];
+  CePurchaseStatus? ceStatus;
+  bool ceReady = false;
+  final Set<String> _awaitingCe = {};
+
+  CeBillingGateway? get ceGateway =>
+      gateway is CeBillingGateway && (gateway as CeBillingGateway).ceSupported
+      ? gateway as CeBillingGateway
+      : null;
+  bool get ceAvailable => ceGateway != null;
+  bool canPurchaseCe(String id) =>
+      ceAvailable &&
+      signedIn &&
+      ceReady &&
+      !busy &&
+      ceStatus?.userId == gateway?.userId &&
+      ceStatus!.enabled.contains(id) &&
+      !ceStatus!.owned.contains(id) &&
+      !_awaitingCe.contains(id) &&
+      ceProducts.any((p) => p.id == id);
+
+  /// Uses the SAME operation lock and SDK identity as subscription checkout.
+  Future<void> refreshCe() async {
+    if (!ceAvailable || _disposed) return;
+    if (busy) {
+      _ceRefreshPending = true;
+      return;
+    }
+    await _run(() async {
+      final user = gateway!.userId;
+      final version = _identityVersion;
+      await gateway!.identify(user);
+      final products = await ceGateway!.ceProducts();
+      if (!_sameUser(version, user)) return;
+      ceProducts = products;
+      if (user == null) {
+        ceReady = false;
+        message =
+            'Sign in to link CE purchases and certificates to your account.';
+        return;
+      }
+      await _readCeStatus(user, version);
+    });
+  }
+
+  Future<void> _readCeStatus(String user, int version) async {
+    final status = await ceGateway!.ceStatus(user);
+    if (!_sameUser(version, user)) return;
+    if (status.userId != user) throw StateError('CE account mismatch');
+    ceStatus = status;
+    ceReady = true;
+    _awaitingCe.removeAll(status.owned);
+  }
+
+  Future<void> purchaseCe(String id) async {
+    if (!canPurchaseCe(id)) return;
+    final product = ceProducts.firstWhere((p) => p.id == id);
+    await _run(() async {
+      final user = gateway!.userId!;
+      final version = _identityVersion;
+      await _readCeStatus(user, version);
+      if (!_sameUser(version, user) ||
+          !ceStatus!.enabled.contains(id) ||
+          ceStatus!.owned.contains(id)) {
+        return;
+      }
+      await ceGateway!.purchaseCe(product);
+      if (!_sameUser(version, user)) return;
+      // A successful native sheet is NOT proof of server fulfillment.
+      _awaitingCe.add(id);
+      await _readCeStatus(user, version);
+      if (!_sameUser(version, user)) return;
+      message = ceStatus!.owned.contains(id)
+          ? 'Your CE purchase is verified. Return to your course to continue.'
+          : 'Apple completed checkout. Course verification is pending. '
+                'Use Refresh CE access; do not purchase again.';
+    });
+  }
+
+  Future<void> restoreCe() async {
+    if (!ceAvailable || !signedIn || busy) return;
+    await _run(() async {
+      final user = gateway!.userId!;
+      final version = _identityVersion;
+      await gateway!.identify(user);
+      await _readCeStatus(user, version);
+      if (!_sameUser(version, user)) return;
+      await gateway!.restore();
+      if (!_sameUser(version, user)) return;
+      await _readCeStatus(user, version);
+      if (!_sameUser(version, user)) return;
+      message = ceStatus!.owned.isNotEmpty
+          ? 'Verified CE purchases restored. Return to your course to continue.'
+          : 'No CE purchase has been verified for this account yet. '
+                'If you purchased, refresh later or contact info@cehalo.com. Do not buy again.';
+    });
+  }
 
   bool get available => gateway != null;
   bool get signedIn => gateway?.userId != null;
@@ -58,6 +158,11 @@ class SubscriptionBilling extends ChangeNotifier {
     _identityVersion++;
     verified = false;
     serverReady = false;
+    ceStatus = null;
+    ceReady = false;
+    ceProducts = const [];
+    _awaitingCe.clear();
+    _ceRefreshPending = ceAvailable;
     message = null;
     _emit();
     if (busy) {
@@ -138,6 +243,7 @@ class SubscriptionBilling extends ChangeNotifier {
       message = error.message;
     } catch (_) {
       serverReady = false;
+      ceReady = false;
       message =
           'Unable to verify billing right now. Check your connection and '
           'use Refresh access. If charged, do not purchase again.';
@@ -147,6 +253,10 @@ class SubscriptionBilling extends ChangeNotifier {
       if (_refreshPending && !_disposed) {
         _refreshPending = false;
         await refresh();
+      }
+      if (_ceRefreshPending && !_disposed) {
+        _ceRefreshPending = false;
+        await refreshCe();
       }
     }
   }
