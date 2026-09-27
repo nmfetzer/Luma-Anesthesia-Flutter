@@ -11,6 +11,9 @@ import 'package:luma_anesthesia/screens/drugs_categories_screen.dart';
 import 'package:luma_anesthesia/screens/category_detail_screen.dart';
 
 import 'medication_sources_test.dart' show MemoryAuthStorage;
+import 'offline_cache_test.dart' show MemoryCacheStorage;
+
+import 'package:luma_anesthesia/offline/offline_cache.dart';
 
 void main() {
   var fail = true;
@@ -50,6 +53,7 @@ void main() {
   });
   tearDownAll(() => Supabase.instance.dispose());
   setUp(() {
+    OfflineCache.testInstance = OfflineCache(storage: MemoryCacheStorage());
     fail = true;
     offsets.clear();
     MedicationRepository.instance.clearCache();

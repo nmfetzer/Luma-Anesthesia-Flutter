@@ -1,9 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../config.dart';
+import '../offline/offline_library.dart';
 import 'clinical_source_link.dart';
 
 /// Protected prose is fetched separately, never from the public drug model.
@@ -32,9 +35,10 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
   @override
   void initState() {
     super.initState();
-    final changes = widget.authChanges ??
+    final changes =
+        widget.authChanges ??
         (widget.load == null && LumaConfig.supabaseConfigured
-            ? Supabase.instance.client.auth.onAuthStateChange.map((_) {})
+            ? OfflineLibrary.authChanges(Supabase.instance.client)
             : null);
     _subscription = changes?.listen((_) {
       if (!mounted) return;
@@ -59,10 +63,7 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
     final client = Supabase.instance.client;
     final user = client.auth.currentUser;
     if (user == null || user.isAnonymous) return {'allowed': false};
-    return Map<String, dynamic>.from(await client.rpc(
-      'medication_deep_dive',
-      params: {'p_medication_id': widget.medicationId},
-    ));
+    return OfflineLibrary(client).medicationDeepDive(widget.medicationId);
   }
 
   Future<void> _open() async {
@@ -97,8 +98,10 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
       }
     } catch (_) {
       if (mounted && generation == _generation) {
-        setState(() => _message =
-            'Unable to check access. Check your connection and try again.');
+        setState(
+          () => _message =
+              'Unable to check access. Check your connection and try again.',
+        );
       }
     } finally {
       if (mounted && generation == _generation) {
@@ -109,32 +112,28 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_body?.trim().isNotEmpty ?? false)
-            MarkdownBody(
-              data: _body!,
-              selectable: true,
-              extensionSet: md.ExtensionSet.gitHubWeb,
-              onTapLink: (_, href, __) =>
-                  ClinicalSourceLink.open(context, href),
-            )
-          else ...[
-            const Text(
-              'Deep Dives are included with Luma Premium or authorized '
-              'complimentary app access. All other Drug Library content is free.',
-            ),
-            if (_message != null) ...[
-              const SizedBox(height: 8),
-              Text(_message!),
-            ],
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _busy ? null : _open,
-              icon: const Icon(Icons.lock_outline),
-              label: Text(_busy ? 'Checking access…' : 'Open Deep Dive'),
-            ),
-          ],
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (_body?.trim().isNotEmpty ?? false)
+        MarkdownBody(
+          data: _body!,
+          selectable: true,
+          extensionSet: md.ExtensionSet.gitHubWeb,
+          onTapLink: (_, href, __) => ClinicalSourceLink.open(context, href),
+        )
+      else ...[
+        const Text(
+          'Deep Dives are included with Luma Premium or authorized '
+          'complimentary app access. All other Drug Library content is free.',
+        ),
+        if (_message != null) ...[const SizedBox(height: 8), Text(_message!)],
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _open,
+          icon: const Icon(Icons.lock_outline),
+          label: Text(_busy ? 'Checking access…' : 'Open Deep Dive'),
+        ),
+      ],
+    ],
+  );
 }

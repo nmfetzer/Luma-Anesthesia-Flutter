@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config.dart';
+import '../offline/offline_cache.dart';
+import '../offline/offline_library.dart';
 
 const mobileAuthRedirect = 'com.luma.anesthesia://login-callback/';
 
@@ -105,7 +107,11 @@ class SupabaseAccountAccess implements AccountAccess, PasswordRecoveryAccess {
   }
 
   @override
-  Future<void> signOut() => client.auth.signOut();
+  Future<void> signOut() async {
+    await OfflineCache.instance.setOwner(null);
+    OfflineLibrary.accessChanged.add(null);
+    await client.auth.signOut(scope: SignOutScope.local);
+  }
 
   @override
   Future<void> requestPasswordReset(String email) {

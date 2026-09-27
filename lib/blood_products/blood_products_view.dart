@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'dart:convert';
+
 import 'package:url_launcher/url_launcher.dart';
+
 import '../widgets/luma_home_button.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../shared/luma_theme_tokens.dart';
+import '../offline/offline_library.dart';
 
 /// Blood Products list view — reads from `blood_products` table.
 class BloodProductsView extends StatefulWidget {
@@ -35,14 +40,17 @@ class _BloodProductsViewState extends State<BloodProductsView> {
   Future<List<Map<String, dynamic>>> _load() =>
       (widget.load?.call() ?? _fetch()).timeout(const Duration(seconds: 20));
 
-  void _retry() => setState(() => _future = _load());
+  void _retry() => setState(() {
+    _future = _load();
+  });
 
   Future<List<Map<String, dynamic>>> _fetch() async {
-    final res = await Supabase.instance.client
-        .from('blood_products')
-        .select()
-        .order('display_order');
-    return List<Map<String, dynamic>>.from(res);
+    final rows = await OfflineLibrary(Supabase.instance.client).blood();
+    return rows..sort(
+      (a, b) => ((a['display_order'] as num?) ?? 0).compareTo(
+        (b['display_order'] as num?) ?? 0,
+      ),
+    );
   }
 
   @override
@@ -65,22 +73,30 @@ class _BloodProductsViewState extends State<BloodProductsView> {
         if (snap.hasError) {
           return Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
                   'Unable to load transfusion references. Check your connection and try again.',
-                  style: LumaTokens.bodyMuted),
-              const SizedBox(height: 12),
-              OutlinedButton(onPressed: _retry, child: const Text('Retry')),
-            ]),
+                  style: LumaTokens.bodyMuted,
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(onPressed: _retry, child: const Text('Retry')),
+              ],
+            ),
           );
         }
         final rows = snap.data ?? [];
         if (rows.isEmpty) {
           return Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('No transfusion references are available.'),
-            OutlinedButton(onPressed: _retry, child: const Text('Retry')),
-          ]));
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('No transfusion references are available.'),
+                OutlinedButton(onPressed: _retry, child: const Text('Retry')),
+              ],
+            ),
+          );
         }
 
         final Map<String, List<Map<String, dynamic>>> grouped = {};
@@ -92,52 +108,59 @@ class _BloodProductsViewState extends State<BloodProductsView> {
           grouped.putIfAbsent(cat, () => []).add(r);
         }
 
-        return Column(children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-            child: TextField(
-              controller: _search,
-              onChanged: (value) =>
-                  setState(() => _query = value.trim().toLowerCase()),
-              decoration: InputDecoration(
-                hintText: 'Search transfusions',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _query.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Clear transfusion search',
-                        icon: const Icon(Icons.close),
-                        onPressed: () => setState(() {
-                          _search.clear();
-                          _query = '';
-                        }),
-                      ),
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+              child: TextField(
+                controller: _search,
+                onChanged: (value) =>
+                    setState(() => _query = value.trim().toLowerCase()),
+                decoration: InputDecoration(
+                  hintText: 'Search transfusions',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _query.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Clear transfusion search',
+                          icon: const Icon(Icons.close),
+                          onPressed: () => setState(() {
+                            _search.clear();
+                            _query = '';
+                          }),
+                        ),
+                ),
               ),
             ),
-          ),
-          if (grouped.isEmpty)
-            const Expanded(
-                child:
-                    Center(child: Text('No matching transfusion references.')))
-          else
-            Expanded(
+            if (grouped.isEmpty)
+              const Expanded(
+                child: Center(
+                  child: Text('No matching transfusion references.'),
+                ),
+              )
+            else
+              Expanded(
                 child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-              children: [
-                for (final entry in grouped.entries) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 10),
-                    child: Text(entry.key.toUpperCase(),
-                        style: LumaTokens.eyebrow),
-                  ),
-                  for (final p in entry.value) ...[
-                    _BloodProductCard(product: p),
-                    const SizedBox(height: 10),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                  children: [
+                    for (final entry in grouped.entries) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12, bottom: 10),
+                        child: Text(
+                          entry.key.toUpperCase(),
+                          style: LumaTokens.eyebrow,
+                        ),
+                      ),
+                      for (final p in entry.value) ...[
+                        _BloodProductCard(product: p),
+                        const SizedBox(height: 10),
+                      ],
+                    ],
                   ],
-                ],
-              ],
-            )),
-        ]);
+                ),
+              ),
+          ],
+        );
       },
     );
   }
@@ -157,7 +180,8 @@ class _BloodProductCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (_) => _BloodProductDetail(product: product)),
+            builder: (_) => _BloodProductDetail(product: product),
+          ),
         );
       },
       child: Column(
@@ -190,19 +214,26 @@ class _BloodProductCard extends StatelessWidget {
                     ),
                     if (unit.isNotEmpty) ...[
                       const SizedBox(height: 4),
-                      Text('UNIT · $unit'.toUpperCase(),
-                          style: LumaTokens.classLabel),
+                      Text(
+                        'UNIT · $unit'.toUpperCase(),
+                        style: LumaTokens.classLabel,
+                      ),
                     ],
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  size: 18, color: LumaTokens.textMuted),
+              const Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: LumaTokens.textMuted,
+              ),
             ],
           ),
           const SizedBox(height: 10),
-          Text('View dosing, compatibility & safety',
-              style: LumaTokens.bodyMuted),
+          Text(
+            'View dosing, compatibility & safety',
+            style: LumaTokens.bodyMuted,
+          ),
         ],
       ),
     );
@@ -227,8 +258,11 @@ class _BloodProductDetail extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,
-              color: LumaTokens.textPrimary, size: 20),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: LumaTokens.textPrimary,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         bottom: PreferredSize(
@@ -268,7 +302,9 @@ class _BloodProductDetail extends StatelessWidget {
             _textSection('Reactions', product['reactions']),
             _textSection('Contraindications', product['contraindications']),
             _textSection(
-                'Special Considerations', product['special_considerations']),
+              'Special Considerations',
+              product['special_considerations'],
+            ),
             _sourcesCard(context, product['sources']),
           ],
         ),
@@ -304,8 +340,11 @@ class _BloodProductDetail extends StatelessWidget {
       if (value.isEmpty) return const SizedBox.shrink();
       body = value.map((e) => '•  $e').join('\n');
     } else {
-      body =
-          value.toString().replaceAll(r'\n', '\n').replaceAll('**', '').trim();
+      body = value
+          .toString()
+          .replaceAll(r'\n', '\n')
+          .replaceAll('**', '')
+          .trim();
       if (body.isEmpty) return const SizedBox.shrink();
     }
     return Padding(
@@ -356,7 +395,8 @@ class _BloodProductDetail extends StatelessWidget {
         : source.toString();
     final url = source is Map ? source['url']?.toString() : text;
     final uri = Uri.tryParse(url ?? '');
-    final linked = uri != null &&
+    final linked =
+        uri != null &&
         uri.host.isNotEmpty &&
         (uri.scheme == 'https' || uri.scheme == 'http');
     if (!linked) return Text(text, style: LumaTokens.bodySmall);
@@ -372,10 +412,12 @@ class _BloodProductDetail extends StatelessWidget {
           );
         }
       },
-      child: Text(text,
-          style: LumaTokens.bodySmall.copyWith(
-            decoration: TextDecoration.underline,
-          )),
+      child: Text(
+        text,
+        style: LumaTokens.bodySmall.copyWith(
+          decoration: TextDecoration.underline,
+        ),
+      ),
     );
   }
 }

@@ -13,7 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config.dart';
 import '../models/medication.dart';
-import 'medication_public_fields.dart';
+import '../offline/offline_library.dart';
 
 class MedicationRepository {
   MedicationRepository._();
@@ -25,19 +25,9 @@ class MedicationRepository {
     if (_cache != null) return _cache!;
 
     if (LumaConfig.supabaseConfigured) {
-      final medications = <Medication>[];
-      const pageSize = 200;
-      for (var offset = 0; ; offset += pageSize) {
-        final rows = await Supabase.instance.client
-            .from('medication')
-            .select(medicationPublicFields)
-            .order('name')
-            .order('id')
-            .range(offset, offset + pageSize - 1)
-            .timeout(const Duration(seconds: 15));
-        medications.addAll(rows.map(Medication.fromJson));
-        if (rows.length < pageSize) break;
-      }
+      final rows = await OfflineLibrary(Supabase.instance.client).medications();
+      final medications = rows.map(Medication.fromJson).toList()
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       // Commit only a complete result, never a partial page after a failure.
       _cache = medications;
     } else {

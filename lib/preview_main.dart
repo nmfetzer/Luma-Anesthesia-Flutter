@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
 import 'main.dart' show LumaApp;
+import 'offline/offline_library.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,9 @@ Future<void> main() async {
         autoRefreshToken: false,
       ),
     );
+    try {
+      await OfflineLibrary.initialize(Supabase.instance.client);
+    } catch (_) {}
   }
   runApp(const LumaApp(allowSocialSignIn: false, showComingSoon: true));
 }

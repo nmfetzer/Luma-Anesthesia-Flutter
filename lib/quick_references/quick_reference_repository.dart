@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../offline/offline_library.dart';
+
 /// Ignore spaces/punctuation so GLP1, GLP-1 and GLP 1 resolve identically.
 String normalizeReferenceQuery(String value) =>
     value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
@@ -124,31 +126,15 @@ class SupabaseQuickReferenceRepository implements QuickReferenceDataSource {
 
   @override
   Future<List<QuickReferenceSection>> catalog() async {
-    final entries = <QuickReferenceSection>[];
-    const pageSize = 200;
-    for (var offset = 0; ; offset += pageSize) {
-      final rows = await client
-          .from('quick_reference_catalog')
-          .select('id,reference_id,reference_title,title,keywords')
-          .order('reference_id', ascending: true)
-          .order('sort_order', ascending: true)
-          .order('id', ascending: true)
-          .range(offset, offset + pageSize - 1)
-          .timeout(const Duration(seconds: 15));
-      entries.addAll(rows.map(QuickReferenceSection.fromJson));
-      if (rows.length < pageSize) break;
-    }
-    return entries;
+    final rows = await OfflineLibrary(client).quickCatalog();
+    return rows.map(QuickReferenceSection.fromJson).toList();
   }
 
   @override
   Future<QuickReferenceContent?> content(String id) async {
-    final row = await client
-        .from('quick_reference_sections')
-        .select('body,version')
-        .eq('id', id)
-        .maybeSingle()
-        .timeout(const Duration(seconds: 15));
+    final row = await OfflineLibrary(
+      client,
+    ).detail('quick:$id', 'quick_reference_sections', 'body,version', 'id', id);
     if (row == null) return null;
     return QuickReferenceContent(
       body: row['body'] as String,

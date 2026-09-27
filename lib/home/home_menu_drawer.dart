@@ -73,6 +73,7 @@ class HomeMenuDrawer extends StatelessWidget {
                   _sectionLabel('ACCOUNT'),
                   _link(context, 'Luma Premium', '/subscribe'),
                   _link(context, 'My Account', '/account'),
+                  _link(context, 'Offline downloads', '/offline-downloads'),
                 ],
               ),
             ),

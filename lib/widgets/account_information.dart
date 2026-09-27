@@ -132,6 +132,19 @@ class AccountInformation extends StatelessWidget {
         child: Text('Help, policies & about', style: lumaDisplay(size: 28)),
       ),
       const SizedBox(height: 20),
+      _card('Offline references', [
+        Text(
+          'Prepare your clinical library before going offline. '
+          'Download status and paid-access recheck dates are shown in Offline downloads.',
+          style: lumaBody(),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.pushNamed(context, '/offline-downloads'),
+          icon: const Icon(Icons.download_for_offline_outlined),
+          label: const Text('Manage offline downloads'),
+        ),
+      ]),
       _card('About CE HALO LLC', [
         Text(
           'At CE HALO LLC, we are committed to continually improving Luma '

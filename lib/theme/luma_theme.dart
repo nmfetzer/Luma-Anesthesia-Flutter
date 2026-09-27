@@ -98,6 +98,8 @@ TextStyle lumaMono({
 
 /// Global ThemeData for MaterialApp.
 ThemeData buildLumaTheme() {
+  // Every used variant is bundled; never contact a font CDN at runtime.
+  GoogleFonts.config.allowRuntimeFetching = false;
   return ThemeData(
     useMaterial3: true,
     scaffoldBackgroundColor: LumaColors.cream,

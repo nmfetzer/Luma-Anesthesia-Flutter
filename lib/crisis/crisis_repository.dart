@@ -1,5 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../offline/offline_library.dart';
+import '../offline/offline_cache.dart';
+
 const crisisCategories = {
   'resuscitation': 'ACLS/PALS/BLS',
   'neurological': 'Neurological',
@@ -24,13 +27,13 @@ class CrisisEntry {
   final String slug, title, category, searchTerms;
   final bool isFree, isPublished;
   factory CrisisEntry.fromJson(Map<String, dynamic> json) => CrisisEntry(
-        slug: json['slug'] as String,
-        title: json['title'] as String,
-        category: json['category'] as String,
-        searchTerms: json['search_terms'] as String? ?? '',
-        isFree: json['is_free'] == true,
-        isPublished: json['release_status'] == 'published',
-      );
+    slug: json['slug'] as String,
+    title: json['title'] as String,
+    category: json['category'] as String,
+    searchTerms: json['search_terms'] as String? ?? '',
+    isFree: json['is_free'] == true,
+    isPublished: json['release_status'] == 'published',
+  );
   String get categoryLabel => crisisCategories[category] ?? category;
   // Temporarily reserved for a future pediatric anesthesia pack.
   // Presentation-only: preserve database records and existing access rules.
@@ -63,52 +66,51 @@ class SupabaseCrisisRepository implements CrisisDataSource {
   SupabaseCrisisRepository(this.client);
   final SupabaseClient client;
   @override
-  Stream<void> get authChanges => client.auth.onAuthStateChange.map((_) {});
+  Stream<void> get authChanges => OfflineLibrary.authChanges(client);
   @override
   Future<List<CrisisEntry>> catalog() async {
-    final result = <CrisisEntry>[];
-    for (var offset = 0;; offset += 200) {
-      final rows = await client
-          .from('crisis_catalog')
-          .select('slug,title,category,search_terms,is_free,release_status')
-          .order('sort_order')
-          .order('title')
-          .order('slug')
-          .range(offset, offset + 199)
-          .timeout(const Duration(seconds: 15));
-      result.addAll(rows
-          .map(CrisisEntry.fromJson)
-          .where((entry) => entry.isVisibleInHub));
-      if (rows.length < 200) return result;
-    }
+    final rows = await OfflineLibrary(client).crisisCatalog();
+    return rows
+        .map(CrisisEntry.fromJson)
+        .where((entry) => entry.isVisibleInHub)
+        .toList();
   }
 
   @override
   Future<Map<String, dynamic>?> detail(String slug) async {
     // RLS, not the widget, decides whether this caller can read clinical prose.
-    // No persistent cache: signing out immediately removes reviewer content.
+    // Reviewer drafts are online-only and are never persisted.
     if (client.auth.currentUser != null &&
-        !client.auth.currentUser!.isAnonymous) {
-      final draft = await client
-          .from('crisis_reference_drafts')
-          .select('content,revision')
-          .eq('slug', slug)
-          .maybeSingle()
-          .timeout(const Duration(seconds: 15));
-      if (draft != null) {
-        return {
-          ...Map<String, dynamic>.from(draft['content'] as Map),
-          '_review_draft': true,
-          '_revision': draft['revision'],
-        };
+        !client.auth.currentUser!.isAnonymous &&
+        !OfflineCache.instance.networkUnavailable) {
+      try {
+        final draft = await client
+            .from('crisis_reference_drafts')
+            .select('content,revision')
+            .eq('slug', slug)
+            .maybeSingle()
+            .timeout(const Duration(seconds: 15));
+        if (draft != null) {
+          return {
+            ...Map<String, dynamic>.from(draft['content'] as Map),
+            '_review_draft': true,
+            '_revision': draft['revision'],
+          };
+        }
+      } catch (error) {
+        if (!OfflineCache.isConnectionError(error)) rethrow;
+        OfflineCache.instance.networkUnavailable = true;
       }
     }
-    final row = await client
-        .from('crisis_protocols')
-        .select('content')
-        .eq('slug', slug)
-        .maybeSingle()
-        .timeout(const Duration(seconds: 15));
+    final library = OfflineLibrary(client);
+    final row = await library.detail(
+      'crisis:$slug',
+      'crisis_protocols',
+      'content',
+      'slug',
+      slug,
+      private: !await library.freeCrisis(slug),
+    );
     return row == null
         ? null
         : Map<String, dynamic>.from(row['content'] as Map);
@@ -120,12 +122,21 @@ class SupabaseCrisisRepository implements CrisisDataSource {
         client.auth.currentUser!.isAnonymous) {
       return const CrisisAccess();
     }
-    final reviewer = await client
-        .rpc('is_crisis_reviewer')
-        .timeout(const Duration(seconds: 15));
-    final premium = await client
-        .rpc('has_clinical_premium_access')
-        .timeout(const Duration(seconds: 15));
-    return CrisisAccess(reviewer: reviewer == true, premium: premium == true);
+    if (OfflineCache.instance.networkUnavailable) {
+      return CrisisAccess(premium: await OfflineCache.instance.restoreLease());
+    }
+    try {
+      final reviewer = await client
+          .rpc('is_crisis_reviewer')
+          .timeout(const Duration(seconds: 15));
+      final premium = await client
+          .rpc('has_clinical_premium_access')
+          .timeout(const Duration(seconds: 15));
+      return CrisisAccess(reviewer: reviewer == true, premium: premium == true);
+    } catch (error) {
+      if (!OfflineCache.isConnectionError(error)) rethrow;
+      OfflineCache.instance.networkUnavailable = true;
+      return CrisisAccess(premium: await OfflineCache.instance.restoreLease());
+    }
   }
 }

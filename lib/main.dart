@@ -27,6 +27,9 @@ import 'screens/password_recovery_screen.dart';
 import 'ce/ce_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
+import 'offline/offline_library.dart';
+import 'offline/offline_status_frame.dart';
+import 'offline/offline_downloads_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +47,11 @@ Future<void> main() async {
       anonKey: LumaConfig.supabaseAnonKey,
     );
     LumaBilling.instance.start(Supabase.instance.client);
+    try {
+      await OfflineLibrary.initialize(Supabase.instance.client);
+    } catch (_) {
+      /* Device storage failure must not block online reference use. */
+    }
   }
 
   runApp(const LumaApp());
@@ -117,7 +125,10 @@ class _LumaAppState extends State<LumaApp> {
       builder: (context, child) => QuickReferenceShortcut(
         observer: _quickReferenceObserver,
         navigatorKey: _navKey,
-        child: child ?? const SizedBox.shrink(),
+        child: OfflineStatusFrame(
+          navigatorKey: _navKey,
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
       home: kIsWeb && Uri.base.queryParameters['recovery'] == '1'
           ? const PasswordRecoveryScreen()
@@ -128,6 +139,12 @@ class _LumaAppState extends State<LumaApp> {
           : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (path == '/offline-downloads') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const OfflineDownloadsScreen(),
+          );
+        }
         if (LaunchScope.isDeferred(path)) {
           return MaterialPageRoute(
             settings: settings,
