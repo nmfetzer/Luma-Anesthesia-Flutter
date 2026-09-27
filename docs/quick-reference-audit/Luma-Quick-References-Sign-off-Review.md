@@ -96,14 +96,17 @@ These are practice-policy choices or product-scope limitations, not unresolved a
 
 ## Owner sign-off record
 
-Complete this after reviewing the corrected library and policy choices. The publication of audit corrections does not record approval on your behalf.
+Owner approval was explicitly provided in this conversation on September 27, 2026 at 12:25 PM EDT: “approve all changes and push to app.” This records the owner's authorization of the reviewed changes, not an independently verified physician/pharmacist certification.
 
-- **Clinical reviewer:** ____________________
-- **Review date:** ____________________
-- **Disposition:** Approve / approve with changes / hold
-- **GLP-1 pathway presentation accepted:** ____________________
-- **Metformin/institutional-plan language accepted:** ____________________
-- **Droperidol and off-label context accepted:** ____________________
-- **Remaining requested edits:** ____________________
+- **Approving owner:** Nicole Fetzer.
+- **Approval date:** September 27, 2026, 12:25 PM EDT.
+- **Disposition:** Approved for app publication.
+- **Scope:** All reviewed Quick Reference changes across 24 guides / 59 sections, including search improvements; audited content commit `883f4c5` and preview compatibility commit `c928a58`.
+- **GLP-1 pathway presentation:** Accepted as presented.
+- **Metformin/institutional-plan language:** Accepted as presented.
+- **Droperidol and off-label context:** Accepted as presented.
+- **Local-policy and scope boundaries:** Retained as presented.
+- **Access:** Free for guests and unpaid users; no subscription gate.
+- **Remaining requested edits:** None specified with this approval.
 
 The companion “Clinical Sign-off Copy” contains the exact reviewed text of all 59 live sections, with their versions and inline source links. It is the content to review alongside the app, not a substitute for checking how the information is used clinically.
