@@ -8,16 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
-import 'widgets/luma_home_button.dart';
 import 'home/home_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
-import 'screens/luma_assistant_screen.dart';
-import 'diagnostics/diagnostics_screen.dart';
+import 'launch/launch_scope.dart';
+import 'launch/deferred_section_screen.dart';
 import 'crisis/crisis_screen.dart';
 import 'crisis/provider_support_screen.dart';
-import 'special_considerations/special_considerations_screen.dart';
 import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
 import 'welcome/welcome_carousel.dart';
@@ -28,10 +26,12 @@ import 'quick_references/quick_reference_shortcut.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
 
   if (LumaConfig.supabaseConfigured) {
     await Supabase.initialize(
@@ -44,13 +44,14 @@ Future<void> main() async {
 }
 
 class LumaApp extends StatelessWidget {
-  const LumaApp(
-      {super.key,
-      this.allowSocialSignIn = true,
-      this.showDiagnosticsDraft = false,
-      this.cePortal = false});
+  const LumaApp({
+    super.key,
+    this.allowSocialSignIn = true,
+    this.showComingSoon = false,
+    this.cePortal = false,
+  });
   final bool allowSocialSignIn;
-  final bool showDiagnosticsDraft;
+  final bool showComingSoon;
   final bool cePortal;
 
   @override
@@ -69,14 +70,24 @@ class LumaApp extends StatelessWidget {
       home: kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : cePortal
-              ? const CeCourseScreen()
-              : WelcomeCarousel(
-                  onFinish: () {
-                    final navigator = _navKey.currentState;
-                    navigator?.pushReplacementNamed('/home');
-                  },
-                ),
+          ? const CeCourseScreen()
+          : WelcomeCarousel(
+              onFinish: () {
+                final navigator = _navKey.currentState;
+                navigator?.pushReplacementNamed('/home');
+              },
+            ),
       onGenerateRoute: (settings) {
+        final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (LaunchScope.isDeferred(path)) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => DeferredSectionScreen(
+              title: LaunchScope.titleFor(path),
+              showComingSoon: showComingSoon,
+            ),
+          );
+        }
         if (settings.name == '/provider-support') {
           return MaterialPageRoute(
             settings: settings,
@@ -104,34 +115,12 @@ class LumaApp extends StatelessWidget {
             ),
           );
         }
-        if (settings.name == '/diagnostics') {
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (_) => DiagnosticsScreen(
-              showClinicalDraft: showDiagnosticsDraft,
-            ),
-          );
-        }
-        if (settings.name == '/luma-ai') {
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (_) => const LumaAssistantScreen(),
-          );
-        }
         if (settings.name == '/home') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) =>
-                cePortal ? const CeCourseScreen() : const HomeScreen(),
-          );
-        }
-        if (settings.name == '/special-considerations') {
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (_) => SpecialConsiderationsScreen(
-              onSignIn: () => _navKey.currentState?.pushNamed('/account'),
-              onSubscribe: () => _navKey.currentState?.pushNamed('/subscribe'),
-            ),
+            builder: (_) => cePortal
+                ? const CeCourseScreen()
+                : HomeScreen(showComingSoon: showComingSoon),
           );
         }
         if (settings.name == '/subscribe') {
@@ -155,25 +144,16 @@ class LumaApp extends StatelessWidget {
         }
         if (settings.name == '/drug-library') {
           return MaterialPageRoute(
-              builder: (_) => const DrugsCategoriesScreen());
+            builder: (_) => const DrugsCategoriesScreen(),
+          );
         }
         if (settings.name == '/vasopressors-infusions') {
           return MaterialPageRoute(builder: (_) => const VasopressorsScreen());
         }
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            appBar: AppBar(
-              title: Text(settings.name ?? 'Coming soon'),
-              actions: const [LumaHomeButton()],
-            ),
-            body: Center(
-              child: Text(
-                '${settings.name}\n\nComing soon',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
+          settings: settings,
+          builder: (_) =>
+              const DeferredSectionScreen(title: 'Section unavailable'),
         );
       },
     );

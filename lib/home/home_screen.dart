@@ -1,36 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../launch/launch_scope.dart';
 import 'home_background.dart';
 import 'home_tile.dart';
 import 'home_menu_drawer.dart';
 import 'home_search.dart';
-import 'luma_ai_tile.dart';
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF08192B),
-      drawer: const HomeMenuDrawer(),
-      body: Stack(
-        children: [
-          const HomeBackground(),
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final w = constraints.maxWidth;
-                if (w < 600) return _PhoneLayout(width: w);
-                if (w < 1024) return _TabletLayout(width: w);
-                return _DesktopLayout(width: w);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class HomeTileData {
   final String eyebrow;
@@ -39,7 +13,6 @@ class HomeTileData {
   final String? subtitle;
   final HomeTileStyle style;
   final String route;
-
   const HomeTileData({
     required this.titlePlain,
     required this.titleAccent,
@@ -50,364 +23,258 @@ class HomeTileData {
   });
 }
 
-const List<HomeTileData> _tiles = [
+const _tiles = [
   HomeTileData(
     titlePlain: 'Drug',
     titleAccent: 'Library',
-    subtitle: 'Adult & pediatric dosing, contraindications, sources',
+    subtitle: 'Dosing, mixing, precautions & sources',
     style: HomeTileStyle.featured,
     route: '/drug-library',
+  ),
+  HomeTileData(
+    titlePlain: '',
+    titleAccent: 'Crisis Hub',
+    subtitle: 'Clinical crisis references · Free provider support',
+    style: HomeTileStyle.crisis,
+    route: '/crisis-guidelines',
+  ),
+  HomeTileData(
+    titlePlain: 'Vasopressors, Infusions, &',
+    titleAccent: 'Transfusions',
+    subtitle: 'Medication preparation & clinical references',
+    route: '/vasopressors-infusions',
   ),
   HomeTileData(
     eyebrow: 'Continuing Education',
     titlePlain: 'CE',
     titleAccent: 'Halo',
-    subtitle: 'Courses · 20 AANA-Approved MAC Ed CEs each',
+    subtitle: 'Course information & learning access',
     style: HomeTileStyle.darkHero,
     route: '/ce-halo',
   ),
-  HomeTileData(titlePlain: 'Luma', titleAccent: 'Academy', route: '/luma-academy'),
-  HomeTileData(titlePlain: 'Vasopressors, Infusions, &', titleAccent: 'Transfusions', route: '/vasopressors-infusions'),
-  HomeTileData(titlePlain: 'Pathophysiology &', titleAccent: 'Anesthesia Considerations', route: '/special-considerations'),
-  HomeTileData(titlePlain: 'Surgical Case', titleAccent: 'Prep', route: '/surgical-prep'),
-  HomeTileData(titlePlain: '', titleAccent: 'Diagnostics', route: '/diagnostics'),
-  HomeTileData(titlePlain: 'Regional &', titleAccent: 'Procedures', route: '/regional-procedures'),
-  HomeTileData(titlePlain: 'Practice', titleAccent: 'Guidelines', style: HomeTileStyle.parchment, route: '/practice-guidelines'),
   HomeTileData(
-    titlePlain: '',
-    titleAccent: 'Crisis Hub',
-    subtitle: 'MH · ACLS · PALS & more',
-    style: HomeTileStyle.crisis,
-    route: '/crisis-guidelines',
+    titlePlain: 'Quick',
+    titleAccent: 'References',
+    subtitle: 'Searchable, source-linked guidance',
+    style: HomeTileStyle.parchment,
+    route: '/quick-references',
   ),
 ];
 
-HomeTileData _tile(String key) => _tiles.firstWhere((t) => t.route.contains(key));
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key, this.showComingSoon = false});
+
+  /// Preview-only teasers; the production entry point leaves this false.
+  final bool showComingSoon;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF08192B),
+    drawer: const HomeMenuDrawer(),
+    body: Stack(
+      children: [
+        const HomeBackground(),
+        SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Column(
+                children: [
+                  const _TopBar(),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4, bottom: 14),
+                    child: Text(
+                      'Welcome to Luma',
+                      style: TextStyle(
+                        fontFamily: 'Fraunces',
+                        fontSize: 24,
+                        color: Color(0xFFF7F1E6),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: HomeSearch(
+                      sections: [
+                        for (final tile in _tiles)
+                          HomeSearchSection(
+                            '${tile.titlePlain} ${tile.titleAccent}'.trim(),
+                            tile.route,
+                            keywords:
+                                '${tile.subtitle ?? ''} '
+                                '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia ACLS PALS BLS emergency' : ''} '
+                                '${tile.route == '/quick-references' ? 'preop pre-op clearance GLP1 GLP-1 guidelines' : ''}',
+                          ),
+                        const HomeSearchSection(
+                          'Mental Health & Recovery Support',
+                          '/provider-support',
+                          keywords:
+                              'mental emergency suicide 988 AANA ASA rehab addiction '
+                              'provider wellness Parkdale Marworth physician MD DO CRNA CAA '
+                              'student resident fellow nurse anesthesiologist burnout',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final columns = constraints.maxWidth < 560
+                                  ? 1
+                                  : 2;
+                              const gap = 12.0;
+                              final width =
+                                  (constraints.maxWidth - gap * (columns - 1)) /
+                                  columns;
+                              final scale =
+                                  MediaQuery.textScalerOf(context).scale(16) /
+                                  16;
+                              return Wrap(
+                                spacing: gap,
+                                runSpacing: gap,
+                                children: [
+                                  for (final tile in _tiles)
+                                    SizedBox(
+                                      width: width,
+                                      height: 152 * scale.clamp(1.0, 2.5),
+                                      child: HomeTile(data: tile),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                          if (showComingSoon) ...[
+                            const SizedBox(height: 24),
+                            const _ComingSoonPanel(),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      12,
+                      20,
+                      MediaQuery.sizeOf(context).width < 900 ? 76 : 18,
+                    ),
+                    child: const Text(
+                      'LUMA · Knowledge Illuminated',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Fraunces',
+                        fontSize: 14,
+                        color: Color(0xFFE6CF9C),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
 class _TopBar extends StatelessWidget {
-  final bool compact;
-  const _TopBar({this.compact = false});
-
+  const _TopBar();
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(compact ? 12 : 20, compact ? 8 : 12, compact ? 12 : 20, 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _MenuPill(compact: compact),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: _Wordmark(compact: compact),
-              ),
-            ),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    child: Row(
+      children: [
+        Builder(
+          builder: (context) => IconButton(
+            tooltip: 'Menu',
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            icon: const Icon(Icons.menu, color: Color(0xFFF7F1E6)),
           ),
-          const _AccountAvatar(),
-        ],
-      ),
-    );
-  }
-}
-
-class _MenuPill extends StatelessWidget {
-  final bool compact;
-  const _MenuPill({this.compact = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Scaffold.of(context).openDrawer(),
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: compact ? 10 : 14, vertical: compact ? 6 : 7),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F2A3D).withValues(alpha: 0.55),
-          border: Border.all(color: const Color(0xFFE6CF9C).withValues(alpha: 0.35), width: 0.5),
-          borderRadius: BorderRadius.circular(999),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.menu, size: compact ? 12 : 14, color: const Color(0xFFF7F1E6)),
-            if (!compact) ...[
-              const SizedBox(width: 6),
-              const Text('MENU', style: TextStyle(fontFamily: 'Inter', fontSize: 10, letterSpacing: 1.4, color: Color(0xFFF7F1E6), fontWeight: FontWeight.w500)),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Wordmark extends StatelessWidget {
-  final bool compact;
-  const _Wordmark({this.compact = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final size = compact ? 15.0 : 17.0;
-    return RichText(
-      text: TextSpan(
-        style: TextStyle(fontFamily: 'Fraunces', fontSize: size, color: const Color(0xFFF7F1E6)),
-        children: const [
-          TextSpan(text: 'Luma '),
-          TextSpan(text: 'Anesthesia', style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFFE6CF9C), fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
-}
-
-class _AccountAvatar extends StatelessWidget {
-  const _AccountAvatar();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: const ValueKey('home-account-button'),
-      tooltip: 'Account',
-      onPressed: () => Navigator.of(context).pushNamed('/account'),
-      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-      padding: const EdgeInsets.all(4),
-      icon: Image.asset(
-        'assets/branding/luma_symbol_halo.png',
-        width: 40,
-        height: 40,
-        fit: BoxFit.contain,
-        excludeFromSemantics: true,
-      ),
-    );
-  }
-}
-
-class _Greeting extends StatelessWidget {
-  final String name;
-  const _Greeting({required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      child: Column(
-        children: [
-          RichText(
+        const Expanded(
+          child: Text(
+            'Luma Anesthesia',
             textAlign: TextAlign.center,
-            text: TextSpan(
-              style: const TextStyle(fontFamily: 'Fraunces', fontSize: 22, color: Color(0xFFF7F1E6), height: 1.1),
-              children: [
-                const TextSpan(text: 'Welcome back, '),
-                TextSpan(text: name, style: const TextStyle(fontStyle: FontStyle.italic, color: Color(0xFFE6CF9C))),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          HomeSearch(sections: [
-            for (final tile in _tiles)
-              HomeSearchSection(
-                '${tile.titlePlain} ${tile.titleAccent}'.trim(),
-                tile.route,
-                keywords: '${tile.subtitle ?? ''} '
-                    '${tile.route == '/special-considerations' ? 'special considerations conditions' : ''} '
-                    '${tile.route == '/diagnostics' ? 'labs laboratory values CBC BMP CMP sodium potassium hemoglobin platelets creatinine ABG acid base PFT spirometry echo TEE imaging CXR POCUS ultrasound carotid Doppler' : ''} '
-                    '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia emergency' : ''}',
-              ),
-            const HomeSearchSection('Luma AI', '/luma-ai',
-                keywords: 'assistant'),
-            const HomeSearchSection('Mental Health & Recovery Support', '/provider-support',
-                keywords: 'mental emergency suicide 988 AANA ASA rehab addiction substance use provider wellness Parkdale Marworth physician doctor MD DO CRNA CAA student resident fellow nurse anesthesiologist technician burnout anxiety depression trauma'),
-          ]),
-        ],
-      ),
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  const _Footer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      // Leave a clear lane for the floating Quick Ref pill on smaller screens.
-      padding: EdgeInsets.fromLTRB(
-        20, 12, 20, MediaQuery.sizeOf(context).width < 900 ? 76 : 12,
-      ),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: const Color(0xFFE6CF9C).withValues(alpha: 0.18), width: 0.5)),
-      ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 14, runSpacing: 8,
-        children: [
-          _footerBadge('AANA-Approved CE'),
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(fontFamily: 'Fraunces', fontSize: 13, color: Color(0xD9F7F1E6), letterSpacing: 0.5),
-              children: const [
-                TextSpan(text: 'LUMA · '),
-                TextSpan(text: 'Knowledge Illuminated', style: TextStyle(fontStyle: FontStyle.italic, color: Color(0xFFE6CF9C))),
-              ],
-            ),
-          ),
-          _footerBadge('Reviewed by Clinicians'),
-        ],
-      ),
-    );
-  }
-
-  Widget _footerBadge(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F2A3D).withValues(alpha: 0.5),
-        border: Border.all(color: const Color(0xFFE6CF9C).withValues(alpha: 0.25), width: 0.5),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(width: 5, height: 5, decoration: const BoxDecoration(color: Color(0xFFE6CF9C), shape: BoxShape.circle)),
-          const SizedBox(width: 6),
-          Text(text.toUpperCase(), style: const TextStyle(fontFamily: 'Inter', fontSize: 9, letterSpacing: 1.2, color: Color(0xB8F7F1E6), fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
-}
-
-class _PhoneLayout extends StatelessWidget {
-  final double width;
-  const _PhoneLayout({required this.width});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const _TopBar(compact: true),
-        const _Greeting(name: 'Nicole'),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
-            child: Column(
-              children: [
-                SizedBox(height: 160, child: HomeTile(data: _tile('drug-library'))),
-                const SizedBox(height: 8),
-                SizedBox(height: 130, child: HomeTile(data: _tile('ce-halo'))),
-                const SizedBox(height: 8),
-                const SizedBox(height: 124, child: LumaAiTile()),
-                const SizedBox(height: 8),
-                _tileRow(_tile('crisis-guidelines'), _tile('vasopressors-infusions')),
-                const SizedBox(height: 8),
-                _tileRow(_tile('special-considerations'), _tile('surgical-prep')),
-                const SizedBox(height: 8),
-                _tileRow(_tile('diagnostics'), _tile('regional-procedures')),
-                const SizedBox(height: 8),
-                SizedBox(height: 68, child: HomeTile(data: _tile('practice-guidelines'))),
-                const SizedBox(height: 8),
-                SizedBox(height: 68, child: HomeTile(data: _tile('luma-academy'))),
-              ],
+            style: TextStyle(
+              fontFamily: 'Fraunces',
+              fontSize: 18,
+              color: Color(0xFFE6CF9C),
             ),
           ),
         ),
-        const _Footer(),
-      ],
-    );
-  }
-
-  Widget _tileRow(HomeTileData a, HomeTileData b) {
-    return SizedBox(
-      height: 132,
-      child: Row(
-        children: [
-          Expanded(child: HomeTile(data: a)),
-          const SizedBox(width: 8),
-          Expanded(child: HomeTile(data: b)),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabletLayout extends StatelessWidget {
-  final double width;
-  const _TabletLayout({required this.width});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const _TopBar(),
-        const _Greeting(name: 'Nicole'),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-            child: Column(
-              children: [
-                Expanded(flex: 3, child: Row(children: [Expanded(child: HomeTile(data: _tile('drug-library'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('ce-halo')))])),
-                const SizedBox(height: 10),
-                Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('crisis-guidelines'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions')))])),
-                const SizedBox(height: 10),
-                Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('special-considerations'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('surgical-prep')))])),
-                const SizedBox(height: 10),
-                Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
-                const SizedBox(height: 10),
-                Expanded(flex: 1, child: Row(children: [
-                  Expanded(child: HomeTile(data: _tile('luma-academy'))),
-                  const SizedBox(width: 10),
-                  const Expanded(child: LumaAiTile()),
-                ])),
-              ],
-            ),
+        IconButton(
+          key: const ValueKey('home-account-button'),
+          tooltip: 'Account',
+          onPressed: () => Navigator.of(context).pushNamed('/account'),
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          padding: const EdgeInsets.all(4),
+          icon: Image.asset(
+            'assets/branding/luma_symbol_halo.png',
+            width: 40,
+            height: 40,
+            fit: BoxFit.contain,
+            excludeFromSemantics: true,
           ),
         ),
-        const _Footer(),
       ],
-    );
-  }
+    ),
+  );
 }
 
-class _DesktopLayout extends StatelessWidget {
-  final double width;
-  const _DesktopLayout({required this.width});
-
+class _ComingSoonPanel extends StatelessWidget {
+  const _ComingSoonPanel();
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1440),
-        child: Column(
-          children: [
-            const _TopBar(),
-            const _Greeting(name: 'Nicole'),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
-                child: Column(
-                  children: [
-                    Expanded(flex: 2, child: Row(children: [Expanded(flex: 5, child: HomeTile(data: _tile('drug-library'))), const SizedBox(width: 10), Expanded(flex: 7, child: HomeTile(data: _tile('ce-halo')))])),
-                    const SizedBox(height: 10),
-                    Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('crisis-guidelines'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('vasopressors-infusions'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('special-considerations')))])),
-                    const SizedBox(height: 10),
-                    Expanded(flex: 1, child: Row(children: [Expanded(child: HomeTile(data: _tile('surgical-prep'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('diagnostics'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('regional-procedures'))), const SizedBox(width: 10), Expanded(child: HomeTile(data: _tile('practice-guidelines')))])),
-                    const SizedBox(height: 10),
-                    Expanded(flex: 1, child: Row(children: [
-                      Expanded(flex: 5, child: HomeTile(data: _tile('luma-academy'))),
-                      const SizedBox(width: 10),
-                      const Expanded(flex: 7, child: LumaAiTile()),
-                    ])),
-                  ],
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: const Color(0xFF102A3D),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: const Color(0xFF596476)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Coming soon',
+          style: TextStyle(
+            fontFamily: 'Fraunces',
+            fontSize: 24,
+            color: Color(0xFFE6CF9C),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Planned for future updates. These features are not '
+          'available or included in the current subscription.',
+          style: TextStyle(fontSize: 14, height: 1.5, color: Color(0xFFF7F1E6)),
+        ),
+        const SizedBox(height: 14),
+        for (final entry in LaunchScope.deferred.entries)
+          if (entry.key != '/ekg')
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(
+                '• ${entry.value}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Color(0xFFF7F1E6),
                 ),
               ),
             ),
-            const _Footer(),
-          ],
+        const SizedBox(height: 12),
+        const Text(
+          'Private preview only. This panel is omitted from the store build.',
+          style: TextStyle(fontSize: 12, height: 1.5, color: Color(0xFFCCD3DB)),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
 }

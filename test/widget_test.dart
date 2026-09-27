@@ -4,22 +4,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/main.dart';
 import 'package:luma_anesthesia/ce/ce_screen.dart';
 import 'package:luma_anesthesia/crisis/provider_support_screen.dart';
-import 'package:luma_anesthesia/diagnostics/diagnostics_screen.dart';
+import 'package:luma_anesthesia/launch/deferred_section_screen.dart';
+import 'package:luma_anesthesia/launch/launch_scope.dart';
 import 'package:luma_anesthesia/quick_references/quick_reference_screen.dart';
 
 void main() {
   test('production defaults preserve clinical review and normal app entry', () {
     const app = LumaApp();
-    expect(app.showDiagnosticsDraft, isFalse);
+    expect(app.showComingSoon, isFalse);
     expect(app.cePortal, isFalse);
     expect(app.allowSocialSignIn, isTrue);
   });
 
   testWidgets(
-    'merged navigation retains Diagnostics, support, Quick Ref and CE',
+    'launch navigation blocks deferred sections, retains support, Quick Ref and CE',
     (tester) async {
       GoogleFonts.config.allowRuntimeFetching = false;
-      await tester.pumpWidget(const LumaApp(showDiagnosticsDraft: true));
+      await tester.pumpWidget(const LumaApp());
       await tester.pump(const Duration(milliseconds: 500));
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
       final context = tester.element(find.byType(MaterialApp));
@@ -36,11 +37,34 @@ void main() {
       final quick =
           screen('/quick-references', 'GLP1') as QuickReferencesScreen;
       expect(quick.initialQuery, 'GLP1');
-      final diagnostics = screen('/diagnostics') as DiagnosticsScreen;
-      expect(diagnostics.showClinicalDraft, isTrue);
+      for (final path in LaunchScope.deferred.keys) {
+        final deferred = screen(path) as DeferredSectionScreen;
+        expect(deferred.showComingSoon, isFalse);
+        expect(
+          screen('$path/detail?preview=true'),
+          isA<DeferredSectionScreen>(),
+        );
+      }
       expect(screen('/ce-halo'), isA<CeCourseScreen>());
       expect(screen('/ce-halo/courses'), isA<CeCourseScreen>());
       expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'private preview uses inert coming-soon routes, never draft content',
+    (tester) async {
+      await tester.pumpWidget(const LumaApp(showComingSoon: true));
+      await tester.pump(const Duration(milliseconds: 100));
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      final route =
+          app.onGenerateRoute!(const RouteSettings(name: '/diagnostics'))!
+              as MaterialPageRoute<dynamic>;
+      final screen = route.builder(
+        tester.element(find.byType(MaterialApp)),
+      ) as DeferredSectionScreen;
+      expect(screen.showComingSoon, isTrue);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

@@ -2,6 +2,7 @@
 // stays a comfortable reading width on phone, tablet, and desktop.
 
 import 'package:flutter/material.dart';
+
 import 'luma_theme.dart';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -19,7 +20,11 @@ class WelcomeSlideOne extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('WELCOME TO LUMA', textAlign: TextAlign.center, style: LumaText.eyebrow()),
+          Text(
+            'WELCOME TO LUMA',
+            textAlign: TextAlign.center,
+            style: LumaText.eyebrow(),
+          ),
           const SizedBox(height: 12),
           _TitleWithItalic(
             plain: 'A quieter kind of ',
@@ -66,15 +71,15 @@ class WelcomeSlideTwo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('778 MEDICATIONS · 23 CATEGORIES', style: LumaText.eyebrow()),
+          Text('ANESTHESIA MEDICATION REFERENCES', style: LumaText.eyebrow()),
           const SizedBox(height: 10),
           _TitleWithItalic(
-            plain: 'Comprehensive drug library for ',
-            italic: 'clinical excellence.',
+            plain: 'Medication details. ',
+            italic: 'Clinical context.',
           ),
           const SizedBox(height: 14),
           Text(
-            'Adult and pediatric dosing, mixing pearls, contraindications, and cited sources on every record — trusted from your first case through your last.',
+            'Explore adult and pediatric dosing, preparation, precautions, and supporting references. Always confirm the patient, formulation, and local protocol.',
             style: LumaText.body(),
           ),
         ],
@@ -97,11 +102,11 @@ class WelcomeSlideThree extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('TRUSTED REFERENCE GUIDE', style: LumaText.eyebrow()),
+          Text('YOUR CLINICAL REFERENCE', style: LumaText.eyebrow()),
           const SizedBox(height: 10),
           _TitleWithItalic(
-            plain: 'A complete anesthesia ',
-            italic: 'companion.',
+            plain: 'Focused references for ',
+            italic: 'anesthesia practice.',
           ),
           const SizedBox(height: 14),
           Text(
@@ -137,20 +142,20 @@ class WelcomeSlideFour extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('AANA-APPROVED CE · FOR CRNAS', style: LumaText.eyebrow()),
+          Text('CE HALO · CONTINUING EDUCATION', style: LumaText.eyebrow()),
           const SizedBox(height: 10),
           _TitleWithItalic(
-            plain: 'Earn credit while you ',
-            italic: 'learn.',
+            plain: 'Continuing education, ',
+            italic: 'in one place.',
           ),
           const SizedBox(height: 14),
           Text(
-            'Current-evidence CE modules, quizzes, and certificates — right in the app you already use to look up your drugs.',
+            'Explore course information and your learning access in CE HALO. Course availability, requirements, and credit details are shown within each course.',
             style: LumaText.body(),
           ),
           const SizedBox(height: 16),
           Text(
-            'Continuing education is currently AANA-approved for CRNAs. The reference library and board prep are available to everyone.',
+            'A clinical app subscription is not required for CE courses. Course purchases and access are separate from the reference subscription.',
             style: LumaText.note(),
           ),
         ],
@@ -168,7 +173,10 @@ class WelcomeSlideFour extends StatelessWidget {
 class _SlideFrame extends StatelessWidget {
   final Widget child;
   final CrossAxisAlignment alignment;
-  const _SlideFrame({required this.child, this.alignment = CrossAxisAlignment.start});
+  const _SlideFrame({
+    required this.child,
+    this.alignment = CrossAxisAlignment.start,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +197,11 @@ class _TitleWithItalic extends StatelessWidget {
   final String plain;
   final String italic;
   final TextAlign textAlign;
-  const _TitleWithItalic({required this.plain, required this.italic, this.textAlign = TextAlign.start});
+  const _TitleWithItalic({
+    required this.plain,
+    required this.italic,
+    this.textAlign = TextAlign.start,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +237,11 @@ class _BrandLine extends StatelessWidget {
       runSpacing: 6,
       children: [
         Text('LUMA · ', style: LumaText.brandLine()),
-        Text('Knowledge Illuminated', textAlign: TextAlign.center, style: LumaText.brandLineItalic()),
+        Text(
+          'Knowledge Illuminated',
+          textAlign: TextAlign.center,
+          style: LumaText.brandLineItalic(),
+        ),
       ],
     );
   }
@@ -242,7 +258,10 @@ class _AudienceChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: LumaColors.navy.withOpacity(0.4),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: LumaColors.goldSoft.withOpacity(0.35), width: 0.5),
+        border: Border.all(
+          color: LumaColors.goldSoft.withOpacity(0.35),
+          width: 0.5,
+        ),
       ),
       child: Text(label.toUpperCase(), style: LumaText.chip()),
     );
@@ -255,12 +274,36 @@ class _FeatureGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const tiles = <_FeatureData>[
-      _FeatureData(Icons.emergency_outlined, 'Crisis Hub', 'Fast paths for the moments that count.'),
-      _FeatureData(Icons.control_point_duplicate_outlined, 'Regional Anesthesia', 'Blocks, landmarks, and dosing.'),
-      _FeatureData(Icons.checklist_rtl_outlined, 'Case Setup', 'Checklists tuned to the procedure.'),
-      _FeatureData(Icons.star_outline_rounded, 'Pathophysiology & Anesthesia Considerations', 'OB, cardiac, peds, and more.'),
-      _FeatureData(Icons.menu_book_outlined, 'Board Prep', 'NCLEX · SEE · ABA Basic + Advanced.'),
-      _FeatureData(Icons.style_outlined, 'Flashcards', 'Spaced repetition, made for anesthesia.'),
+      _FeatureData(
+        Icons.emergency_outlined,
+        'Crisis Hub',
+        'Organized clinical crisis references.',
+      ),
+      _FeatureData(
+        Icons.medication_outlined,
+        'Drug Library',
+        'Dosing, precautions, and sources.',
+      ),
+      _FeatureData(
+        Icons.water_drop_outlined,
+        'Vasopressors & Infusions',
+        'Preparation and clinical context.',
+      ),
+      _FeatureData(
+        Icons.menu_book_outlined,
+        'Quick References',
+        'Searchable, source-linked guidance.',
+      ),
+      _FeatureData(
+        Icons.school_outlined,
+        'CE HALO',
+        'Course information and learning access.',
+      ),
+      _FeatureData(
+        Icons.favorite_outline,
+        'Provider Support',
+        'Always free. No account required.',
+      ),
     ];
 
     // Responsive grid: 2 columns on narrow phones, 3 columns everywhere else.
@@ -276,10 +319,12 @@ class _FeatureGrid extends StatelessWidget {
           spacing: gap,
           runSpacing: gap,
           children: tiles
-              .map((t) => SizedBox(
-                    width: tileWidth,
-                    child: _FeatureTile(data: t),
-                  ))
+              .map(
+                (t) => SizedBox(
+                  width: tileWidth,
+                  child: _FeatureTile(data: t),
+                ),
+              )
               .toList(),
         );
       },
@@ -305,7 +350,10 @@ class _FeatureTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: LumaColors.navy.withOpacity(0.45),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: LumaColors.goldSoft.withOpacity(0.18), width: 0.5),
+        border: Border.all(
+          color: LumaColors.goldSoft.withOpacity(0.18),
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

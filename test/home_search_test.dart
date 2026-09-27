@@ -8,8 +8,11 @@ import 'package:luma_anesthesia/models/medication.dart';
 import 'package:luma_anesthesia/special_considerations/special_consideration.dart';
 
 const sections = [
-  HomeSearchSection(pathophysiologyTitle, '/special-considerations',
-      keywords: 'special considerations'),
+  HomeSearchSection(
+    pathophysiologyTitle,
+    '/special-considerations',
+    keywords: 'special considerations',
+  ),
   HomeSearchSection('Crisis Hub', '/crisis-guidelines'),
   HomeSearchSection('Luma Academy', '/luma-academy'),
 ];
@@ -20,51 +23,69 @@ final data = HomeSearchData(
       'name': 'Propofol',
       'brand_name': 'Diprivan',
       'category': 'Anesthetics',
-    })
+    }),
   ],
   conditions: const [
     SpecialConsiderationEntry(
-        slug: 'aortic-stenosis',
-        title: 'Aortic Stenosis',
-        category: 'Cardiac',
-        reviewStatus: 'published',
-        searchTags: ['AS']),
+      slug: 'aortic-stenosis',
+      title: 'Aortic Stenosis',
+      category: 'Cardiac',
+      reviewStatus: 'published',
+      searchTags: ['AS'],
+    ),
     SpecialConsiderationEntry(
-        slug: 'draft', title: 'Draft condition', category: 'Cardiac'),
+      slug: 'draft',
+      title: 'Draft condition',
+      category: 'Cardiac',
+    ),
   ],
 );
 
-Future<void> openSearch(WidgetTester tester,
-    {Future<HomeSearchData> Function()? loader}) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
+Future<void> openSearch(
+  WidgetTester tester, {
+  Future<HomeSearchData> Function()? loader,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
         body: HomeSearch(
-            sections: sections, loadData: loader ?? () async => data)),
-    routes: {
-      '/special-considerations': (_) =>
-          const Scaffold(body: Text('Condition library opened'))
-    },
-  ));
+          sections: sections,
+          loadData: loader ?? () async => data,
+        ),
+      ),
+      routes: {
+        '/special-considerations': (_) =>
+            const Scaffold(body: Text('Condition library opened')),
+      },
+    ),
+  );
   await tester.tap(find.byType(SearchBar));
   await tester.pumpAndSettle();
 }
 
 void main() {
-  testWidgets('home search hides deferred pediatric topics but retains PALS',
-      (tester) async {
-    await openSearch(tester,
-        loader: () async => const HomeSearchData(crises: [
-              CrisisEntry(
-                  slug: 'child-fixture',
-                  title: 'Pediatric Emergency Fixture',
-                  category: 'pediatric',
-                  searchTerms: 'pediatric child emergency'),
-              CrisisEntry(
-                  slug: 'pals',
-                  title: 'PALS',
-                  category: 'resuscitation',
-                  searchTerms: 'pediatric advanced life support'),
-            ]));
+  testWidgets('home search hides deferred pediatric topics but retains PALS', (
+    tester,
+  ) async {
+    await openSearch(
+      tester,
+      loader: () async => const HomeSearchData(
+        crises: [
+          CrisisEntry(
+            slug: 'child-fixture',
+            title: 'Pediatric Emergency Fixture',
+            category: 'pediatric',
+            searchTerms: 'pediatric child emergency',
+          ),
+          CrisisEntry(
+            slug: 'pals',
+            title: 'PALS',
+            category: 'resuscitation',
+            searchTerms: 'pediatric advanced life support',
+          ),
+        ],
+      ),
+    );
     await tester.enterText(find.byType(TextField).last, 'pediatric');
     await tester.pumpAndSettle();
     expect(find.text('Pediatric Emergency Fixture'), findsNothing);
@@ -75,54 +96,58 @@ void main() {
     expect(find.textContaining('No matches yet'), findsOneWidget);
   });
   testWidgets(
-      'live matches update without submitting; names, brands and no results',
-      (tester) async {
-    await openSearch(tester);
-    await tester.enterText(find.byType(TextField).last, 'pro');
-    await tester.pumpAndSettle();
-    expect(find.text('Propofol'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).last, 'dipr');
-    await tester.pumpAndSettle();
-    expect(find.text('Propofol'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).last, 'aortic');
-    await tester.pumpAndSettle();
-    expect(find.text('Aortic Stenosis'), findsOneWidget);
-    expect(find.text('$pathophysiologyTitle · 1 results'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).last, 'draft');
-    await tester.pumpAndSettle();
-    expect(find.text('Draft condition'), findsNothing);
-    expect(find.textContaining('No matches yet'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).last, '');
-    await tester.pumpAndSettle();
-    expect(find.text('Crisis Hub'), findsOneWidget);
-  });
+    'live matches update without submitting; names, brands and no results',
+    (tester) async {
+      await openSearch(tester);
+      await tester.enterText(find.byType(TextField).last, 'pro');
+      await tester.pumpAndSettle();
+      expect(find.text('Propofol'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, 'dipr');
+      await tester.pumpAndSettle();
+      expect(find.text('Propofol'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, 'aortic');
+      await tester.pumpAndSettle();
+      expect(find.text('Aortic Stenosis'), findsNothing);
+      expect(find.textContaining('No matches yet'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, 'draft');
+      await tester.pumpAndSettle();
+      expect(find.text('Draft condition'), findsNothing);
+      expect(find.textContaining('No matches yet'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, '');
+      await tester.pumpAndSettle();
+      expect(find.text('Crisis Hub'), findsOneWidget);
+    },
+  );
 
-  testWidgets('old search alias opens newly named section', (tester) async {
+  testWidgets('deferred aliases do not reopen hidden content', (tester) async {
     await openSearch(tester);
     await tester.enterText(
-        find.byType(TextField).last, 'special considerations');
+      find.byType(TextField).last,
+      'special considerations',
+    );
     await tester.pumpAndSettle();
-    expect(find.text(pathophysiologyTitle), findsOneWidget);
-    await tester.tap(find.text(pathophysiologyTitle));
-    await tester.pumpAndSettle();
-    expect(find.text('Condition library opened'), findsOneWidget);
+    expect(find.text(pathophysiologyTitle), findsNothing);
+    expect(find.textContaining('No matches yet'), findsOneWidget);
   });
 
-  testWidgets('section search remains usable if library loading fails',
-      (tester) async {
+  testWidgets('section search remains usable if library loading fails', (
+    tester,
+  ) async {
     await openSearch(tester, loader: () async => throw StateError('Offline'));
-    await tester.enterText(find.byType(TextField).last, 'patho');
+    await tester.enterText(find.byType(TextField).last, 'crisis');
     await tester.pumpAndSettle();
-    expect(find.text(pathophysiologyTitle), findsOneWidget);
+    expect(find.text('Crisis Hub'), findsOneWidget);
     expect(find.text('Some library results could not load.'), findsOneWidget);
   });
 
   for (final size in [
     const Size(375, 812),
     const Size(768, 1024),
-    const Size(1280, 800)
+    const Size(1280, 800),
   ]) {
-    testWidgets('swapped tiles and full new title fit $size', (tester) async {
+    testWidgets('five launch tiles replace deferred areas at $size', (
+      tester,
+    ) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -131,14 +156,19 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       Finder tile(String route) =>
           find.byWidgetPredicate((w) => w is HomeTile && w.data.route == route);
-      expect(
-          tester.getTopLeft(tile('/crisis-guidelines')).dy,
-          lessThan(tester.getTopLeft(tile('/special-considerations')).dy +
-              (size.width >= 1024 ? 1 : 0)));
-      expect(tester.getTopLeft(tile('/luma-academy')).dy,
-          greaterThan(tester.getTopLeft(tile('/practice-guidelines')).dy));
-      expect(
-          find.text(pathophysiologyTitle, findRichText: true), findsOneWidget);
+      expect(find.byType(HomeTile), findsNWidgets(5));
+      for (final path in [
+        '/drug-library',
+        '/crisis-guidelines',
+        '/vasopressors-infusions',
+        '/ce-halo',
+        '/quick-references',
+      ]) {
+        expect(tile(path), findsOneWidget);
+      }
+      expect(tile('/special-considerations'), findsNothing);
+      expect(tile('/diagnostics'), findsNothing);
+      expect(find.text('Coming soon'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

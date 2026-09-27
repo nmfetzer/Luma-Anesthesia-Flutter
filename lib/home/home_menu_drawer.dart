@@ -20,13 +20,19 @@ class HomeMenuDrawer extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   style: const TextStyle(
-                      fontFamily: 'Fraunces', fontSize: 20, color: _cream),
+                    fontFamily: 'Fraunces',
+                    fontSize: 20,
+                    color: _cream,
+                  ),
                   children: const [
                     TextSpan(text: 'Luma '),
                     TextSpan(
-                        text: 'Anesthesia',
-                        style: TextStyle(
-                            fontStyle: FontStyle.italic, color: _gold)),
+                      text: 'Anesthesia',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: _gold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -38,36 +44,30 @@ class HomeMenuDrawer extends StatelessWidget {
                 children: [
                   _sectionLabel('MEDICATIONS'),
                   _link(context, 'Drug Library', '/drug-library'),
-                  _link(context, 'Vasopressors, Infusions, & Transfusions',
-                      '/vasopressors-infusions'),
-                  _sectionLabel('CLINICAL'),
-                  _link(context, 'Quick References', '/quick-references',
-                      accent: const Color(0xFF69AAFF)),
-                  _link(context, 'Pathophysiology & Anesthesia Considerations',
-                      '/special-considerations'),
-                  _link(context, 'Surgical Case Prep', '/surgical-prep'),
-                  _link(context, 'Diagnostics', '/diagnostics'),
                   _link(
-                      context, 'Regional & Procedures', '/regional-procedures'),
-                  _link(context, 'Practice Guidelines', '/practice-guidelines'),
-                  _link(context, 'Crisis Hub', '/crisis-guidelines',
-                      accent: const Color(0xFFB43C37)),
+                    context,
+                    'Vasopressors, Infusions, & Transfusions',
+                    '/vasopressors-infusions',
+                  ),
+                  _sectionLabel('CLINICAL'),
+                  _link(
+                    context,
+                    'Quick References',
+                    '/quick-references',
+                    accent: const Color(0xFF69AAFF),
+                  ),
+                  _link(
+                    context,
+                    'Crisis Hub',
+                    '/crisis-guidelines',
+                    accent: const Color(0xFFB43C37),
+                  ),
                   _sectionLabel('EDUCATION'),
-                  _link(context, 'Meet Luma AI', '/luma-ai'),
                   _link(context, 'CE Halo', '/ce-halo'),
                   _sub(context, 'My Courses', '/ce-halo/courses'),
-                  _sub(context, 'My Certificates', '/ce-halo/certificates'),
-                  _link(context, 'Luma Academy', '/luma-academy'),
-                  _sub(context, 'NBCRNA Prep', '/luma-academy/nbcrna'),
-                  _sub(context, 'ABA Basic', '/luma-academy/aba-basic'),
-                  _sub(context, 'ABA Advanced', '/luma-academy/aba-advanced'),
-                  _sub(context, 'SEE Exam Prep', '/luma-academy/see'),
-                  _sub(context, 'Anesthesia Flashcards',
-                      '/luma-academy/flashcards'),
                   _sectionLabel('ACCOUNT'),
                   _link(context, 'Luma Premium', '/subscribe'),
                   _link(context, 'My Account', '/account'),
-                  _link(context, 'Settings', '/settings'),
                 ],
               ),
             ),
@@ -80,18 +80,25 @@ class HomeMenuDrawer extends StatelessWidget {
   Widget _sectionLabel(String text) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
-      child: Text(text,
-          style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 10,
-              letterSpacing: 1.6,
-              color: _gold,
-              fontWeight: FontWeight.w500)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 10,
+          letterSpacing: 1.6,
+          color: _gold,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 
-  Widget _link(BuildContext context, String label, String route,
-      {Color? accent}) {
+  Widget _link(
+    BuildContext context,
+    String label,
+    String route, {
+    Color? accent,
+  }) {
     return InkWell(
       onTap: () {
         Navigator.pop(context);
@@ -99,9 +106,14 @@ class HomeMenuDrawer extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Text(label,
-            style: TextStyle(
-                fontFamily: 'Fraunces', fontSize: 15, color: accent ?? _cream)),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Fraunces',
+            fontSize: 15,
+            color: accent ?? _cream,
+          ),
+        ),
       ),
     );
   }
@@ -114,9 +126,14 @@ class HomeMenuDrawer extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(38, 6, 20, 6),
-        child: Text(label,
-            style: const TextStyle(
-                fontFamily: 'Inter', fontSize: 13, color: Color(0xCCF7F1E6))),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 13,
+            color: Color(0xCCF7F1E6),
+          ),
+        ),
       ),
     );
   }

@@ -4,9 +4,59 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/home/home_screen.dart';
 import 'package:luma_anesthesia/quick_references/quick_reference_shortcut.dart';
 import 'package:luma_anesthesia/welcome/welcome_carousel.dart';
+import 'package:luma_anesthesia/welcome/welcome_slides.dart';
 
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
+
+  testWidgets(
+    'welcome describes launch scope without deferred feature promises',
+    (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  WelcomeSlideOne(),
+                  WelcomeSlideTwo(),
+                  WelcomeSlideThree(),
+                  WelcomeSlideFour(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      for (final name in [
+        'Crisis Hub',
+        'Drug Library',
+        'Vasopressors & Infusions',
+        'CE HALO',
+        'Provider Support',
+      ]) {
+        expect(find.text(name), findsOneWidget);
+      }
+      for (final name in [
+        'Regional Anesthesia',
+        'Case Setup',
+        'Board Prep',
+        'Flashcards',
+        'Pathophysiology & Anesthesia Considerations',
+        'Diagnostics',
+        'Luma AI',
+        '778 MEDICATIONS · 23 CATEGORIES',
+      ]) {
+        expect(find.text(name), findsNothing);
+      }
+      expect(find.textContaining('certificates'), findsNothing);
+      expect(
+        find.textContaining('subscription is not required'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   for (final size in [
     const Size(320, 568),
@@ -14,8 +64,9 @@ void main() {
     const Size(820, 1180),
     const Size(1280, 900),
   ]) {
-    testWidgets('welcome introduces searchable pre-op guidance at $size',
-        (tester) async {
+    testWidgets('welcome introduces searchable pre-op guidance at $size', (
+      tester,
+    ) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -29,7 +80,7 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 1500));
       }
-      expect(find.text('Quick References'), findsOneWidget);
+      expect(find.text('Quick References'), findsWidgets);
       final copy = find.text(
         'Tap Quick Ref for searchable, source-linked guidance. Start with Pre-Op Clearance Guidelines, including GLP-1 considerations.',
       );
@@ -40,8 +91,9 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     });
 
-    testWidgets('Quick Ref leaves home footer unobstructed at $size',
-        (tester) async {
+    testWidgets('Quick Ref leaves home footer unobstructed at $size', (
+      tester,
+    ) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -67,7 +119,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       final shortcut = tester.getRect(find.byType(ElevatedButton));
-      for (final label in ['AANA-APPROVED CE', 'REVIEWED BY CLINICIANS']) {
+      for (final label in ['LUMA · Knowledge Illuminated']) {
         expect(shortcut.overlaps(tester.getRect(find.text(label))), isFalse);
       }
       expect(tester.takeException(), isNull);

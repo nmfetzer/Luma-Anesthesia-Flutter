@@ -1,6 +1,7 @@
 // Embedded browser preview only. The mobile app still uses main.dart.
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'config.dart';
 import 'main.dart' show LumaApp;
 
@@ -18,7 +19,7 @@ Future<void> main() async {
       ),
     );
   }
-  runApp(const LumaApp(allowSocialSignIn: false, showDiagnosticsDraft: true));
+  runApp(const LumaApp(allowSocialSignIn: false, showComingSoon: true));
 }
 
 class _PreviewMemoryStorage extends GotrueAsyncStorage {
