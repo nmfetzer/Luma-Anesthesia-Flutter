@@ -158,6 +158,7 @@ class LabValuesScreen extends StatefulWidget {
 class _LabValuesScreenState extends State<LabValuesScreen> {
   final _search = TextEditingController();
   String _group = 'All';
+  bool _urgentOnly = false;
 
   @override
   void dispose() {
@@ -167,7 +168,11 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final entries = searchLabReferences(_search.text, group: _group);
+    final entries = searchLabReferences(
+      _search.text,
+      group: _group,
+      urgentOnly: _urgentOnly,
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lab Values'),
@@ -192,9 +197,11 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                         const _DraftNotice(),
                         const SizedBox(height: 16),
                         const Text(
-                          'Adult reference examples',
+                          'Adult lab interpretation',
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w600),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         const Text(
@@ -205,13 +212,18 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                           label: 'How to interpret reference ranges',
                           url: labResultsGuide,
                         ),
+                        const Text(
+                          'Clinical guidance is grouped separately below each example interval. '
+                          'Urgent findings are selected clinical cautions, not an exhaustive '
+                          'critical-value list. Follow local laboratory alerts and institutional protocols.',
+                        ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: _search,
                           onChanged: (_) => setState(() {}),
                           decoration: InputDecoration(
                             labelText: 'Search lab values',
-                            hintText: 'Potassium, Hb, creatinine…',
+                            hintText: 'Potassium, INR, neuraxial, transfusion…',
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: _search.text.isEmpty
                                 ? null
@@ -224,6 +236,16 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: FilterChip(
+                            label: const Text('Urgent findings'),
+                            selected: _urgentOnly,
+                            onSelected: (value) =>
+                                setState(() => _urgentOnly = value),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
@@ -281,37 +303,29 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                                 CrossAxisAlignment.start,
                             children: [
                               const Divider(),
-                              const Text(
-                                'Example interval, not a treatment threshold.',
-                                style: TextStyle(
+                              Text(
+                                entry.hasExampleInterval
+                                    ? 'Example interval, not a treatment threshold.'
+                                    : 'Assay context, not a universal numeric cutoff.',
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: LumaColors.inkMuted,
                                 ),
                               ),
                               const SizedBox(height: 12),
                               for (final bullet in entry.bullets)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text('•  '),
-                                      Expanded(
-                                        child:
-                                            SelectionArea(child: Text(bullet)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                _LabBullet(bullet),
                               _SourceLink(
-                                label: 'MedlinePlus · Reference interval',
+                                label: entry.intervalLabel,
                                 url: entry.intervalUrl,
                               ),
-                              _SourceLink(
-                                label: 'MedlinePlus · Test interpretation',
-                                url: entry.explanationUrl,
-                              ),
+                              if (entry.explanationUrl != entry.intervalUrl)
+                                _SourceLink(
+                                  label: entry.explanationLabel,
+                                  url: entry.explanationUrl,
+                                ),
+                              for (final section in entry.clinicalSections)
+                                _ClinicalSection(section),
                             ],
                           ),
                         );
@@ -323,6 +337,60 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
             ),
     );
   }
+}
+
+class _LabBullet extends StatelessWidget {
+  const _LabBullet(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('•  '),
+            Expanded(child: SelectionArea(child: Text(text))),
+          ],
+        ),
+      );
+}
+
+class _ClinicalSection extends StatelessWidget {
+  const _ClinicalSection(this.section);
+  final LabClinicalSection section;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: section.urgent ? LumaColors.haloGoldLight : null,
+          border: Border.all(color: LumaColors.inkMuted.withValues(alpha: 0.2)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (section.urgent)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 6),
+                child: Text(
+                  'IMPORTANT CLINICAL CONTEXT',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            Text(
+              section.title,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            for (final bullet in section.bullets) _LabBullet(bullet),
+            _SourceLink(label: section.sourceLabel, url: section.url),
+          ],
+        ),
+      );
 }
 
 class _PreparationScreen extends StatelessWidget {

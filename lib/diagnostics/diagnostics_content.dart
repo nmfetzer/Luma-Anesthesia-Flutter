@@ -1,5 +1,8 @@
-/// Initial Diagnostics content. This is a review draft, not a released library.
-/// Intervals are examples from the linked source, never treatment thresholds.
+// Diagnostics content. This is a review draft, not a released library.
+// Intervals are examples from the linked source, never treatment thresholds.
+import 'lab_clinical_guidance.dart';
+export 'lab_clinical_guidance.dart';
+
 class DiagnosticCategory {
   const DiagnosticCategory(
     this.id,
@@ -17,8 +20,8 @@ const diagnosticCategories = [
   DiagnosticCategory(
     'labs',
     'Lab Values',
-    'Chemistry, renal markers, liver tests, and blood counts.',
-    'CBC BMP CMP sodium potassium hemoglobin platelets electrolytes laboratory',
+    'Lab interpretation, coagulation, and critical abnormalities.',
+    'CBC BMP CMP sodium potassium hemoglobin platelets electrolytes laboratory INR aPTT coagulation fibrinogen troponin lactate',
   ),
   DiagnosticCategory(
     'abg',
@@ -77,6 +80,9 @@ class LabReference {
     this.intervalUrl,
     this.explanationUrl, {
     this.aliases = '',
+    this.intervalLabel = 'MedlinePlus · Reference interval',
+    this.explanationLabel = 'MedlinePlus · Test interpretation',
+    this.hasExampleInterval = true,
   });
   final String id;
   final String title;
@@ -86,6 +92,12 @@ class LabReference {
   final String intervalUrl;
   final String explanationUrl;
   final String aliases;
+  final String intervalLabel;
+  final String explanationLabel;
+  final bool hasExampleInterval;
+  List<LabClinicalSection> get clinicalSections =>
+      labClinicalGuidance[id] ?? const [];
+  bool get hasUrgentContext => clinicalSections.any((s) => s.urgent);
 }
 
 const labResultsGuide =
@@ -327,15 +339,186 @@ const labReferences = [
     _cbcMeaning,
     aliases: 'PLT CBC thrombocytes clotting',
   ),
+  LabReference(
+    'pt-inr',
+    'PT / INR',
+    'Coagulation',
+    'PT: 11–13.5 seconds • INR: 0.8–1.1\nExample without anticoagulant therapy',
+    [
+      'PT assesses part of the clotting system. INR standardizes PT reporting for vitamin K antagonist monitoring.',
+      'A warfarin treatment target is different from a healthy reference interval.',
+    ],
+    'https://medlineplus.gov/ency/article/003652.htm',
+    coagulationLabSource,
+    explanationLabel: 'ARUP Consult · Clotting-time interpretation',
+    aliases: 'prothrombin warfarin clotting neuraxial',
+  ),
+  LabReference(
+    'aptt',
+    'aPTT / PTT',
+    'Coagulation',
+    '25–35 seconds',
+    [
+      'Measures part of the coagulation system and may be used to monitor heparin.',
+      'The example interval is not an unfractionated-heparin treatment target; use the local assay and monitoring protocol.',
+    ],
+    'https://medlineplus.gov/ency/article/003653.htm',
+    coagulationLabSource,
+    explanationLabel: 'ARUP Consult · Clotting-time interpretation',
+    aliases: 'activated partial thromboplastin heparin UFH clotting',
+  ),
+  LabReference(
+    'fibrinogen',
+    'Fibrinogen',
+    'Coagulation',
+    '200–400 mg/dL (2.0–4.0 g/L)',
+    [
+      'Liver-produced protein needed for clot formation.',
+      'Interpret concentration with bleeding, platelet count, other coagulation tests, and serial trends.',
+    ],
+    'https://medlineplus.gov/ency/article/003650.htm',
+    dicLabSource,
+    explanationLabel: 'ARUP Consult · Consumption and DIC',
+    aliases: 'factor I Clauss cryoprecipitate hemorrhage',
+  ),
+  LabReference(
+    'anti-xa',
+    'Anti-Xa / Direct Xa Inhibitor Levels',
+    'Coagulation',
+    'Drug-, assay-, and timing-specific',
+    [
+      'Confirm whether the test is calibrated for heparin or for a specific direct Xa inhibitor.',
+      'Heparin anti-Xa activity and DOAC drug concentrations are not interchangeable results.',
+    ],
+    xaLabSource,
+    asraLabSource,
+    intervalLabel: 'ARUP Consult · Assay context',
+    explanationLabel: 'ASRA · Regional-anesthesia guidance',
+    hasExampleInterval: false,
+    aliases: 'apixaban rivaroxaban edoxaban LMWH heparin DOAC',
+  ),
+  LabReference(
+    'viscoelastic',
+    'Viscoelastic Testing (TEG / ROTEM)',
+    'Coagulation',
+    'Device- and assay-specific intervals',
+    [
+      'Whole-blood clot assessment may complement conventional coagulation tests during major bleeding.',
+      'Interpret within the local validated hemorrhage algorithm.',
+    ],
+    traumaLabSource,
+    traumaLabSource,
+    intervalLabel: 'European trauma guideline · Assay context',
+    explanationLabel: 'European trauma guideline · Interpretation',
+    hasExampleInterval: false,
+    aliases:
+        'thromboelastography rotational thromboelastometry VEM clot strength fibrinolysis',
+  ),
+  LabReference(
+    'd-dimer',
+    'D-dimer',
+    'Coagulation',
+    'Use the local assay cutoff and units',
+    [
+      'Marker of fibrin breakdown; elevation is not specific to a single diagnosis.',
+      'This card covers coagulation-pattern interpretation, not a stand-alone pulmonary embolism rule-out pathway.',
+    ],
+    dicLabSource,
+    dicLabSource,
+    intervalLabel: 'ARUP Consult · Assay context',
+    explanationLabel: 'ARUP Consult · DIC interpretation',
+    hasExampleInterval: false,
+    aliases: 'fibrin degradation DIC thrombosis',
+  ),
+  LabReference(
+    'ionized-calcium',
+    'Ionized Calcium',
+    'Chemistry & Renal',
+    '1.20–1.40 mmol/L (4.8–5.6 mg/dL)',
+    [
+      'Free calcium not attached to proteins.',
+      'Use the local interval; published example intervals differ.',
+    ],
+    'https://medlineplus.gov/ency/article/003486.htm',
+    traumaLabSource,
+    explanationLabel: 'European trauma guideline · Transfusion context',
+    aliases: 'iCa free calcium massive transfusion citrate',
+  ),
+  LabReference(
+    'magnesium',
+    'Magnesium (Mg)',
+    'Chemistry & Renal',
+    '1.7–2.2 mg/dL',
+    [
+      'Only a small proportion of total-body magnesium is measured in serum.',
+      'An apparently normal serum value does not fully describe intracellular stores.',
+    ],
+    'https://medlineplus.gov/ency/article/003487.htm',
+    'https://www.merckmanuals.com/professional/nephrology/electrolyte-disorders/hypomagnesemia',
+    explanationLabel: 'Merck Manual · Hypomagnesemia',
+    aliases: 'Mg2+ electrolyte',
+  ),
+  LabReference(
+    'phosphate',
+    'Phosphate / Phosphorus',
+    'Chemistry & Renal',
+    '2.8–4.5 mg/dL',
+    [
+      'Phosphate is important for nerve signaling and muscle contraction.',
+      'Adult example only; children have a different reference interval.',
+    ],
+    'https://medlineplus.gov/ency/article/003478.htm',
+    'https://www.merckmanuals.com/professional/nephrology/electrolyte-disorders/hypophosphatemia',
+    explanationLabel: 'Merck Manual · Hypophosphatemia',
+    aliases: 'PO4 phosphorus refeeding',
+  ),
+  LabReference(
+    'lactate',
+    'Lactate',
+    'Perfusion & Cardiac Markers',
+    'Use the local specimen-specific interval (mmol/L)',
+    [
+      'Trend in the clinical context rather than using a universal action cutoff.',
+      'The source-linked guidance below concerns major trauma and sepsis.',
+    ],
+    traumaLabSource,
+    sepsisLabSource,
+    intervalLabel: 'European trauma guideline · Lactate context',
+    explanationLabel: 'SCCM · Sepsis interpretation',
+    hasExampleInterval: false,
+    aliases: 'lactic acid shock hypoperfusion',
+  ),
+  LabReference(
+    'troponin',
+    'Cardiac Troponin',
+    'Perfusion & Cardiac Markers',
+    'Assay-specific 99th-percentile upper reference limit',
+    [
+      'Use the reporting laboratory’s troponin assay, units, and upper reference limit.',
+      'An elevated troponin indicates myocardial injury, not automatically infarction.',
+    ],
+    troponinLabSource,
+    troponinLabSource,
+    intervalLabel: 'ACC · Assay-specific definition',
+    explanationLabel: 'ACC · Myocardial injury interpretation',
+    hasExampleInterval: false,
+    aliases: 'hs-cTn cTnI cTnT myocardial injury ischemia',
+  ),
 ];
 
-List<LabReference> searchLabReferences(String query, {String group = 'All'}) {
+List<LabReference> searchLabReferences(
+  String query, {
+  String group = 'All',
+  bool urgentOnly = false,
+}) {
   final words = query.trim().toLowerCase().split(RegExp(r'\s+'));
   return labReferences.where((item) {
     final text =
-        '${item.title} ${item.group} ${item.aliases} ${item.bullets.join(' ')}'
+        '${item.title} ${item.group} ${item.aliases} ${item.bullets.join(' ')} '
+                '${item.clinicalSections.map((s) => '${s.title} ${s.bullets.join(' ')}').join(' ')}'
             .toLowerCase();
-    return (group == 'All' || group == item.group) &&
+    return (!urgentOnly || item.hasUrgentContext) &&
+        (group == 'All' || group == item.group) &&
         words.every(text.contains);
   }).toList();
 }
