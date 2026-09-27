@@ -195,6 +195,18 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                               ),
                             ),
                           ),
+                          if (searching)
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 10),
+                              child: Text(
+                                'Keyword matches may include cautions or related topics. '
+                                'Open the section; a match is not a treatment recommendation.',
+                                style: TextStyle(
+                                  color: LumaColors.inkSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
                           for (final section in sections)
                             Card(
                               child: ListTile(
@@ -443,11 +455,7 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
 }
 
 class _Notice extends StatelessWidget {
-  const _Notice({
-    required this.text,
-    this.action,
-    this.onAction,
-  });
+  const _Notice({required this.text, this.action, this.onAction});
   final String text;
   final String? action;
   final VoidCallback? onAction;

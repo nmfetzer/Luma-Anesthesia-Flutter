@@ -3,8 +3,9 @@
 // This does not publish content or change the database.
 import fs from 'node:fs';
 import path from 'node:path';
+import {finalizeRows} from './quick_reference_release.mjs';
 
-const source = fs.readFileSync(process.argv[2], 'utf8');
+const source = fs.readFileSync(process.argv[2] ?? 'supabase/seeds/preop_quick_reference.md', 'utf8');
 const definitions = [
   ['clearance-visit', 'When a separate medical clearance visit may not be needed',
     'When a separate clearance visit may not be needed',
@@ -55,6 +56,8 @@ const rows = definitions.map(([slug, heading, title, keywords], index) => {
     sort_order: index, is_published: true, body, version: '2026-09-27',
   };
 });
+finalizeRows(rows);
+export {rows};
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 let sql = 'begin;\n\n';
 for (const row of rows) {

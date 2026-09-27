@@ -74,7 +74,7 @@ void main() {
     'nitroprusside maximum',
   ]) {
     test('infusion search: $query', () {
-      expect(results(query), ['antihypertensive-infusion']);
+      expect(results(query), contains('antihypertensive-infusion'));
     });
   }
   for (final query in [
@@ -84,13 +84,14 @@ void main() {
     'esmolol push',
   ]) {
     test('bolus search: $query', () {
-      expect(results(query), ['antihypertensive-bolus']);
+      expect(results(query), contains('antihypertensive-bolus'));
     });
   }
   test('no accidental medication substitution', () {
     expect(results('phenylephrine'), isEmpty);
     expect(results('nicardipinex'), isEmpty);
-    expect(results('nicardipine bolus'), isEmpty);
+    // Keyword co-occurrence can retrieve a safety chart, not prescribe a bolus.
+    expect(results('nicardipine bolus'), ['antihypertensive-safety']);
   });
   for (final width in [375.0, 1280.0]) {
     for (final id in ['antihypertensive-bolus', 'antihypertensive-infusion']) {

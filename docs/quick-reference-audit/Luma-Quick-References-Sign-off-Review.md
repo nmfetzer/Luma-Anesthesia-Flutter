@@ -1,0 +1,109 @@
+# Luma Anesthesia Quick References: Sign-off Review
+
+Review date: September 27, 2026. The entire published library was reviewed: **24 guides containing 59 sections**, not a sample. Verified corrections were applied to 16 sections; the complete clinical review copy reflects the content read back from Supabase after those updates.
+
+## Bottom line
+
+The library is ready for your clinical editorial review and sign-off, with the local-policy choices below made explicit. The audit found and corrected safety wording, missing administration details, cross-guide inconsistencies and source-quality gaps; it is not independent physician/pharmacist certification, institutional protocol approval, or a claim that a short reference replaces a complete emergency algorithm.
+
+No additional source-supported dosing discrepancy was identified within the reviewed content after these corrections. That conclusion is limited to the material and sources reviewed; patient-specific prescribing, exact product formulations, institutional concentrations, device-model instructions and future guideline changes still require clinical verification.
+
+## Corrections completed
+
+| Area | What changed and why |
+|---|---|
+| Metformin across pre-op guides | Both locations now explicitly distinguish AHA/ACC permission to continue from ADA's day-of-procedure hold recommendation, and direct users to the adopted institutional diabetes plan. This removes an unexplained contradiction without falsely claiming that the guidelines say the same thing ([AHA/ACC slide set](https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2024/2024-Guideline-for-Perioperative-Cardiovascular-Management-slide-set.pdf?sc_lang=en); [ADA 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC12690180/)). |
+| Pre-op documentation | Added direct supporting links and clearly labeled the documentation prompts as editorial synthesis, not a quoted or validated “clearance checklist” ([AHA/ACC guideline](https://www.ahajournals.org/doi/10.1161/CIR.0000000000001285); [ASA standards](https://www.asahq.org/~/media/Sites/ASAHQ/Files/Public/Resources/standards-guidelines/basic-standards-for-preanesthesia-care.pdf)). |
+| Labetalol timing | Removed an internally conflicting onset statement while retaining the labeled peak-effect description and distinguishing small perioperative boluses from the severe-hypertension label regimen ([labetalol label](https://labeling.pfizer.com/ShowLabeling.aspx?id=4492)). |
+| WPW language outside the WPW guide | Removed shorthand that could imply the same drug rule applies to every WPW rhythm. The beta-blocker and routine AF charts now specifically identify pre-excited AF and direct users to rhythm-based assessment ([AF guideline](https://www.ahajournals.org/doi/10.1161/CIR.0000000000001193); [SVT guideline slide set](https://professional.heart.org/en/science-news/-/media/028ddd505f514ea2b3a4e74bb72e3557.ashx)). |
+| Diltiazem | Added the 15-minute interval before the second bolus, the second bolus's two-minute administration time, labeled infusion-start context, and the warning against concomitant or closely timed IV beta-blockers ([diltiazem label](https://labeling.pfizer.com/ShowLabeling.aspx?id=4408)). |
+| Shockable versus nonshockable rhythms | Replaced the broad “pulseless rhythm” row heading with polymorphic VT/VF/pulseless VT. Explicitly separated sustained polymorphic VT requiring unsynchronized shock from PEA/asystole, which are nonshockable ([2025 cardioversion algorithm](https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-Electrical-Cardioversion-250514.pdf?sc_lang=en); [2025 adult arrest algorithm](https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-CA-250527.pdf?sc_lang=en)). |
+| Dobutamine | Added the labeled low starting infusion rate and distinguished it from the usual titrated range in both the hemodynamic-support and drip charts. Replaced the resident-medication-list dosing citation with the FDA label ([dobutamine label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/020255s025lbl.pdf)). |
+| Enoxaparin reversal | Added the ≥12-hour qualification, clarified incomplete anti-Xa reversal, and prevented the enoxaparin mg-for-mg regimen from being generalized to every LMWH product ([Lovenox label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2021/020164s129lbl.pdf)). |
+| Massive transfusion | Clarified that a 1:1:1 platelet-equivalent ratio does not mean one apheresis platelet pack per RBC unit. The chart now identifies the approximate pooled-unit equivalence and leaves local pack composition to blood bank ([European trauma guideline](https://pmc.ncbi.nlm.nih.gov/articles/PMC9977110/)). |
+| Local anesthetics | Added an explicit additive-toxicity warning for combined agents and doses given by multiple clinicians. Individual maximums must not be treated as independently available when combining drugs ([bupivacaine label](https://labeling.pfizer.com/ShowLabeling.aspx?id=4704)). |
+| LAST | Added post-stabilization observation: two hours after seizure, four to six hours after cardiovascular instability, and individualized observation after arrest ([ASRA checklist](https://asra.com/docs/default-source/guidelines-articles/local-anesthetic-systemic-toxicity-rgb.pdf?sfvrsn=33b348e_2)). |
+| PONV | Made amisulpride administration time apply to both prophylaxis and rescue. Added droperidol's US boxed-warning selection criteria, pre-dose ECG, QTc restrictions and post-treatment monitoring instead of a generic QT caution ([Barhemsys guidance](https://barhemsys.com/dosing-and-administration); [droperidol US label](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=147e033d-d997-4ef6-8bb5-a9ba372590b2)). |
+| Neuromuscular blockers | Replaced secondary intubation-dose citations with manufacturer labeling for rocuronium, vecuronium and cisatracurium; explicitly noted that cisatracurium is not recommended for RSI because of onset time ([rocuronium](https://labeling.pfizer.com/ShowLabeling.aspx?format=PDF&id=4593); [vecuronium](https://labeling.pfizer.com/ShowLabeling.aspx?id=4648); [cisatracurium](https://labeling.pfizer.com/ShowLabeling.aspx?id=15414)). |
+
+## Complete coverage
+
+“Reviewed” means the published text was inspected and compared with its linked evidence for relevant doses, units, route, timing, limitations and cross-guide consistency. It does not mean every possible drug, contraindication, pediatric scenario or institutional variation belongs in this compact library.
+
+| Guide | Sections | Review outcome |
+|---|---:|---|
+| Pre-Op Clearance Guidelines | 12 | Reviewed urgency, risk assessment, testing, PCI/stroke timing, medications, GLP-1 distinctions and documentation; revised metformin/documentation. A separate consultation is not the same as the required preanesthesia assessment, and the guide does not grant automatic age-based or “no prescriptions” exemptions ([AHA/ACC](https://www.ahajournals.org/doi/10.1161/CIR.0000000000001285); [ASA](https://www.asahq.org/~/media/Sites/ASAHQ/Files/Public/Resources/standards-guidelines/basic-standards-for-preanesthesia-care.pdf)). |
+| AICDs & Pacemakers | 12 | Reviewed pacing dependence, ICD versus pacemaker magnet effects, manufacturer exceptions, bipolar/monopolar electrosurgery, monitoring, external shock and restoration/handoff. Exact-device confirmation remains essential ([AHA scientific statement](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)). |
+| Antihypertensive Dosing | 3 | Reviewed bolus/infusion distinctions, unit differences, cumulative limits, delayed effects and contraindications; corrected labetalol timing wording ([labetalol label](https://labeling.pfizer.com/ShowLabeling.aspx?id=4492); [perioperative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC6148691/)). |
+| Hypotension Dosing | 3 | Reviewed pressor selection, push-dose versus infusion context, units/concentrations, labeled versus off-label dosing, extravasation and monitoring; retained indication-specific boundaries ([norepinephrine label](https://www.dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=728734e7-1684-4b37-980c-f1dfd408b436&type=display)). |
+| Beta-Blocker Dosing | 3 | Reviewed boluses, infusions, cumulative doses, airway/conduction cautions and perioperative continuation; made pre-excited AF wording rhythm-specific ([AF guideline](https://www.ahajournals.org/doi/10.1161/CIR.0000000000001193)). |
+| Induction Medications | 1 | Reviewed induction versus sedation context, patient-specific reduction, respiratory/hemodynamic cautions and paralytic adjuncts; strengthened the rocuronium source ([rocuronium label](https://labeling.pfizer.com/ShowLabeling.aspx?format=PDF&id=4593)). |
+| Hemodynamic Support | 1 | Reviewed preload/afterload/inotropy/HR actions and their physiologic limitations; added dobutamine starting-versus-titrated-dose distinction ([dobutamine label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/020255s025lbl.pdf)). |
+| Drip Quick Reference | 2 | Reviewed vasoactive and anesthetic/sedation infusions, dose units, indication context, organ-function cautions and monitoring; strengthened dobutamine dosing/source ([dobutamine label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/020255s025lbl.pdf)). |
+| Normal Hemodynamics | 1 | Reviewed measurement ranges, units, indexed versus non-indexed values and the distinction between reference ranges and patient-specific targets ([pulmonary artery catheter review](https://pmc.ncbi.nlm.nih.gov/articles/PMC7917533/)). |
+| SVT / AFib / Cardioversion | 2 | Reviewed stability, rate-control exclusions, synchronized versus unsynchronized shocks and contemporary energies; revised diltiazem and rhythm safety wording ([AF guideline](https://www.ahajournals.org/doi/10.1161/CIR.0000000000001193); [2025 cardioversion algorithm](https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-Electrical-Cardioversion-250514.pdf?sc_lang=en)). |
+| WPW Syndrome | 2 | Reviewed sinus-rhythm pattern, orthodromic AVRT, antidromic AVRT, pre-excited AF, unstable rhythms, VF/pulseless VT and PEA/asystole; retained procainamide/ibutilide limits and monitoring ([SVT guideline](https://professional.heart.org/en/science-news/-/media/028ddd505f514ea2b3a4e74bb72e3557.ashx); [AF guideline](https://pmc.ncbi.nlm.nih.gov/articles/PMC11104284/)). |
+| Valve Disorders | 1 | Reviewed AS, AR, MS and MR hemodynamic priorities and cautions; retained qualitative rather than universal numeric HR/BP targets ([valvular anesthesia review](https://pmc.ncbi.nlm.nih.gov/articles/PMC5613597/)). |
+| Antibiotic Redosing | 1 | Reviewed doses, interval origin, weight/renal considerations, blood-loss exceptions and allergy caveats; institutional prophylaxis policy still governs agent selection ([Stanford prophylaxis guideline](https://med.stanford.edu/content/dam/sm/bugsanddrugs/documents/clinicalpathways/SHC-Surgical-Prophylaxis-ABX-Guideline.pdf); [ASHP guideline](https://www.ashp.org/surgical-guidelines)). |
+| Anticoagulants & Reversal | 1 | Reviewed emergency versus elective/neuraxial scope, PCC limits, vitamin K, idarucizumab, heparin/LMWH and US andexanet availability; revised LMWH wording ([ACC reversal reference](https://www.acc.org/-/media/Non-Clinical/Images/Tools-and-Practice-Support/Mobile-Resources/ManageAnticoag/B20115-Reversal-Agent-Fact-Sheet.pdf); [FDA Andexxa safety communication](https://www.fda.gov/safety/medical-product-safety-information/update-safety-andexxa-astrazeneca-fda-safety-communication)). |
+| Massive Transfusion | 1 | Reviewed early activation/source control, products, fibrinogen, platelets, calcium, trauma TXA and temperature; clarified platelet equivalence and retained trauma-versus-obstetric limitations ([European trauma guideline](https://pmc.ncbi.nlm.nih.gov/articles/PMC9977110/)). |
+| Opioid Dosing | 1 | Reviewed adult monitored-IV scope, units, titration, renal/hepatic cautions, naloxone and renarcotization. This is not an equianalgesic, PCA or neuraxial chart ([Stanford emergency manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)). |
+| Local Anesthetic Maxima | 2 | Reviewed lower weight-based/absolute ceilings, route restrictions, conversion, lipid rescue and modified resuscitation; added additive toxicity and observation ([Iowa protocols](https://iowaprotocols.medicine.uiowa.edu/protocols/maximum-recommended-doses-and-duration-local-anesthetics); [ASRA](https://asra.com/docs/default-source/guidelines-articles/local-anesthetic-systemic-toxicity-rgb.pdf?sfvrsn=33b348e_2)). |
+| PONV | 1 | Reviewed prophylaxis timing, rescue-class selection, repeat-dose limits and QT risk; strengthened amisulpride timing and droperidol US-label warnings ([2025 consensus summary, UIC 2026](https://dig.pharmacy.uic.edu/faqs/2026-2/may-2026-faqs/what-are-current-recommendations-for-prevention-and-treatment-of-post-operative-nausea-and-vomiting-ponv/); [droperidol label](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=147e033d-d997-4ef6-8bb5-a9ba372590b2)). |
+| Neuromuscular Blockade | 2 | Reviewed intubation versus RSI doses, succinylcholine exclusions, sugammadex depth/weight criteria, neostigmine and quantitative recovery; strengthened three primary labels and cisatracurium RSI caution ([ASA NMB guideline](https://pubs.asahq.org/anesthesiology/article/138/1/13/137379/2023-American-Society-of-Anesthesiologists)). |
+| Bronchospasm | 1 | Reviewed differential diagnosis, inhaled therapy, severe perioperative IV rescue, steroid limitations, ventilation and anaphylaxis separation ([Stanford emergency manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)). |
+| Anaphylaxis | 1 | Reviewed monitored-IV versus IM treatment, concentrations, infusion conversion, fluids, refractory shock and tryptase timing; explicitly retains experienced-clinician/local-protocol scope ([RCUK perioperative algorithm](https://www.resus.org.uk/sites/default/files/2024-01/2526%20AAP%20RCUK%20periop%20anaphylaxis-8C.pdf)). |
+| Pre-Op Glucose | 1 | Reviewed ADA versus ambulatory targets, metabolic decompensation, monitoring, insulin adjustment, SGLT2 and GLP-1 considerations; reconciled metformin with the cardiovascular guide ([ADA 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC12690180/)). |
+| ACLS Medications | 2 | Reviewed adult arrest versus pulse-present regimens, epinephrine concentration, antiarrhythmics, atropine limitations and special-cause exclusions against 2025 algorithms ([2025 AHA adult ALS](https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support/)). |
+| PALS Medications | 2 | Reviewed kg-based doses, maximums, concentrations, shock/cardioversion energies and distinction from neonatal resuscitation against 2025 algorithms ([2025 AHA pediatric arrest algorithm](https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-PALS-CA-250123.pdf?sc_lang=en)). |
+
+## Decisions to acknowledge before clinical sign-off
+
+These are practice-policy choices or product-scope limitations, not unresolved arithmetic corrections. The app now identifies the relevant distinction instead of silently choosing one universal protocol.
+
+- **GLP-1 pathway:** The 2024 multisociety pathway and 2025 SPAQI consensus differ in fasting/dietary recommendations. Confirm that you want both labeled pathways retained, rather than making one the institution-specific default ([multisociety guidance](https://pmc.ncbi.nlm.nih.gov/articles/PMC11666732/); [SPAQI consensus](https://pmc.ncbi.nlm.nih.gov/articles/PMC12597468/)).
+- **Metformin and glucose targets:** Confirm the explicit “follow the adopted institutional plan” approach. ADA and cardiovascular recommendations are not interchangeable, and ambulatory guidance has its own context ([ADA 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC12690180/); [AHA/ACC slide set](https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2024/2024-Guideline-for-Perioperative-Cardiovascular-Management-slide-set.pdf?sc_lang=en)).
+- **Off-label/perioperative regimens:** Retain explicit indication and monitoring context rather than treating every anesthesia bolus as a manufacturer's labeled regimen. Pharmacy/clinical leadership should verify the product concentrations and administration practices they intend to support.
+- **Droperidol:** Confirm retention of the US boxed-warning language alongside the consensus low-dose prophylaxis option; institutional practice does not make the label warning disappear ([droperidol label](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=147e033d-d997-4ef6-8bb5-a9ba372590b2)).
+- **Local protocols and formulations:** MTP packs, antibiotic selection/redosing exceptions, infusion concentrations, reversal availability and device-model magnet responses require local verification. The compact charts intentionally do not substitute for these policies.
+- **Scope boundaries:** Adult content is not pediatric dosing; PALS is not neonatal resuscitation; local-anesthetic infiltration limits are not neuraxial/topical/liposomal instructions. These boundaries are visible in the content and should remain part of the approved product.
+
+## Technical verification
+
+| Check | Result |
+|---|---|
+| Live inventory | 24 guides / 59 published sections; all stable IDs preserved. |
+| Content readback | Every published section's body, version, title, reference, keywords and publication status matched the generated reviewed content. |
+| Controlled update | 16 section bodies updated; keyword metadata expanded in 44 sections. The transaction checked the prior body/version/keywords to avoid overwriting concurrent content edits. No unrelated tables or patient records were changed. |
+| Free access | Database role tests returned all 59 bodies for both guests and authenticated unpaid users. |
+| Draft privacy / write protection | Unpublished test content remained hidden; no client write policies were present. Temporary fixtures were rolled back. |
+| Search | All section titles and guide titles searchable; added body-word coverage to older guides. Tested GLP1, bipolar/AICD, known electrocautery misspellings, metformin, WPW, droperidol/QTc, LAST and other mixed-term searches. |
+| Search safety | Results are section retrieval, not generated medication advice. Multiple related safety sections may match; the interface says to open the section and not treat a match as a recommendation. Arbitrary drug-name typo guessing remains disabled. |
+| Phone layout | All 59 sections rendered at 375 × 812 with normal and 150% text: 118 section/scale checks without Flutter layout exceptions. |
+| Browser spot-check | Actual guest browser navigation checked at 375-pixel phone and 1280-pixel desktop widths, including flexible search, GLP-1, CIED cautery and revised PONV content. Screenshots inspected for wrapping/readability. This was not 118 manual screenshot reviews. |
+| Test suite | 442 tests passed after updates. Earlier single-result assumptions were updated to accept valid related safety-section matches; typo and clinical-content guardrails remain tested. |
+| Static analysis | No errors or warnings; 85 existing informational lint notices remain. They were not expanded into an unrelated app-wide refactor. |
+| Web build | Release preview build completed successfully. Native iOS/Android device builds and App Store submission were not part of this audit. |
+| Sources | 100 unique URLs in the final published content returned substantive source text or targeted extracts. This is retrieval/source review, not a manual tap-test of every link on every device. |
+
+## Limits of this review
+
+- **Independent clinical approval:** This was an AI-assisted source and implementation audit. It does not replace your professional clinical editorial approval or a pharmacist/physician review where required by your governance process.
+- **Source hierarchy:** The library uses society guidelines, regulators/manufacturer labeling, institutional protocols and selected clinical reviews. Some anesthesia dosing context still uses secondary educational references; the source is linked rather than represented as a primary label.
+- **Completeness:** “Whole-library review” means every currently published section was covered. It does not mean the charts include every drug, special population, interaction or complete treatment algorithm.
+- **Future updates:** Sources and formulations can change. Recheck after relevant guideline/label updates, safety communications, medication availability changes and device-manufacturer changes.
+- **Access scope:** Quick References were checked as free. This review did not change or certify premium subscriptions, CE purchases, Luma AI, payment processing or unrelated app modules.
+
+## Owner sign-off record
+
+Complete this after reviewing the corrected library and policy choices. The publication of audit corrections does not record approval on your behalf.
+
+- **Clinical reviewer:** ____________________
+- **Review date:** ____________________
+- **Disposition:** Approve / approve with changes / hold
+- **GLP-1 pathway presentation accepted:** ____________________
+- **Metformin/institutional-plan language accepted:** ____________________
+- **Droperidol and off-label context accepted:** ____________________
+- **Remaining requested edits:** ____________________
+
+The companion “Clinical Sign-off Copy” contains the exact reviewed text of all 59 live sections, with their versions and inline source links. It is the content to review alongside the app, not a substitute for checking how the information is used clinically.

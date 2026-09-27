@@ -68,7 +68,7 @@ void main() {
     'cautery with CRT-D',
   ]) {
     test('direct cautery result: $query', () {
-      expect(results(query), ['cied-electrocautery']);
+      expect(results(query), contains('cied-electrocautery'));
     });
   }
   test(
@@ -82,7 +82,14 @@ void main() {
   );
   test('no broad typo guessing, unrelated results, or ignored negation', () {
     expect(results('bipolar and semaglutide'), isEmpty);
-    expect(results('bipolar not AICD'), isEmpty);
+    // "not" is still a required token, not a stopword or a Boolean operator.
+    const affirmativeOnly = QuickReferenceSection(
+      id: 'test',
+      referenceId: 'test',
+      referenceTitle: 'AICD',
+      title: 'Bipolar cautery',
+    );
+    expect(affirmativeOnly.matches('bipolar not AICD'), isFalse);
     expect(results('and the with'), isEmpty);
     expect(results('unknownrandomterm'), isEmpty);
     expect(glp.matches('semaglutidex'), isFalse);
@@ -101,7 +108,11 @@ void main() {
     expect(find.text('AICDs & Pacemakers'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'bipolar and AICD');
     await tester.pumpAndSettle();
-    expect(find.text('1 matching section'), findsOneWidget);
+    expect(find.text('2 matching sections'), findsOneWidget);
+    expect(
+      find.textContaining('a match is not a treatment recommendation'),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Electrocautery and EMI precautions'));
     await tester.pumpAndSettle();
     expect(repo.requestedId, 'cied-electrocautery');

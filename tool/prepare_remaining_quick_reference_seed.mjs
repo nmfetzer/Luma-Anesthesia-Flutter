@@ -1,6 +1,7 @@
 // Chart-only, source-linked content remains in Supabase. No automatic DB writes.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import {finalizeRows} from './quick_reference_release.mjs';
 
 const source = fs.readFileSync('supabase/seeds/remaining_quick_references.md', 'utf8');
 const slug = value => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -61,6 +62,8 @@ for (const guide of source.split(/^# /m).slice(1)) {
 }
 assert.equal(new Set(rows.map(r => r.reference_id)).size, 19);
 assert.equal(new Set(rows.map(r => r.id)).size, rows.length);
+finalizeRows(rows);
+export {rows};
 const q = s => `'${s.replaceAll("'", "''")}'`;
 let sql = '-- Owner authorized completion of free Quick Reference charts.\nbegin;\n';
 for (const r of rows) {

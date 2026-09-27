@@ -1,6 +1,7 @@
 // Generate server-only clinical bodies and public searchable metadata; no DB writes.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import {finalizeRows} from './quick_reference_release.mjs';
 
 const source = fs.readFileSync('supabase/seeds/beta_blocker_quick_reference.md', 'utf8');
 const definitions = [
@@ -26,6 +27,8 @@ const rows = definitions.map(([slug, title, keywords], index) => {
     sort_order: index, is_published: true, body, version: '2026-09-27',
   };
 });
+finalizeRows(rows);
+export {rows};
 const q = s => `'${s.replaceAll("'", "''")}'`;
 let sql = '-- Authorized adult beta-blocker quick charts.\nbegin;\n';
 for (const row of rows) {
