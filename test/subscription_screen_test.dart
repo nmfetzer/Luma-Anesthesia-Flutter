@@ -144,6 +144,14 @@ void main() {
         find.textContaining('bonus activation are coming soon'),
         findsOneWidget,
       );
+      expect(
+        find.textContaining('Maximum 3 bonus months per account across stores'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('the bundle adds only 2 more months'),
+        findsOneWidget,
+      );
       await tester.ensureVisible(find.text('Explore CE access'));
       await tester.tap(find.text('Explore CE access'));
       await tester.pumpAndSettle();

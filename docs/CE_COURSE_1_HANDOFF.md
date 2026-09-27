@@ -43,9 +43,9 @@ The private provider-side seed is retained under `supabase/seed/course1_content.
 The requested U.S. price is **$249.99**. This is configured as the planned price and displayed as planned, not as a verified live store price. Production checkout must display the localized price returned by the store rather than hard-coding USD.
 
 - **Individual CE purchase:** One complimentary calendar month of Luma clinical access, once per account across stores.
-- **Bundle purchase:** Three complimentary calendar months, once per account across stores.
+- **Bundle purchase:** Three complimentary calendar months total per account across stores, or two additional months if the course month was already awarded.
 - **Repeat purchases and restores:** Do not restart or extend the same benefit.
-- **Timing:** Benefits begin on the original verified purchase date; month-end dates are clamped. Windows overlap rather than adding unused days.
+- **Timing:** The course or bundle-first benefit begins on the original verified purchase date. A two-month bundle upgrade follows any unexpired, unrevoked CE bonus, or begins on the original bundle purchase date if none remains. Month-end dates are clamped in UTC. Lifetime awards, including refunded/expired awards, never exceed three months.
 - **Existing subscriptions:** Remain independent. A CE bonus does not pause billing or reimburse an existing subscription.
 - **Renewal:** The bonus itself does not enroll the learner in an automatically renewing subscription.
 - **Refunds:** Existing server-side revocation removes refunded purchase access without deleting an unrelated paid subscription.

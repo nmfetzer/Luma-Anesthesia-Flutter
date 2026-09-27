@@ -62,10 +62,7 @@ const _tiles = [
 ];
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, this.showComingSoon = false});
-
-  /// Preview-only teasers; the production entry point leaves this false.
-  final bool showComingSoon;
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -149,10 +146,8 @@ class HomeScreen extends StatelessWidget {
                               );
                             },
                           ),
-                          if (showComingSoon) ...[
-                            const SizedBox(height: 24),
-                            const _ComingSoonPanel(),
-                          ],
+                          const SizedBox(height: 24),
+                          const _ComingSoonPanel(),
                         ],
                       ),
                     ),
@@ -271,7 +266,7 @@ class _ComingSoonPanel extends StatelessWidget {
             ),
         const SizedBox(height: 12),
         const Text(
-          'Private preview only. This panel is omitted from the store build.',
+          'You’ll be notified in the app when new features and updates are available.',
           style: TextStyle(fontSize: 12, height: 1.5, color: Color(0xFFCCD3DB)),
         ),
       ],
