@@ -7,10 +7,17 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'subscription_billing.dart';
+import 'ce_billing.dart';
 
 class RevenueCatConfig {
   static const enabled = bool.fromEnvironment('LUMA_BILLING_ENABLED');
-  static const appleKey = String.fromEnvironment('REVENUECAT_APPLE_PUBLIC_KEY');
+  static const ceEnabled = bool.fromEnvironment('LUMA_CE_BILLING_ENABLED');
+  // App-specific PUBLIC SDK key supplied by the owner. Never put an sk_ key here.
+  // Build-time overrides remain available; both purchasing flags stay false.
+  static const appleKey = String.fromEnvironment(
+    'REVENUECAT_APPLE_PUBLIC_KEY',
+    defaultValue: 'appl_bqeLOaQfDuVqgyasScLybjHoRTT',
+  );
   static const googleKey = String.fromEnvironment(
     'REVENUECAT_GOOGLE_PUBLIC_KEY',
   );
@@ -86,12 +93,100 @@ class LumaBilling with WidgetsBindingObserver {
   }
 }
 
-class RevenueCatGateway implements BillingGateway {
+class RevenueCatGateway implements BillingGateway, CeBillingGateway {
   RevenueCatGateway(this.client, this.key, this.platform);
   final SupabaseClient client;
   final String key;
   final TargetPlatform platform;
   final Map<String, Package> _packages = {};
+  final Map<String, Package> _cePackages = {};
+  @override
+  bool get ceSupported =>
+      RevenueCatConfig.ceEnabled && platform == TargetPlatform.iOS;
+
+  @override
+  Future<List<CeStoreProduct>> ceProducts() async {
+    _cePackages.clear();
+    if (!RevenueCatConfig.ceEnabled || platform != TargetPlatform.iOS) {
+      return [];
+    }
+    final offering = (await Purchases.getOfferings()).all['crna_courses'];
+    final result = <CeStoreProduct>[];
+    for (final package in offering?.availablePackages ?? <Package>[]) {
+      final product = package.storeProduct;
+      if (!CeProduct.accepts(product.identifier) ||
+          product.subscriptionPeriod != null ||
+          _cePackages.containsKey(product.identifier)) {
+        continue;
+      }
+      _cePackages[product.identifier] = package;
+      result.add(CeStoreProduct(product.identifier, product.priceString));
+    }
+    return result;
+  }
+
+  @override
+  Future<CePurchaseStatus> ceStatus(String expectedUser) async {
+    if (userId != expectedUser) throw StateError('CE account changed');
+    final raw = await client.rpc('luma_ce_checkout_status');
+    if (raw is! Map ||
+        raw['user_id'] != expectedUser ||
+        raw['products'] is! List ||
+        userId != expectedUser) {
+      throw StateError('Invalid CE verification');
+    }
+    final enabled = <String>{};
+    final owned = <String>{};
+    for (final item in raw['products'] as List) {
+      if (item is! Map ||
+          item['product_id'] is! String ||
+          item['enabled'] is! bool ||
+          item['owned'] is! bool) {
+        throw StateError('Invalid CE product');
+      }
+      final id = item['product_id'] as String;
+      if (!CeProduct.accepts(id)) continue;
+      if (RevenueCatConfig.ceEnabled &&
+          platform == TargetPlatform.iOS &&
+          item['enabled'] == true) {
+        enabled.add(id);
+      }
+      if (item['owned'] == true) owned.add(id);
+    }
+    return CePurchaseStatus(
+      userId: expectedUser,
+      enabled: enabled,
+      owned: owned,
+    );
+  }
+
+  @override
+  Future<void> purchaseCe(CeStoreProduct product) => _storeAction(() async {
+    final expected = userId;
+    await _requireCurrentIdentity();
+    final package = _cePackages[product.id];
+    if (!RevenueCatConfig.ceEnabled ||
+        platform != TargetPlatform.iOS ||
+        package == null ||
+        !CeProduct.accepts(product.id)) {
+      throw const BillingFailure('This CE purchase is not available.');
+    }
+    // Avoid opening another sheet while a prior successful store transaction
+    // awaits the webhook. Client history never grants course access.
+    final info = await Purchases.getCustomerInfo();
+    if (expected != userId) {
+      throw const BillingFailure('Your account changed. Refresh CE access.');
+    }
+    if (info.nonSubscriptionTransactions.any(
+      (t) => t.productIdentifier == product.id,
+    )) {
+      throw const BillingFailure(
+        'Apple already reports this purchase. Use Restore CE purchases or '
+        'Refresh CE access. If access remains unavailable, contact info@cehalo.com.',
+      );
+    }
+    await Purchases.purchase(PurchaseParams.package(package));
+  });
   @override
   String? get userId {
     final user = client.auth.currentUser;
@@ -139,6 +234,7 @@ class RevenueCatGateway implements BillingGateway {
 
   @override
   Future<void> purchase(BillingPlan plan) => _storeAction(() async {
+    final expected = userId;
     await _requireCurrentIdentity();
     final package = _packages[plan.productId];
     if (package == null ||
@@ -149,6 +245,9 @@ class RevenueCatGateway implements BillingGateway {
     }
     // Existing subscriptions are managed through the store, not a second purchase.
     final info = await Purchases.getCustomerInfo();
+    if (expected != userId) {
+      throw const BillingFailure('Your account changed. Refresh access.');
+    }
     if (info.entitlements.active.containsKey(RevenueCatConfig.entitlement)) {
       throw const BillingFailure(
         'You already have an active subscription. '

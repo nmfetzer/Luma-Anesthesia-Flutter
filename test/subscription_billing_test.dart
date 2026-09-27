@@ -55,6 +55,9 @@ void main() {
   test('billing disabled by default and no real prices invented', () {
     final c = SubscriptionBilling();
     expect(RevenueCatConfig.enabled, false);
+    expect(RevenueCatConfig.ceEnabled, false);
+    expect(RevenueCatConfig.appleKey.startsWith('appl_'), true);
+    expect(RevenueCatConfig.appleKey.startsWith('sk_'), false);
     expect(c.canPurchase, false);
     expect(c.plan(SubscriptionTerm.annual), null);
   });

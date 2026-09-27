@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true },
+  "tasks": { "test": "deno test validation_test.ts handler_test.ts" }
+}
