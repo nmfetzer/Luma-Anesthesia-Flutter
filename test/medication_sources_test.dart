@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,8 +45,12 @@ void main() {
     'id': 'test',
     'name': 'Source fixture',
     'sources': [
-      jsonEncode(
-          {'number': 1, 'tier': 1, 'citation': 'Direct label', 'url': url}),
+      jsonEncode({
+        'number': 1,
+        'tier': 1,
+        'citation': 'Direct label',
+        'url': url,
+      }),
     ],
   };
   late RecordingLauncher launcher;
@@ -67,6 +72,32 @@ void main() {
     launcher = RecordingLauncher();
     UrlLauncherPlatform.instance = launcher;
   });
+
+  testWidgets(
+    'drug fields render Markdown and do not label an absent boxed warning as present',
+    (t) async {
+      final med = Medication.fromJson({
+        ...row,
+        'black_box_warning':
+            'No FDA boxed warning. Follow product precautions.',
+        'adult_dose':
+            '**Protocol heading**\n\n- Verify institutional protocol.',
+      });
+      await t.pumpWidget(
+        MaterialApp(home: drug_library.DrugDetailScreen(medication: med)),
+      );
+      await t.pumpAndSettle();
+      expect(find.text('FDA BOXED WARNING'), findsNothing);
+      expect(find.text('WARNINGS & PRECAUTIONS'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is MarkdownBody && w.data == med.adultDose,
+        ),
+        findsOneWidget,
+      );
+      expect(t.takeException(), isNull);
+    },
+  );
 
   test('imported JSON source strings and numeric tiers survive parsing', () {
     final med = Medication.fromJson(row);
@@ -96,46 +127,54 @@ void main() {
       '/relative',
       'https:',
       'javascript:alert(1)',
-      'file:///tmp/a'
+      'file:///tmp/a',
     ]) {
       expect(ClinicalSourceLink.validUri(invalid), isNull);
     }
     expect(ClinicalSourceLink.validUri(url)?.host, 'dailymed.nlm.nih.gov');
   });
 
-  testWidgets('authorized Deep Dive links use the same safe external launcher',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: MedicationDeepDive(
-          medicationId: 'test',
-          load: () async => {
-            'allowed': true,
-            'body': '## References\n[Human prescribing information]($url)',
-          },
+  testWidgets(
+    'authorized Deep Dive links use the same safe external launcher',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MedicationDeepDive(
+              medicationId: 'test',
+              load: () async => {
+                'allowed': true,
+                'body': '## References\n[Human prescribing information]($url)',
+              },
+            ),
+          ),
         ),
-      ),
-    ));
-    expect(find.byType(MarkdownBody), findsNothing);
-    await tester.tap(find.text('Open Deep Dive'));
-    await tester.pumpAndSettle();
-    final markdown = tester.widget<MarkdownBody>(find.byType(MarkdownBody));
-    markdown.onTapLink!('Human prescribing information', url, '');
-    await tester.pumpAndSettle();
-    expect(launcher.lastUrl, url);
-    expect(launcher.lastOptions?.webOnlyWindowName, '_blank');
-    expect(tester.takeException(), isNull);
-  });
+      );
+      expect(find.byType(MarkdownBody), findsNothing);
+      await tester.tap(find.text('Open Deep Dive'));
+      await tester.pumpAndSettle();
+      final markdown = tester.widget<MarkdownBody>(find.byType(MarkdownBody));
+      markdown.onTapLink!('Human prescribing information', url, '');
+      await tester.pumpAndSettle();
+      expect(launcher.lastUrl, url);
+      expect(launcher.lastOptions?.webOnlyWindowName, '_blank');
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   for (final route in ['library', 'vasopressors']) {
-    testWidgets('$route renders imported citation and opens its exact URL',
-        (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: route == 'library'
-            ? drug_library.DrugDetailScreen(
-                medication: Medication.fromJson(row))
-            : vaso.DrugDetailScreen(drug: row),
-      ));
+    testWidgets('$route renders imported citation and opens its exact URL', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: route == 'library'
+              ? drug_library.DrugDetailScreen(
+                  medication: Medication.fromJson(row),
+                )
+              : vaso.DrugDetailScreen(drug: row),
+        ),
+      );
       await tester.pumpAndSettle();
       if (route == 'library') {
         await tester.scrollUntilVisible(find.text('Sources'), 300);
@@ -153,14 +192,18 @@ void main() {
   }
 
   for (final throws in [false, true]) {
-    testWidgets('failed source launch gives feedback, exception=$throws',
-        (tester) async {
+    testWidgets('failed source launch gives feedback, exception=$throws', (
+      tester,
+    ) async {
       launcher.fail = true;
       launcher.throwError = throws;
-      await tester.pumpWidget(const MaterialApp(
-        home:
-            Scaffold(body: ClinicalSourceLink(url: url, child: Text('Label'))),
-      ));
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ClinicalSourceLink(url: url, child: Text('Label')),
+          ),
+        ),
+      );
       await tester.tap(find.text('Label'));
       await tester.pump();
       expect(find.text('Could not open $url'), findsOneWidget);

@@ -10,7 +10,9 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
 import '../widgets/luma_home_button.dart';
+import '../widgets/reference_load_error.dart';
 
 import '../data/medication_repository.dart';
 import '../models/medication.dart';
@@ -35,10 +37,12 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _future = widget.category == null
-        ? MedicationRepository.instance.all()
-        : MedicationRepository.instance.inCategory(widget.category!);
+    _future = _load();
   }
+
+  Future<List<Medication>> _load() => widget.category == null
+      ? MedicationRepository.instance.all()
+      : MedicationRepository.instance.inCategory(widget.category!);
 
   @override
   void dispose() {
@@ -57,12 +61,21 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Drug Category',
-            style: lumaBody(size: 14, weight: FontWeight.w500)),
+        title: Text(
+          'Drug Category',
+          style: lumaBody(size: 14, weight: FontWeight.w500),
+        ),
       ),
       body: FutureBuilder<List<Medication>>(
         future: _future,
         builder: (context, snap) {
+          if (snap.hasError) {
+            return ReferenceLoadError(
+              onRetry: () => setState(() {
+                _future = _load();
+              }),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -70,15 +83,21 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           final filtered = _query.isEmpty
               ? all
               : all
-                  .where((m) =>
-                      m.name.toLowerCase().contains(_query.toLowerCase()) ||
-                      (m.brandName?.toLowerCase().contains(_query.toLowerCase()) ??
-                          false))
-                  .toList();
+                    .where(
+                      (m) =>
+                          m.name.toLowerCase().contains(_query.toLowerCase()) ||
+                          (m.brandName?.toLowerCase().contains(
+                                _query.toLowerCase(),
+                              ) ??
+                              false),
+                    )
+                    .toList();
 
           final grouped = <String, List<Medication>>{};
           for (final m in filtered) {
-            final letter = m.name.substring(0, 1).toUpperCase();
+            final letter = m.name.trim().isEmpty
+                ? '#'
+                : m.name.trim().substring(0, 1).toUpperCase();
             grouped.putIfAbsent(letter, () => []).add(m);
           }
           final activeLetters = grouped.keys.toSet();
@@ -92,10 +111,16 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
               CustomScrollView(
                 controller: _scroll,
                 slivers: [
-                  SliverToBoxAdapter(child: _Header(title: title, count: all.length)),
-                  SliverToBoxAdapter(child: _SearchField(onChanged: (v) {
-                    setState(() => _query = v);
-                  })),
+                  SliverToBoxAdapter(
+                    child: _Header(title: title, count: all.length),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _SearchField(
+                      onChanged: (v) {
+                        setState(() => _query = v);
+                      },
+                    ),
+                  ),
                   for (final letter in grouped.keys.toList()..sort())
                     SliverToBoxAdapter(
                       key: _letterKeys[letter],
@@ -111,10 +136,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                 right: 4,
                 top: 140,
                 bottom: 20,
-                child: _AlphaRail(
-                  activeLetters: activeLetters,
-                  onTap: _jumpTo,
-                ),
+                child: _AlphaRail(activeLetters: activeLetters, onTap: _jumpTo),
               ),
             ],
           );
@@ -149,8 +171,10 @@ class _Header extends StatelessWidget {
         children: [
           Text(title, style: lumaDisplay(size: 26, weight: FontWeight.w600)),
           const SizedBox(height: 6),
-          Text('$count drugs',
-              style: lumaMono(size: 13, color: LumaColors.inkMuted)),
+          Text(
+            '$count drugs',
+            style: lumaMono(size: 13, color: LumaColors.inkMuted),
+          ),
         ],
       ),
     );
@@ -206,12 +230,14 @@ class _LetterGroup extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
-          child: Text(letter,
-              style: lumaMono(
-                size: 12,
-                weight: FontWeight.w500,
-                color: LumaColors.inkMuted,
-              )),
+          child: Text(
+            letter,
+            style: lumaMono(
+              size: 12,
+              weight: FontWeight.w500,
+              color: LumaColors.inkMuted,
+            ),
+          ),
         ),
         for (final m in meds) _DrugRow(med: m),
       ],
@@ -237,43 +263,45 @@ class _DrugRow extends StatelessWidget {
           ),
         ),
         child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: lumaDisplay(size: 16, weight: FontWeight.w600),
-                    children: [
-                      TextSpan(text: med.name),
-                      if (med.brandName != null)
-                        TextSpan(
-                          text: '  (${med.brandName})',
-                          style: lumaBody(
-                            size: 13,
-                            weight: FontWeight.w400,
-                            color: LumaColors.inkMuted,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: lumaDisplay(size: 16, weight: FontWeight.w600),
+                      children: [
+                        TextSpan(text: med.name),
+                        if (med.brandName != null)
+                          TextSpan(
+                            text: '  (${med.brandName})',
+                            style: lumaBody(
+                              size: 13,
+                              weight: FontWeight.w400,
+                              color: LumaColors.inkMuted,
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (med.classShort != null) ...[
-                  const SizedBox(height: 3),
-                  Text(med.classShort!,
-                      style: lumaBody(size: 13, color: LumaColors.inkSecondary)),
+                  if (med.classShort != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      med.classShort!,
+                      style: lumaBody(size: 13, color: LumaColors.inkSecondary),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          if (med.highAlert) _FlagChip('HA', LumaColors.highAlert),
-          if (med.isScheduled) ...[
-            const SizedBox(width: 6),
-            _FlagChip(med.deaLabel, LumaColors.caution),
+            if (med.highAlert) _FlagChip('HA', LumaColors.highAlert),
+            if (med.isScheduled) ...[
+              const SizedBox(width: 6),
+              _FlagChip(med.deaLabel, LumaColors.caution),
+            ],
           ],
-        ],
-      ),
+        ),
       ),
     );
   }
@@ -292,8 +320,10 @@ class _FlagChip extends StatelessWidget {
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(label,
-          style: lumaMono(size: 10, weight: FontWeight.w600, color: color)),
+      child: Text(
+        label,
+        style: lumaMono(size: 10, weight: FontWeight.w600, color: color),
+      ),
     );
   }
 }
@@ -304,8 +334,32 @@ class _AlphaRail extends StatelessWidget {
   const _AlphaRail({required this.activeLetters, required this.onTap});
 
   static const _letters = [
-    'A','B','C','D','E','F','G','H','I','J','K','L','M',
-    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
   ];
 
   @override
@@ -320,14 +374,16 @@ class _AlphaRail extends StatelessWidget {
               child: GestureDetector(
                 onTap: activeLetters.contains(l) ? () => onTap(l) : null,
                 child: Center(
-                  child: Text(l,
-                      style: lumaMono(
-                        size: 10,
-                        weight: FontWeight.w500,
-                        color: activeLetters.contains(l)
-                            ? LumaColors.haloGold
-                            : LumaColors.inkMuted.withValues(alpha: 0.35),
-                      )),
+                  child: Text(
+                    l,
+                    style: lumaMono(
+                      size: 10,
+                      weight: FontWeight.w500,
+                      color: activeLetters.contains(l)
+                          ? LumaColors.haloGold
+                          : LumaColors.inkMuted.withValues(alpha: 0.35),
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -253,6 +253,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final email = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: const Text('Reset your password'),
         content: Form(
           key: key,

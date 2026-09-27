@@ -16,6 +16,8 @@ import '../data/medication_repository.dart';
 import '../models/medication.dart';
 import '../theme/luma_theme.dart';
 import '../widgets/luma_app_bar.dart';
+import '../home/home_menu_drawer.dart';
+import '../widgets/reference_load_error.dart';
 import 'category_detail_screen.dart';
 import 'drug_detail_screen.dart';
 
@@ -82,9 +84,17 @@ class _DrugsCategoriesScreenState extends State<DrugsCategoriesScreen> {
     return Scaffold(
       backgroundColor: LumaColors.cream,
       appBar: const LumaAppBar(title: 'Luma Anesthesia'),
+      drawer: const HomeMenuDrawer(),
       body: FutureBuilder<_LibraryData>(
         future: _future,
         builder: (context, snap) {
+          if (snap.hasError) {
+            return ReferenceLoadError(
+              onRetry: () => setState(() {
+                _future = _loadLibrary();
+              }),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -117,19 +127,19 @@ class _DrugsCategoriesScreenState extends State<DrugsCategoriesScreen> {
 
   Widget _buildSearchResults(List<Medication> allMeds) {
     final q = _query.trim().toLowerCase();
-    final matches = allMeds.where((m) {
-      if (m.name.toLowerCase().contains(q)) return true;
-      if (m.brandName?.toLowerCase().contains(q) ?? false) return true;
-      if (m.classShort?.toLowerCase().contains(q) ?? false) return true;
-      return false;
-    }).toList()
-      ..sort((a, b) {
-        // Prefer name matches at start
-        final aStarts = a.name.toLowerCase().startsWith(q);
-        final bStarts = b.name.toLowerCase().startsWith(q);
-        if (aStarts != bStarts) return aStarts ? -1 : 1;
-        return a.name.compareTo(b.name);
-      });
+    final matches =
+        allMeds.where((m) {
+          if (m.name.toLowerCase().contains(q)) return true;
+          if (m.brandName?.toLowerCase().contains(q) ?? false) return true;
+          if (m.classShort?.toLowerCase().contains(q) ?? false) return true;
+          return false;
+        }).toList()..sort((a, b) {
+          // Prefer name matches at start
+          final aStarts = a.name.toLowerCase().startsWith(q);
+          final bStarts = b.name.toLowerCase().startsWith(q);
+          if (aStarts != bStarts) return aStarts ? -1 : 1;
+          return a.name.compareTo(b.name);
+        });
 
     if (matches.isEmpty) {
       return SliverToBoxAdapter(
@@ -139,11 +149,15 @@ class _DrugsCategoriesScreenState extends State<DrugsCategoriesScreen> {
             children: [
               Icon(Icons.search_off, size: 40, color: LumaColors.inkMuted),
               const SizedBox(height: 12),
-              Text('No matches for "$_query"',
-                  style: lumaBody(size: 15, color: LumaColors.inkSecondary)),
+              Text(
+                'No matches for "$_query"',
+                style: lumaBody(size: 15, color: LumaColors.inkSecondary),
+              ),
               const SizedBox(height: 4),
-              Text('Try a different name or brand',
-                  style: lumaBody(size: 13, color: LumaColors.inkMuted)),
+              Text(
+                'Try a different name or brand',
+                style: lumaBody(size: 13, color: LumaColors.inkMuted),
+              ),
             ],
           ),
         ),
@@ -168,50 +182,58 @@ class _DrugsCategoriesScreenState extends State<DrugsCategoriesScreen> {
     );
   }
 
-  Widget _buildCategoryList(Map<String, List<Medication>> byCat, int totalCount) {
+  Widget _buildCategoryList(
+    Map<String, List<Medication>> byCat,
+    int totalCount,
+  ) {
     // Build items in canonical order.
     final items = <_CategoryListItem>[];
     // "All Medications" first
-    items.add(_CategoryListItem(
-      title: 'All Medications',
-      count: totalCount,
-      isBold: true,
-      onTap: () => _openAll(context),
-    ));
+    items.add(
+      _CategoryListItem(
+        title: 'All Medications',
+        count: totalCount,
+        isBold: true,
+        onTap: () => _openAll(context),
+      ),
+    );
     // Then the canonical list
     for (int i = 0; i < kLumaCategoryOrder.length; i++) {
       final name = kLumaCategoryOrder[i];
       final drugs = byCat[name] ?? [];
       final isBold = i < kPrioritySectionCount;
-      items.add(_CategoryListItem(
-        title: name,
-        count: drugs.length,
-        isBold: isBold,
-        onTap: drugs.isEmpty
-            ? null
-            : () => Navigator.of(context).push(
+      items.add(
+        _CategoryListItem(
+          title: name,
+          count: drugs.length,
+          isBold: isBold,
+          onTap: drugs.isEmpty
+              ? null
+              : () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => CategoryDetailScreen(category: name),
                   ),
                 ),
-      ));
+        ),
+      );
     }
     // Any drugs in categories NOT in the canonical list (safety net — should be empty)
-    final orphanCats = byCat.keys
-        .where((c) => !kLumaCategoryOrder.contains(c))
-        .toList()
-      ..sort();
+    final orphanCats =
+        byCat.keys.where((c) => !kLumaCategoryOrder.contains(c)).toList()
+          ..sort();
     for (final name in orphanCats) {
-      items.add(_CategoryListItem(
-        title: name,
-        count: byCat[name]!.length,
-        isBold: false,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => CategoryDetailScreen(category: name),
+      items.add(
+        _CategoryListItem(
+          title: name,
+          count: byCat[name]!.length,
+          isBold: false,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => CategoryDetailScreen(category: name),
+            ),
           ),
         ),
-      ));
+      );
     }
 
     return SliverList.builder(
@@ -329,8 +351,10 @@ class _Breadcrumb extends StatelessWidget {
         children: [
           Icon(Icons.home_outlined, size: 15, color: LumaColors.inkMuted),
           const SizedBox(width: 6),
-          Text('Drugs',
-              style: lumaBody(size: 13, color: LumaColors.inkSecondary)),
+          Text(
+            'Drugs',
+            style: lumaBody(size: 13, color: LumaColors.inkSecondary),
+          ),
         ],
       ),
     );
@@ -441,17 +465,19 @@ class _SearchResultRow extends StatelessWidget {
             ),
             if (med.highAlert)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: LumaColors.highAlert.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text('HA',
-                    style: lumaMono(
-                        size: 10,
-                        weight: FontWeight.w600,
-                        color: LumaColors.highAlert)),
+                child: Text(
+                  'HA',
+                  style: lumaMono(
+                    size: 10,
+                    weight: FontWeight.w600,
+                    color: LumaColors.highAlert,
+                  ),
+                ),
               ),
           ],
         ),

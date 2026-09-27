@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------
 
 import 'dart:convert';
+
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -24,13 +25,21 @@ class MedicationRepository {
     if (_cache != null) return _cache!;
 
     if (LumaConfig.supabaseConfigured) {
-      final rows = await Supabase.instance.client
-          .from('medication')
-          .select(medicationPublicFields)
-          .order('name');
-      _cache = (rows as List)
-          .map((r) => Medication.fromJson(r as Map<String, dynamic>))
-          .toList();
+      final medications = <Medication>[];
+      const pageSize = 200;
+      for (var offset = 0; ; offset += pageSize) {
+        final rows = await Supabase.instance.client
+            .from('medication')
+            .select(medicationPublicFields)
+            .order('name')
+            .order('id')
+            .range(offset, offset + pageSize - 1)
+            .timeout(const Duration(seconds: 15));
+        medications.addAll(rows.map(Medication.fromJson));
+        if (rows.length < pageSize) break;
+      }
+      // Commit only a complete result, never a partial page after a failure.
+      _cache = medications;
     } else {
       final raw = await rootBundle.loadString('assets/data/medications.json');
       final list = jsonDecode(raw) as List;
@@ -66,8 +75,11 @@ class MedicationRepository {
   Future<List<Medication>> inCategory(String category) async {
     final meds = await all();
     final list = meds
-        .where((m) =>
-            m.category == category || m.secondaryCategories.contains(category))
+        .where(
+          (m) =>
+              m.category == category ||
+              m.secondaryCategories.contains(category),
+        )
         .toList();
     list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return list;

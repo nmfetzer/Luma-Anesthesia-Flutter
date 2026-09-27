@@ -92,7 +92,11 @@ class SupabaseAccountAccess implements AccountAccess, PasswordRecoveryAccess {
     required bool create,
   }) async {
     final result = create
-        ? await client.auth.signUp(email: email, password: password)
+        ? await client.auth.signUp(
+            email: email,
+            password: password,
+            emailRedirectTo: accountAuthRedirect(isWeb: kIsWeb, base: Uri.base),
+          )
         : await client.auth.signInWithPassword(
             email: email,
             password: password,

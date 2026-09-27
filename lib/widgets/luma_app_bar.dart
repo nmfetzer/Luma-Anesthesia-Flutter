@@ -3,13 +3,13 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+
 import '../theme/luma_theme.dart';
 import 'luma_home_button.dart';
 
 class LumaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final String initials;
-  const LumaAppBar({super.key, required this.title, this.initials = 'NF'});
+  const LumaAppBar({super.key, required this.title});
 
   @override
   Size get preferredSize => const Size.fromHeight(52);
@@ -19,29 +19,33 @@ class LumaAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       toolbarHeight: 52,
       leadingWidth: 48,
-      leading: IconButton(
-        icon: const Icon(Icons.menu, size: 20),
-        onPressed: () {},
-      ),
+      leading: Scaffold.of(context).hasDrawer
+          ? IconButton(
+              icon: const Icon(Icons.menu, size: 20),
+              tooltip: 'Menu',
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            )
+          : BackButton(
+              onPressed: () {
+                final navigator = Navigator.of(context);
+                if (navigator.canPop()) {
+                  navigator.pop();
+                } else {
+                  navigator.pushReplacementNamed('/home');
+                }
+              },
+            ),
       automaticallyImplyLeading: false,
       title: Text(title, style: lumaDisplay(size: 15, weight: FontWeight.w600)),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search, size: 20),
-          onPressed: () {},
-        ),
         const LumaHomeButton(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 12, 8),
-          child: CircleAvatar(
-            radius: 14,
-            backgroundColor: LumaColors.inkNavy,
-            child: Text(initials,
-                style: lumaBody(
-                  size: 10.5,
-                  weight: FontWeight.w600,
-                  color: LumaColors.cream,
-                )),
+        IconButton(
+          tooltip: 'Account',
+          onPressed: () => Navigator.pushNamed(context, '/account'),
+          icon: Image.asset(
+            'assets/branding/luma_symbol_halo.png',
+            width: 32,
+            height: 32,
           ),
         ),
       ],
