@@ -24,7 +24,7 @@ import 'theme/luma_theme.dart';
 import 'vasopressors/vasopressors_screen.dart';
 import 'welcome/welcome_gate.dart';
 import 'screens/password_recovery_screen.dart';
-import 'ce/ce_screen.dart';
+import 'ce/ce_library_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 
@@ -124,7 +124,7 @@ class _LumaAppState extends State<LumaApp> {
           : kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : cePortal
-          ? const CeCourseScreen()
+          ? const CeLibraryScreen()
           : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
@@ -168,7 +168,7 @@ class _LumaAppState extends State<LumaApp> {
           return MaterialPageRoute(
             settings: settings,
             builder: (_) =>
-                cePortal ? const CeCourseScreen() : const HomeScreen(),
+                cePortal ? const CeLibraryScreen() : const HomeScreen(),
           );
         }
         if (path == '/special-considerations') {
@@ -190,7 +190,7 @@ class _LumaAppState extends State<LumaApp> {
             settings.name == '/ce-halo/courses') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => const CeCourseScreen(),
+            builder: (_) => const CeLibraryScreen(),
           );
         }
         if (settings.name == '/account') {

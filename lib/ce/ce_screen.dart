@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/luma_theme.dart';
 import 'ce_repository.dart';
-import 'ce_records_screen.dart';
 import 'ce_certificate_screen.dart';
 import 'ce_participation_dates.dart';
 import 'ce_purchase_screen.dart';
@@ -17,8 +16,13 @@ const ceNavy = Color(0xFF102A3A);
 const ceGold = Color(0xFFE1BD7F);
 
 class CeCourseScreen extends StatefulWidget {
-  const CeCourseScreen({super.key, this.repository});
+  const CeCourseScreen({
+    super.key,
+    this.repository,
+    this.initialSection = 'catalog',
+  });
   final CeRepository? repository;
+  final String initialSection;
   @override
   State<CeCourseScreen> createState() => _CeCourseScreenState();
 }
@@ -27,7 +31,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   late final CeRepository repo = widget.repository ?? SupabaseCeRepository();
   Map<String, dynamic>? catalog;
   Map<String, dynamic> status = {};
-  String view = 'catalog';
+  late String view = widget.initialSection;
   String? error;
   bool busy = false;
   Map<String, dynamic>? attempt, result;
@@ -101,6 +105,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     run(() async {
       catalog = await call('catalog');
       await refresh();
+      if (status['has_access'] != true) view = 'catalog';
     });
     var previousAccount = repo.accountId;
     accountSubscription = repo.accountChanges.listen((account) {
@@ -113,7 +118,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         result = null;
         answers = {};
         hints = {};
-        ratings = List<int?>.filled(ratingCount, null);
+        ratings = List<int?>.filled(catalog == null ? 11 : ratingCount, null);
         attestation = false;
         for (final controller in [
           fullName,
@@ -130,6 +135,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         }
         view = 'catalog';
       });
+      run(refresh);
     });
   }
 
@@ -154,8 +160,10 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   }
 
   Future<void> refresh() async {
-    if (!repo.signedIn) return;
-    status = await call('access');
+    final account = repo.accountId;
+    final response = repo.signedIn ? await call('access') : <String, dynamic>{};
+    if (!mounted || account != repo.accountId) return;
+    status = response;
     final p = Map<String, dynamic>.from(status['profile'] as Map? ?? {});
     fullName.text = p['full_name'] as String? ?? '';
     credentials.text = p['credentials'] as String? ?? '';
@@ -309,7 +317,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
                       child: Center(
                         child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 760),
+                          constraints: BoxConstraints(
+                            maxWidth: view == 'catalog' ? 1040 : 760,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -354,189 +364,201 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     );
   }
 
-  List<Widget> course() => [
-    Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: ceNavy,
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                'assets/branding/luma_symbol_halo.png',
-                width: 58,
-                height: 58,
+  Map moduleStatus(String id) =>
+      (status['module_statuses'] as Map?)?[id] as Map? ?? {};
+  int get completedCount => availableModules
+      .where((m) => moduleStatus(m['id'] as String)['completed'] == true)
+      .length;
+  Map<String, dynamic> get nextModule => availableModules.firstWhere(
+    (m) => moduleStatus(m['id'] as String)['completed'] != true,
+    orElse: () => availableModules.first,
+  );
+
+  void openModule(String id) {
+    if (status['has_access'] != true) return;
+    run(() async {
+      await selectModule(id);
+      if (mounted && fullName.text.isEmpty) go('details');
+    });
+  }
+
+  void openPurchases() => run(() async {
+    await Navigator.of(
+      context,
+    ).push<void>(MaterialPageRoute(builder: (_) => const CePurchaseScreen()));
+    await refresh();
+  });
+
+  Widget moduleList() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      title('Course modules', size: 23),
+      copy('Content → Quiz → Evaluation'),
+      const SizedBox(height: 18),
+      for (final m in availableModules)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Material(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(color: LumaColors.divider),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              key: ValueKey('ce-module-${m['id']}'),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
               ),
-              const SizedBox(width: 14),
-              const Expanded(
+              leading: CircleAvatar(
+                backgroundColor: moduleStatus(m['id'])['completed'] == true
+                    ? ceNavy
+                    : LumaColors.cream,
+                child: moduleStatus(m['id'])['completed'] == true
+                    ? const Icon(Icons.check, color: Colors.white, size: 19)
+                    : Text(
+                        '${m['number']}'.padLeft(2, '0'),
+                        style: const TextStyle(color: ceNavy, fontSize: 13),
+                      ),
+              ),
+              title: Text(
+                m['title'] as String,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 5),
                 child: Text(
-                  'CE HALO\nCONTINUING EDUCATION',
-                  style: TextStyle(
-                    color: ceGold,
-                    fontSize: 12,
-                    height: 1.8,
-                    letterSpacing: 1.5,
-                  ),
+                  moduleStatus(m['id'])['completed'] == true
+                      ? 'Content, quiz, and evaluation complete'
+                      : moduleStatus(m['id'])['passed'] == true
+                      ? 'Next: module evaluation'
+                      : moduleStatus(m['id'])['read'] == true
+                      ? 'Next: knowledge assessment'
+                      : '${m['credits']} MAC Ed CE credits',
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          Text(
-            'COURSE ${repo.courseNumber.toString().padLeft(2, '0')}',
-            style: const TextStyle(
-              color: ceGold,
-              fontSize: 12,
-              letterSpacing: 2,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            catalog!['title'] as String,
-            style: lumaDisplay(size: 34, color: Colors.white),
-          ),
-          const SizedBox(height: 24),
-          const Divider(color: Color(0xFF52616A)),
-          const SizedBox(height: 16),
-          const Text(
-            '20.00 MAC Ed CE credits',
-            style: TextStyle(
-              color: ceGold,
-              fontSize: 23,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'AANA prior approved  •  Course ID ${repo.courseId}',
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'October 1, 2026 – September 30, 2029',
-            style: TextStyle(color: Color(0xFFE1E6E9), fontSize: 12),
-          ),
-        ],
-      ),
-    ),
-    const SizedBox(height: 20),
-    if (!repo.isDemo)
-      for (final other in [1, 2, 3].where((n) => n != repo.courseNumber))
-        button(
-          'Browse Course $other: ${SupabaseCeRepository(courseNumber: other).courseTitle}',
-          () => Navigator.of(context).push<void>(
-            MaterialPageRoute(
-              builder: (_) => CeCourseScreen(
-                repository: SupabaseCeRepository(courseNumber: other),
+              trailing: Icon(
+                status['has_access'] == true
+                    ? Icons.chevron_right
+                    : Icons.lock_outline,
+                size: 20,
               ),
+              onTap: busy || status['has_access'] != true
+                  ? null
+                  : () => openModule(m['id'] as String),
             ),
           ),
+        ),
+    ],
+  );
+
+  Widget courseProgress() => panel([
+    label(preview ? 'CREATOR PREVIEW' : 'YOUR PROGRESS'),
+    copy('$completedCount of ${repo.moduleCount} modules complete'),
+    const SizedBox(height: 16),
+    LinearProgressIndicator(
+      value: completedCount / repo.moduleCount,
+      color: ceNavy,
+      backgroundColor: LumaColors.cream,
+    ),
+    if (status['has_access'] == true) ...[
+      button(
+        fullName.text.isEmpty
+            ? 'Complete course registration'
+            : completedCount == repo.moduleCount
+            ? 'Review course modules'
+            : 'Continue module ${nextModule['number']}',
+        () => openModule(nextModule['id'] as String),
+      ),
+      if (preview)
+        copy(
+          'Creator access is unlocked. Preview activity does not award CE credits.',
+        ),
+      button('Course certificate', openCertificate, secondary: true),
+      TextButton(
+        onPressed: busy ? null : () => go('details'),
+        child: const Text('Edit course registration'),
+      ),
+    ] else if (repo.isDemo)
+      button(
+        'Preview the post-purchase experience',
+        () => run(() async {
+          await call('demo_unlock');
+          await refresh();
+          go('details');
+        }),
+      )
+    else ...[
+      copy(
+        'Course purchase is not yet available. Existing access is checked through your account.',
+      ),
+      button('View CE purchase options', openPurchases),
+      if (!repo.signedIn)
+        button(
+          'Sign in to check course access',
+          () => run(() async {
+            await Navigator.of(context).pushNamed('/account');
+            await refresh();
+          }),
           secondary: true,
         ),
-    panel([
-      label('YOUR LEARNING PATH'),
-      copy(
-        'Learner details  →  Module content  →  15-question quiz  →  Evaluation',
+    ],
+  ]);
+
+  List<Widget> course() => [
+    if (Navigator.of(context).canPop())
+      TextButton.icon(
+        onPressed: () => Navigator.of(context).pop(),
+        icon: const Icon(Icons.arrow_back, size: 16),
+        label: const Text('All courses'),
       ),
-      const SizedBox(height: 14),
-      Row(
-        children: [
-          Expanded(child: stat('${repo.moduleCount}', 'course modules')),
-          if (repo.hasDesignatedCredits)
-            Expanded(
-              child: stat(
-                repo.pharmacologyCredits,
-                'Pharmacology &\nTherapeutics',
-              ),
-            ),
-          if (repo.hasDesignatedCredits)
-            Expanded(child: stat(repo.painCredits, 'Pain Management')),
-          if (!repo.hasDesignatedCredits)
-            Expanded(child: stat('15', 'questions per quiz')),
-        ],
-      ),
-      copy(
-        '${availableModules.length} of ${repo.moduleCount} modules are loaded for provider preview. The full program is not yet available for purchase.',
-      ),
-      if (status['has_access'] == true)
-        button(
-          status['is_preview'] == true
-              ? 'Open provider preview'
-              : 'Continue my course',
-          () => go(fullName.text.isEmpty ? 'details' : 'modules'),
-        )
-      else if (repo.isDemo)
-        button(
-          'Preview the post-purchase experience',
-          () => run(() async {
-            await call('demo_unlock');
-            await refresh();
-            go('details');
-          }),
-        )
-      else ...[
-        button(
-          'View CE purchase options',
-          () => run(() async {
-            await Navigator.of(context).push<void>(
-              MaterialPageRoute(builder: (_) => const CePurchaseScreen()),
-            );
-            await refresh();
-          }),
+    const SizedBox(height: 18),
+    label('COURSE ${repo.courseNumber.toString().padLeft(2, '0')}'),
+    const SizedBox(height: 14),
+    title(repo.courseTitle, size: 32),
+    copy(
+      '20.00 MAC Ed CE credits · ${repo.moduleCount} modules · Course ID ${repo.courseId}',
+    ),
+    const SizedBox(height: 28),
+    LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 820) {
+          return Column(children: [courseProgress(), moduleList()]);
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: moduleList()),
+            const SizedBox(width: 28),
+            SizedBox(width: 310, child: courseProgress()),
+          ],
+        );
+      },
+    ),
+    const SizedBox(height: 24),
+    ExpansionTile(
+      tilePadding: const EdgeInsets.symmetric(horizontal: 8),
+      title: const Text('Purchase & Luma access details'),
+      childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 20),
+      children: [
+        if (!repo.isDemo)
+          button('CE purchases & restore', openPurchases, secondary: true),
+        copy(
+          'CE courses are purchased separately. A Luma clinical subscription does not unlock this course.',
         ),
-        if (!repo.signedIn)
-          button(
-            'Sign in to check course access',
-            () => run(() async {
-              await Navigator.of(context).pushNamed('/account');
-              await refresh();
-            }),
-            secondary: true,
+        copy(
+          repo.courseNumber == 1
+              ? 'Planned U.S. price: \$249.99. Includes one month of complimentary Luma Anesthesia clinical access, once per account. Final local pricing will come from Apple or Google at checkout.'
+              : 'Course pricing and store checkout are pending launch configuration. No purchase is available in this preview.',
+        ),
+        if (repo.courseNumber == 1)
+          copy(
+            'Maximum three complimentary calendar months per account across stores. The bundle includes three months total, or two additional months if you already received the course month. The two months follow any remaining CE bonus access; otherwise they start on the original verified bundle purchase date. Additional course purchases and restores add no months. Refunds do not reset eligibility. Existing paid subscription billing is unchanged. No automatic subscription enrollment.',
           ),
       ],
-      if (!repo.isDemo && status['has_access'] == true)
-        button(
-          'CE purchases & restore',
-          () => run(() async {
-            await Navigator.of(context).push<void>(
-              MaterialPageRoute(builder: (_) => const CePurchaseScreen()),
-            );
-            await refresh();
-          }),
-          secondary: true,
-        ),
-      if (status['is_provider'] == true)
-        button(
-          'Provider records & exports',
-          () => Navigator.of(context).push<void>(
-            MaterialPageRoute(
-              builder: (_) => CeRecordsScreen(repository: repo),
-            ),
-          ),
-          secondary: true,
-        ),
-      if (preview && status['has_access'] == true)
-        copy(
-          'Provider preview only. Activity here is not a credit-bearing enrollment.',
-        ),
-      copy(
-        'CE courses are purchased separately. A Luma clinical subscription does not unlock this course.',
-      ),
-      copy(
-        repo.courseNumber == 1
-            ? 'Planned U.S. price: \$249.99. Includes one month of complimentary Luma Anesthesia clinical access, once per account. Final local pricing will come from Apple or Google at checkout.'
-            : 'Course pricing and store checkout are pending launch configuration. No purchase is available in this preview.',
-      ),
-      if (repo.courseNumber == 1)
-        copy(
-          'Maximum three complimentary calendar months per account across stores. The bundle includes three months total, or two additional months if you already received the course month. The two months follow any remaining CE bonus access; otherwise they start on the original verified bundle purchase date. Additional course purchases and restores add no months. Refunds do not reset eligibility. Existing paid subscription billing is unchanged. No automatic subscription enrollment.',
-        ),
-    ]),
+    ),
     ExpansionTile(
       tilePadding: const EdgeInsets.symmetric(horizontal: 8),
       title: const Text('AANA approval & course information'),
@@ -668,51 +690,12 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   ];
 
   List<Widget> modules() => [
-    label(
-      'COURSE ${repo.courseNumber.toString().padLeft(2, '0')}  /  YOUR MODULES',
+    TextButton.icon(
+      onPressed: busy ? null : () => go('catalog'),
+      icon: const Icon(Icons.arrow_back, size: 16),
+      label: const Text('All course modules'),
     ),
-    const SizedBox(height: 12),
-    title('Build on your expertise.'),
-    copy(
-      '${availableModules.length} of ${repo.moduleCount} modules loaded. Complete each module’s content, assessment and evaluation.',
-    ),
-    button('Course certificate', openCertificate, secondary: true),
-    const SizedBox(height: 22),
-    for (final m in availableModules)
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: OutlinedButton(
-          style: OutlinedButton.styleFrom(
-            backgroundColor: m['id'] == selectedModuleId
-                ? ceNavy
-                : Colors.white,
-            foregroundColor: m['id'] == selectedModuleId
-                ? Colors.white
-                : ceNavy,
-            padding: const EdgeInsets.all(18),
-            alignment: Alignment.centerLeft,
-          ),
-          onPressed: busy
-              ? null
-              : () => run(() async {
-                  await selectModule(m['id'] as String);
-                }),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Module ${m['number'] ?? availableModules.indexOf(m) + 1}: ${m['title']}',
-                  style: const TextStyle(height: 1.5),
-                ),
-              ),
-              if ((status['module_statuses'] as Map?)?[m['id']]?['completed'] ==
-                  true)
-                const Icon(Icons.check_circle_outline),
-            ],
-          ),
-        ),
-      ),
-    const SizedBox(height: 10),
+    const SizedBox(height: 16),
     panel([
       label(
         'MODULE ${module['number'] ?? 1}  •  ${module['credits']} MAC Ed CE CREDITS',
@@ -804,7 +787,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           'The remaining approved course content will appear here as each revised module is loaded. No unfinished module is represented as available.',
         ),
       ], color: LumaColors.creamElevated),
-    button('Edit course registration', () => go('details'), secondary: true),
+    button('All course modules', () => go('catalog'), secondary: true),
   ];
 
   Widget stageRow(String number, String heading, String detail, bool done) =>
@@ -1176,7 +1159,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           'Your full-program certificate requires all ${repo.moduleCount} modules. Creator previews do not earn credit; AANA submission is handled separately by the provider.',
         ),
         button('Course certificate', openCertificate, secondary: true),
-        button('Return to modules', () => go('modules')),
+        button('Return to modules', () => go('catalog')),
       ]),
     ];
   }

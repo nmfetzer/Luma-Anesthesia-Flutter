@@ -83,7 +83,7 @@ void main() {
         find.text('A Medication Review for the Experienced CRNA'),
         findsOneWidget,
       );
-      expect(find.text('20.00 MAC Ed CE credits'), findsOneWidget);
+      expect(find.textContaining('20.00 MAC Ed CE credits'), findsOneWidget);
       expect(tester.takeException(), isNull);
       final start = find.text('Preview the post-purchase experience');
       await tester.ensureVisible(start);
@@ -114,7 +114,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(save);
       await tester.pumpAndSettle();
-      expect(find.textContaining('11 of 11 modules loaded'), findsOneWidget);
+      expect(find.text('Read learner content'), findsOneWidget);
+      expect(find.text('All course modules'), findsNWidgets(2));
       expect(find.text('More modules to come'), findsNothing);
       expect(find.text('REMAINING 0 MODULES'), findsNothing);
       expect(repo.profile['participation_start_on'], '2026-10-01');
