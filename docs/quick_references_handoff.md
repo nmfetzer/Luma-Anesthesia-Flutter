@@ -4,8 +4,10 @@ This addition implements the owner's approved Quick References request in the ex
 
 ## User-facing behavior
 
-- **Blue lightning shortcut:** Lower-right floating button on clinical pages. Hidden on welcome, account, subscription, CE access, Quick References, dialogs, and while the keyboard is open.
+- **Quick Ref shortcut (owner-selected option D):** Lower-right ivory pill with a slender blue lightning bolt, blue “Quick Ref” label, and subtle neutral border. Uses a minimum 48-pixel touch target and the accessibility label “Quick References.” Hidden on welcome, account, subscription, CE access, Quick References, dialogs, and while the keyboard is open.
 - **Menu entry:** Quick References is also available in the home drawer.
+- **Welcome pages:** The existing third welcome slide introduces Quick References, searchable source-linked guidance, Pre-Op Clearance Guidelines and GLP-1 considerations. No extra slide or unbuilt future guides are advertised.
+- **Mobile spacing:** The home footer reserves a clear lower lane for the wider shortcut on smaller screens.
 - **Search:** Searches section titles, parent guide titles, and curated aliases. GLP1, GLP-1, GLP 1, semaglutide and tirzepatide find the GLP-1 section directly.
 - **Reader:** Opens only the selected section, with bulleted clinical content, inline external source links, scope reminder and content version.
 - **Navigation:** Back retains the search query. Home returns to the existing dashboard.
@@ -32,6 +34,8 @@ The only modified existing files are:
 
 - `lib/main.dart`: Two imports, route observer/builder integration, and the `/quick-references` route.
 - `lib/home/home_menu_drawer.dart`: Quick References navigation item.
+- `lib/home/home_screen.dart`: Responsive footer padding to avoid shortcut overlap.
+- `lib/welcome/welcome_slides.dart`: Brief Quick References introduction on the feature slide.
 
 Everything else is additive under `lib/quick_references/`, `test/`, `supabase/`, `tool/` and this document. Merge the existing-file additions into the other session's latest versions, then rebuild that current source tree and update its existing preview using the same artifact identity.
 
@@ -39,10 +43,10 @@ This task does not release an App Store/TestFlight binary or overwrite the other
 
 ## Verification
 
-- **Flutter tests:** 105 tests passed, including nine new Quick References tests.
+- **Flutter tests:** 113 tests passed after the option D and welcome-page update, including nine Quick References tests and eight welcome/footer checks at phone, tablet and desktop sizes.
 - **Targeted analysis:** No issues in the new module and its tests. The repository-wide analyzer has pre-existing diagnostics; unrelated code was not reformatted or repaired.
 - **Build:** Release web build of `lib/preview_main.dart` succeeded with Flutter 3.47.5.
-- **Browser:** Phone at 375 × 812 and desktop at 1280 × 900 checked for the floating shortcut, live catalog, GLP1 search and direct section opening.
+- **Browser:** Phone at 375 × 812 and desktop at 1280 × 900 checked for the option D shortcut, welcome introduction, live catalog, GLP1 search and direct section opening.
 - **Protected content:** Real anonymous browser requests were denied the body as expected. Reader visual checks used a local-only intercepted response containing the approved content, not an authorization bypass in app code.
 - **Database RLS:** 12 catalog rows publicly visible; 0 clinical bodies visible anonymously, to an unpaid account or an anonymous authenticated session; 12 visible under an existing eligible account's claims. Client writes denied. Tests used transaction-local claims and rolled back.
 - **Other interactions:** Browse, back/query preservation, aliases, clear, empty results, retry, sign-out clearing, enlarged text, dialog hiding, ascending order and pagination beyond 200 entries covered by automated tests.
@@ -53,3 +57,16 @@ This task does not release an App Store/TestFlight binary or overwrite the other
 The server-only seed is `supabase/seeds/preop_quick_reference.sql`. It was mechanically derived from the owner-approved Markdown using `tool/prepare_quick_reference_seed.mjs`, preserving source links and removing draft-only editorial labels.
 
 Future guides can use new reference IDs and section rows without hardcoding their clinical content into Flutter. Keep clinical changes behind owner review, update content versions, and add relevant section-level aliases to make search useful.
+
+## Owner review in Chrome
+
+From the owner's existing Mac checkout:
+
+```sh
+cd ~/Documents/Luma-Anesthesia-Flutter &&
+git pull --ff-only origin main &&
+flutter pub get &&
+flutter run -d chrome
+```
+
+If Git refuses the pull because of local edits or divergent history, stop and reconcile those edits; do not reset the checkout. The command launches the local Flutter app using its configured Supabase backend, not a new App Store release. Sign in with the existing owner account to review protected clinical content. Open Quick Ref, then Pre-Op Clearance Guidelines, or search GLP1. Further guide additions are paused until the owner reviews this first guide.

@@ -204,7 +204,8 @@ void main() {
     expect(find.text('Targeted content'), findsOneWidget);
   });
 
-  testWidgets('blue shortcut hides on welcome, account, dialogs and references',
+  testWidgets(
+      'ivory Quick Ref pill hides on welcome, account, dialogs and references',
       (tester) async {
     final key = GlobalKey<NavigatorState>();
     final observer = QuickReferenceRouteObserver();
@@ -229,10 +230,21 @@ void main() {
     expect(find.byTooltip('Quick References'), findsNothing);
     key.currentState!.pushNamed('/home');
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.bolt_rounded), findsOneWidget);
-    final fab =
-        tester.widget<FloatingActionButton>(find.byType(FloatingActionButton));
-    expect(fab.backgroundColor, quickReferenceBlue);
+    expect(find.text('Quick Ref'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    final button = tester.widget<ElevatedButton>(
+      find.descendant(
+        of: find.byTooltip('Quick References'),
+        matching: find.byType(ElevatedButton),
+      ),
+    );
+    expect(button.style!.backgroundColor!.resolve({}), const Color(0xFFFCFAF6));
+    expect(button.style!.foregroundColor!.resolve({}), const Color(0xFF205D9F));
+    expect(button.style!.shape!.resolve({}), isA<StadiumBorder>());
+    expect(
+      tester.getSize(find.byTooltip('Quick References')).height,
+      greaterThanOrEqualTo(48),
+    );
     await tester.tap(find.byTooltip('Quick References'));
     await tester.pumpAndSettle();
     expect(find.text('References'), findsOneWidget);

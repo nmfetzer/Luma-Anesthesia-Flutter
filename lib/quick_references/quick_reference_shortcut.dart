@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'quick_reference_screen.dart';
 
 /// Observes the active route, including unnamed detail routes and dialogs.
 class QuickReferenceRouteObserver extends NavigatorObserver {
@@ -100,18 +99,65 @@ class _QuickReferenceShortcutState extends State<QuickReferenceShortcut> {
               Positioned(
                 right: 18,
                 bottom: MediaQuery.paddingOf(context).bottom + 18,
-                child: FloatingActionButton(
-                  heroTag: 'quick-reference-shortcut',
-                  tooltip: 'Quick References',
-                  backgroundColor: quickReferenceBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 5,
-                  onPressed: () => widget.navigatorKey.currentState
-                      ?.pushNamed('/quick-references'),
-                  child: const Icon(Icons.bolt_rounded, size: 32),
+                child: Tooltip(
+                  message: 'Quick References',
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFCFAF6),
+                      foregroundColor: const Color(0xFF205D9F),
+                      surfaceTintColor: Colors.transparent,
+                      elevation: 2,
+                      shadowColor: const Color(0x3308192B),
+                      minimumSize: const Size(112, 48),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      shape: const StadiumBorder(
+                        side: BorderSide(color: Color(0xFFDCD5C9)),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onPressed: () => widget.navigatorKey.currentState
+                        ?.pushNamed('/quick-references'),
+                    icon: const ExcludeSemantics(
+                      child: CustomPaint(
+                        size: Size(18, 24),
+                        painter: _QuickReferenceBoltPainter(),
+                      ),
+                    ),
+                    label: const Text(
+                      'Quick Ref',
+                      semanticsLabel: 'Quick References',
+                    ),
+                  ),
                 ),
               ),
           ],
         ),
       );
+}
+
+/// Original slender bolt used in the selected option D concept.
+class _QuickReferenceBoltPainter extends CustomPainter {
+  const _QuickReferenceBoltPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 28, size.height / 34);
+    final bolt = Path()
+      ..moveTo(16, 2)
+      ..lineTo(4, 19)
+      ..lineTo(13, 19)
+      ..lineTo(11, 32)
+      ..lineTo(24, 13)
+      ..lineTo(14, 13)
+      ..close();
+    canvas.drawPath(bolt, Paint()..color = const Color(0xFF205D9F));
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_QuickReferenceBoltPainter oldDelegate) => false;
 }

@@ -230,7 +230,10 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      // Leave a clear lane for the floating Quick Ref pill on smaller screens.
+      padding: EdgeInsets.fromLTRB(
+        20, 12, 20, MediaQuery.sizeOf(context).width < 900 ? 76 : 12,
+      ),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: const Color(0xFFE6CF9C).withValues(alpha: 0.18), width: 0.5)),
       ),
