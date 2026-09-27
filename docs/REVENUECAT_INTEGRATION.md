@@ -15,7 +15,7 @@ User-supplied RevenueCat screenshots identify project `69adc637`, offering `defa
 
 Only `$rc_monthly` and `$rc_annual` packages containing these matching products and periods are displayed. Shared Nurse and ICU/lifetime mappings are left untouched and cannot be selected by this code.
 
-The September 27 RevenueCat Apps screenshot confirms `com.base6a35a143e93e5ed18ad346be.app` for both Luma Anesthesia store entries. Flutter's iOS Debug/Profile/Release bundle identifiers and Android application ID now match it. RunnerTests uses the same identifier with `.RunnerTests` appended. Android's Kotlin namespace and the existing `com.luma.anesthesia` OAuth callback scheme are unchanged. Public SDK keys remain masked in the supplied screenshot and are not configured.
+The September 27 RevenueCat Apps screenshot confirms `com.base6a35a143e93e5ed18ad346be.app` for both Luma Anesthesia store entries. Flutter's iOS Debug/Profile/Release bundle identifiers and Android application ID now match it. RunnerTests uses the same identifier with `.RunnerTests` appended. Android's Kotlin namespace and the existing `com.luma.anesthesia` OAuth callback scheme are unchanged. The owner subsequently supplied the Apple public SDK key from the Apple app row; it is configured as the Flutter default, with build-time override available. The Google key remains unconfigured.
 
 ## Implemented
 

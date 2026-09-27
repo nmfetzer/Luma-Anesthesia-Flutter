@@ -12,7 +12,12 @@ import 'ce_billing.dart';
 class RevenueCatConfig {
   static const enabled = bool.fromEnvironment('LUMA_BILLING_ENABLED');
   static const ceEnabled = bool.fromEnvironment('LUMA_CE_BILLING_ENABLED');
-  static const appleKey = String.fromEnvironment('REVENUECAT_APPLE_PUBLIC_KEY');
+  // App-specific PUBLIC SDK key supplied by the owner. Never put an sk_ key here.
+  // Build-time overrides remain available; both purchasing flags stay false.
+  static const appleKey = String.fromEnvironment(
+    'REVENUECAT_APPLE_PUBLIC_KEY',
+    defaultValue: 'appl_bqeLOaQfDuVqgyasScLybjHoRTT',
+  );
   static const googleKey = String.fromEnvironment(
     'REVENUECAT_GOOGLE_PUBLIC_KEY',
   );
