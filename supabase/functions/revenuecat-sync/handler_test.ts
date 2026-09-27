@@ -1,9 +1,10 @@
 import { createHandler, type SyncDependencies } from "./handler.ts";
+import { entitlement } from "./validation.ts";
 const now = Date.parse("2026-09-27T16:00:00Z");
 function setup() {
   const calls: string[] = [];
   const deps: SyncDependencies = {
-    enabled: true, allowSandbox: false, now: () => now,
+    enabled: true, reviewAllowed: async () => false, now: () => now,
     user: async () => "verified-user",
     subscriber: async (id) => {
       calls.push(`read:${id}`);
@@ -59,4 +60,47 @@ Deno.test("method guard and preflight", async () => {
   assert((await createHandler(deps)(new Request("https://example.test"))).status === 405);
   assert((await createHandler(deps)(new Request("https://example.test", { method: "OPTIONS" }))).status === 200);
   assert(calls.length === 0);
+});
+
+function sandboxBody() {
+  return { request_date_ms: now, subscriber: {
+    entitlements: { [entitlement]: { product_identifier: "Luma_Anesthesia_App_Monthly",
+      purchase_date: new Date(now - 60_000).toISOString(),
+      expires_date: new Date(now + 60_000).toISOString() } },
+    subscriptions: { Luma_Anesthesia_App_Monthly: { store: "app_store",
+      is_sandbox: true, expires_date: new Date(now + 60_000).toISOString() } },
+  } };
+}
+Deno.test("sandbox never writes production; ordinary accounts receive no test lease", async () => {
+  for (const reviewer of [false,true]) {
+    const { deps } = setup();
+    deps.reviewAllowed = async () => reviewer;
+    deps.subscriber = async () => sandboxBody();
+    const writes: boolean[] = [];
+    deps.record = async (_,snapshot,sandbox) => { assert(snapshot.active); writes.push(sandbox); };
+    assert((await createHandler(deps)(request())).status === 200);
+    assert(JSON.stringify(writes) === (reviewer ? "[true]" : "[]"));
+  }
+});
+Deno.test("empty response clears a test lease, never promotes it to production", async () => {
+  const { deps } = setup(); deps.reviewAllowed = async () => true;
+  const writes: boolean[] = [];
+  deps.record = async (_,snapshot,sandbox) => { assert(!snapshot.active); writes.push(sandbox); };
+  assert((await createHandler(deps)(request())).status === 200);
+  assert(writes.join(",") === "false,true");
+});
+Deno.test("policy errors fail closed before any RevenueCat reads or writes", async () => {
+  const { deps,calls } = setup();
+  deps.reviewAllowed = async () => { throw new Error("offline"); };
+  assert((await createHandler(deps)(request())).status === 503 && calls.length === 0);
+});
+Deno.test("expired sandbox clears only its own lease", async () => {
+  const { deps } = setup(); deps.reviewAllowed = async () => true;
+  const body = sandboxBody();
+  body.subscriber.entitlements[entitlement].expires_date = new Date(now - 1).toISOString();
+  deps.subscriber = async () => body;
+  const writes: boolean[] = [];
+  deps.record = async (_,snapshot,sandbox) => { assert(!snapshot.active); writes.push(sandbox); };
+  assert((await createHandler(deps)(request())).status === 200);
+  assert(writes.join(",") === "true");
 });

@@ -2,6 +2,8 @@
 
 Deployed September 27, 2026 after explicit owner approval. This implements guarded Apple CE checkout and the subscription verifier. It is not submission clearance or evidence of a real Apple purchase.
 
+The follow-on sandbox implementation is documented in [Apple Sandbox and App Review Setup](APPLE_SANDBOX_REVIEW.md). Its backend was separately approved and deployed September 27, 2026, with customer checkout disabled and no accounts enrolled. Test-account setup, dashboard configuration and native acceptance remain outstanding. Historical deployment details below describe the earlier approved wiring.
+
 ## Changes
 
 - **CE purchase screen:** lists the three exact individual Apple products and bundle from RevenueCat offering `crna_courses`. Price labels come from the store, never a hard-coded charge.
@@ -48,8 +50,8 @@ These are automated checks, not signed-iPhone StoreKit, TestFlight or App Review
 
 ## Remaining launch gates
 
-- **Correct keys:** the owner supplied the Apple public `appl_...` SDK key from the Luma Anesthesia App (App Store) row on September 27; it is now the Flutter configuration default, with build-time override supported. This does not enable purchasing or establish a successful native connection. `appbafd32b582` is an app identifier, not that key. The existing secret key labeled `Perplexity`, API version 1, was visible masked in the owner's RevenueCat screenshot; its value still needs to be stored directly in Supabase as `REVENUECAT_SECRET_API_KEY`, never in Flutter, chat or GitHub. The two similarly named saved Computer credentials have not been selected arbitrarily.
-- **Sandbox/App Review:** current production handlers intentionally reject sandbox grants. This change does not solve review-environment fulfillment. A secure review/sandbox path must be implemented and exercised using the exact intended submission build before upload. Simply testing a different backend and shipping a production build that rejects review purchases is not sufficient.
+- **Correct keys:** the owner supplied the Apple public SDK key and subsequently reported saving the v1 `REVENUECAT_SECRET_API_KEY` and `LUMA_BILLING_SERVER_ENABLED=true` directly in Supabase. No secret value was placed in Flutter or this repository. Successful authenticated native verification remains unconfirmed.
+- **Sandbox/App Review:** the follow-on isolated sandbox implementation is prepared locally. Its migration and both edge functions need deployment approval, then designated account enrollment, RevenueCat environment-filter configuration and testing with the actual signed submission build.
 - **Course readiness:** all three catalogs, learning routes, quizzes, evaluations, certificate issuance, product mappings and release flags must be checked after the concurrent content work finishes. The third course must be complete before its individual product or the bundle is activated.
 - **Restore history and transfers:** test existing customers, new users, sign-out, a second device, refunds, pending payments, and the configured RevenueCat restore/transfer policy. If any CE courses were sold before this webhook, reconcile their verified transactions into Supabase before promising restore coverage.
 - **Store setup:** complete the Apple agreements/tax/banking and IAP metadata, confirm the offering/package mappings and Apple credentials, and submit the applicable IAPs with the app version.

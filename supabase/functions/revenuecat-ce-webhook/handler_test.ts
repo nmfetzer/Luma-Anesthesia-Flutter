@@ -85,3 +85,17 @@ Deno.test("GET not accepted", async () => {
   );
   assert(calls.length === 0);
 });
+Deno.test("verified event environment selects separate sandbox adapter", async () => {
+  const { deps } = setup();
+  deps.config.allowSandbox = true;
+  const destinations: string[] = [];
+  deps.record = async (_, environment) => {
+    destinations.push(environment);
+    return { error: null };
+  };
+  assert((await handle(request(fixture({ environment: "SANDBOX" })), deps)).status === 200);
+  assert((await handle(request(), deps)).status === 200);
+  assert(destinations.join(",") === "SANDBOX,PRODUCTION");
+  await handle(request(fixture({ environment: "SANDBOX" }), "Bearer forged"), deps);
+  assert(destinations.length === 2);
+});

@@ -42,6 +42,15 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
           'subscription does not include CE courses.',
         ),
         const SizedBox(height: 16),
+        if (billing.ceStatus?.appleReview == true)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Designated Apple test account. Use TestFlight or Apple sandbox '
+              'for testing. Course activity and certificates are previews only '
+              'and do not earn CE credit.',
+            ),
+          ),
         if (!billing.ceAvailable)
           const Text(
             'Apple checkout is being prepared. No payment will be taken. '

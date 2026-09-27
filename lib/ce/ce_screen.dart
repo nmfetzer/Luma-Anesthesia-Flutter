@@ -474,7 +474,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       ),
       if (preview)
         copy(
-          'Creator access is unlocked. Preview activity does not award CE credits.',
+          status['is_sandbox'] == true
+              ? 'Apple sandbox preview is unlocked. Test activity does not award CE credits.'
+              : 'Creator access is unlocked. Preview activity does not award CE credits.',
         ),
       button('Course certificate', openCertificate, secondary: true),
       TextButton(

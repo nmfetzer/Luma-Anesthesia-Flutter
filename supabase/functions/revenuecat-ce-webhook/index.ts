@@ -13,12 +13,14 @@ Deno.serve(async (request: Request) => {
       enabled: Deno.env.get("LUMA_CE_WEBHOOK_ENABLED") === "true",
       secret: Deno.env.get("REVENUECAT_CE_WEBHOOK_SECRET") ?? "",
       appId: Deno.env.get("REVENUECAT_CE_APP_ID") ?? "",
-      // Sandbox transactions can only grant in a separate test project.
-      allowSandbox: Deno.env.get("LUMA_CE_ALLOW_SANDBOX") === "true" &&
-        new URL(url).hostname !== "xuckkusbbcxplpqclbxt.supabase.co",
+      // Accepted only through the isolated RPC, which checks the server-managed
+      // reviewer allowlist. Never send sandbox data to the production ledger.
+      allowSandbox: true,
     },
-    record: async (args) => {
-      const { error } = await admin.rpc("process_revenuecat_ce_event", args);
+    record: async (args, environment) => {
+      const rpc = environment === "SANDBOX"
+        ? "process_revenuecat_ce_sandbox_event" : "process_revenuecat_ce_event";
+      const { error } = await admin.rpc(rpc, args);
       return { error };
     },
   });

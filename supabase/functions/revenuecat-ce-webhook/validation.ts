@@ -10,6 +10,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export class InvalidEvent extends Error {}
 export class ReviewRequired extends Error {}
 export type CeEvent = {
+  environment: "PRODUCTION" | "SANDBOX";
   eventId: string;
   kind: "NON_RENEWING_PURCHASE" | "CANCELLATION";
   appId: string;
@@ -101,6 +102,7 @@ export function parseEvent(
   }
   // Refunds are keyed to the original transaction even if aliases later change.
   return {
+    environment: e.environment as "PRODUCTION" | "SANDBOX",
     eventId: text(e.id),
     kind,
     appId: text(e.app_id),

@@ -209,7 +209,7 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
                         : !hasAccess
                         ? 'View course information'
                         : state['is_preview'] == true
-                        ? 'Creator access · $count/${repo.moduleCount} preview modules'
+                        ? '${state['is_sandbox'] == true ? 'Sandbox preview' : 'Creator access'} · $count/${repo.moduleCount} preview modules'
                         : '$count of ${repo.moduleCount} modules complete',
                     style: lumaBody(size: 12, color: LumaColors.inkMuted),
                   ),

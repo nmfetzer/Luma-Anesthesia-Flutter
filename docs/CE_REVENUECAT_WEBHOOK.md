@@ -2,6 +2,8 @@
 
 ## Status
 
+Follow-on sandbox work was separately approved and deployed September 27, 2026, as documented in [Apple Sandbox and App Review Setup](APPLE_SANDBOX_REVIEW.md). It routes authenticated sandbox events into a private ledger with designated-account checks; no accounts are enrolled and customer checkout remains disabled. The original deployment history below predates that change and later secret configuration; the owner has since confirmed a successful authenticated Dashboard `TEST` delivery. That was a connectivity check, not an Apple purchase.
+
 The Apple-only webhook and database adapter were deployed to production with
 Nicole's explicit approval on September 27, 2026. The endpoint remains disabled
 until its secret and exact RevenueCat Apple app ID are configured. This is not a claim of

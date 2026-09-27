@@ -2,10 +2,10 @@ import { verifiedSnapshot } from "./validation.ts";
 
 export interface SyncDependencies {
   enabled: boolean;
-  allowSandbox: boolean;
+  reviewAllowed(authorization: string, userId: string): Promise<boolean>;
   user(authorization: string): Promise<string | null>;
   subscriber(userId: string): Promise<unknown>;
-  record(userId: string, snapshot: ReturnType<typeof verifiedSnapshot>): Promise<void>;
+  record(userId: string, snapshot: ReturnType<typeof verifiedSnapshot>, sandbox: boolean): Promise<void>;
   access(authorization: string): Promise<boolean>;
   now(): number;
 }
@@ -30,8 +30,17 @@ export function createHandler(deps: SyncDependencies) {
       // Body is deliberately ignored: no client-supplied UUID/receipt/access.
       const user = await deps.user(authorization);
       if (!user) return json({ error: "Sign in required" }, 401);
-      const snapshot = verifiedSnapshot(await deps.subscriber(user), deps.now(), deps.allowSandbox);
-      await deps.record(user, snapshot);
+      const reviewer = await deps.reviewAllowed(authorization, user);
+      const snapshot = verifiedSnapshot(await deps.subscriber(user), deps.now(), reviewer);
+      if (snapshot.sandbox === true) {
+        // Do not replace a production lease with a sandbox snapshot, even an
+        // expired/refunded one. Ineligible sandbox receipts confer no access.
+        if (reviewer) await deps.record(user, snapshot, true);
+      } else {
+        await deps.record(user, snapshot, false);
+        // An empty/production response must also clear an old test lease.
+        if (reviewer) await deps.record(user, { ...snapshot, active: false }, true);
+      }
       const active = await deps.access(authorization);
       if (typeof active !== "boolean") throw new Error("Invalid access response");
       return json({ user_id: user, active });

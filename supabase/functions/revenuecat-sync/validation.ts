@@ -22,16 +22,19 @@ export function verifiedSnapshot(body: unknown, now: number, allowSandbox = fals
   if (typeof checked !== "number" || !Number.isFinite(checked) ||
       Math.abs(checked - now) > 5 * 60_000) throw new Error("Stale provider response");
   const denied = { active: false, validUntil: new Date(now).toISOString(),
-    checkedAt: new Date(checked).toISOString(), productId: null as string | null };
+    checkedAt: new Date(checked).toISOString(), productId: null as string | null,
+    sandbox: null as boolean | null };
   const raw = entitlements[entitlement];
   if (!raw) return denied;
   const e = object(raw);
   const product = e.product_identifier;
   if (typeof product !== "string" || (!apple.has(product) && !google.has(product))) return denied;
   const s = object(subscriptions[product]);
+  denied.sandbox = typeof s.is_sandbox === "boolean" ? s.is_sandbox : null;
   if ((apple.has(product) && s.store !== "app_store") ||
       (google.has(product) && s.store !== "play_store")) return denied;
   if (typeof s.is_sandbox !== "boolean" || (s.is_sandbox && !allowSandbox)) return denied;
+  if (s.is_sandbox && !apple.has(product)) return denied;
   // Never infer lifetime access from null expiry. These are recurring products.
   const expires = Date.parse(e.expires_date);
   const subscriptionExpires = Date.parse(s.expires_date);
@@ -43,5 +46,5 @@ export function verifiedSnapshot(body: unknown, now: number, allowSandbox = fals
   // leave an indefinite DB grant if webhook delivery is absent.
   return { active: true, validUntil: new Date(Math.min(
     expires, subscriptionExpires, now + 15 * 60_000)).toISOString(),
-    checkedAt: new Date(checked).toISOString(), productId: product };
+    checkedAt: new Date(checked).toISOString(), productId: product, sandbox: s.is_sandbox as boolean };
 }

@@ -12,7 +12,7 @@ export type Config = {
 };
 export type Dependencies = {
   config: Config;
-  record: (args: Record<string, unknown>) => Promise<{ error: unknown }>;
+  record: (args: Record<string, unknown>, environment: "PRODUCTION" | "SANDBOX") => Promise<{ error: unknown }>;
 };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -77,7 +77,7 @@ export async function handle(
       p_user_id: event.userId,
       p_purchased_at: event.purchasedAt,
       p_occurred_at: event.occurredAt,
-    });
+    }, event.environment);
     if (error) {
       return json({ error: "CE processing unavailable; retry required" }, 503);
     }

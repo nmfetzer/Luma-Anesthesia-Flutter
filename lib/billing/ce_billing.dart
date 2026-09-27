@@ -27,10 +27,12 @@ class CePurchaseStatus {
     required this.userId,
     required this.enabled,
     required this.owned,
+    this.appleReview = false,
   });
   final String userId;
   final Set<String> enabled;
   final Set<String> owned;
+  final bool appleReview;
 }
 
 abstract interface class CeBillingGateway {

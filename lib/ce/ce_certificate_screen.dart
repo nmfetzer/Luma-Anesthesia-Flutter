@@ -109,7 +109,7 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                 color: const Color(0xFF0B1437),
                 child: Text(
                   preview
-                      ? 'CREATOR PREVIEW · No CE credits earned'
+                      ? 'TEST / PREVIEW · No CE credits earned'
                       : 'Your completed course certificate',
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white),

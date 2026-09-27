@@ -8,10 +8,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'subscription_billing.dart';
 import 'ce_billing.dart';
+import 'checkout_policy.dart';
 
 class RevenueCatConfig {
   static const enabled = bool.fromEnvironment('LUMA_BILLING_ENABLED');
   static const ceEnabled = bool.fromEnvironment('LUMA_CE_BILLING_ENABLED');
+  // TestFlight/App Review build only. Does not authorize any account by itself.
+  static const appleReview = bool.fromEnvironment('LUMA_APPLE_REVIEW_ENABLED');
   // App-specific PUBLIC SDK key supplied by the owner. Never put an sk_ key here.
   // Build-time overrides remain available; both purchasing flags stay false.
   static const appleKey = String.fromEnvironment(
@@ -56,8 +59,12 @@ class LumaBilling with WidgetsBindingObserver {
   void start(SupabaseClient client) {
     if (_started) return;
     _started = true;
-    if (!RevenueCatConfig.enabled || kIsWeb) return;
+    if (kIsWeb) return;
     final platform = defaultTargetPlatform;
+    if (!RevenueCatConfig.enabled &&
+        !(RevenueCatConfig.appleReview && platform == TargetPlatform.iOS)) {
+      return;
+    }
     if (platform != TargetPlatform.iOS && platform != TargetPlatform.android) {
       return;
     }
@@ -102,12 +109,25 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
   final Map<String, Package> _cePackages = {};
   @override
   bool get ceSupported =>
-      RevenueCatConfig.ceEnabled && platform == TargetPlatform.iOS;
+      (RevenueCatConfig.ceEnabled || RevenueCatConfig.appleReview) &&
+      platform == TargetPlatform.iOS;
+
+  Future<bool> _subscriptionCheckoutAllowed(String expectedUser) async {
+    final raw = await client.rpc('luma_billing_policy');
+    if (userId != expectedUser) {
+      throw StateError('Billing policy unavailable');
+    }
+    return CheckoutPolicy.parse(raw, expectedUser).allowsSubscriptions(
+      customerBuild: RevenueCatConfig.enabled,
+      reviewBuild: RevenueCatConfig.appleReview,
+      platform: platform,
+    );
+  }
 
   @override
   Future<List<CeStoreProduct>> ceProducts() async {
     _cePackages.clear();
-    if (!RevenueCatConfig.ceEnabled || platform != TargetPlatform.iOS) {
+    if (!ceSupported) {
       return [];
     }
     final offering = (await Purchases.getOfferings()).all['crna_courses'];
@@ -146,8 +166,10 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
       }
       final id = item['product_id'] as String;
       if (!CeProduct.accepts(id)) continue;
-      if (RevenueCatConfig.ceEnabled &&
-          platform == TargetPlatform.iOS &&
+      if (ceSupported &&
+          (raw['apple_review'] == true
+              ? RevenueCatConfig.appleReview
+              : RevenueCatConfig.ceEnabled) &&
           item['enabled'] == true) {
         enabled.add(id);
       }
@@ -157,6 +179,7 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
       userId: expectedUser,
       enabled: enabled,
       owned: owned,
+      appleReview: raw['apple_review'] == true,
     );
   }
 
@@ -164,11 +187,15 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
   Future<void> purchaseCe(CeStoreProduct product) => _storeAction(() async {
     final expected = userId;
     await _requireCurrentIdentity();
+    final status = await ceStatus(expected!);
+    if (!status.enabled.contains(product.id) ||
+        status.owned.contains(product.id)) {
+      throw const BillingFailure(
+        'CE checkout is not enabled for this account.',
+      );
+    }
     final package = _cePackages[product.id];
-    if (!RevenueCatConfig.ceEnabled ||
-        platform != TargetPlatform.iOS ||
-        package == null ||
-        !CeProduct.accepts(product.id)) {
+    if (!ceSupported || package == null || !CeProduct.accepts(product.id)) {
       throw const BillingFailure('This CE purchase is not available.');
     }
     // Avoid opening another sheet while a prior successful store transaction
@@ -208,6 +235,11 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
 
   @override
   Future<List<BillingPlan>> plans() async {
+    _packages.clear();
+    final expected = userId;
+    if (expected == null || !await _subscriptionCheckoutAllowed(expected)) {
+      return [];
+    }
     final offering =
         (await Purchases.getOfferings()).all[RevenueCatConfig.offering];
     _packages.clear();
@@ -236,6 +268,11 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
   Future<void> purchase(BillingPlan plan) => _storeAction(() async {
     final expected = userId;
     await _requireCurrentIdentity();
+    if (!await _subscriptionCheckoutAllowed(expected!)) {
+      throw const BillingFailure(
+        'Customer sales are not enabled. No payment was taken.',
+      );
+    }
     final package = _packages[plan.productId];
     if (package == null ||
         !RevenueCatConfig.accepts(plan.productId, plan.term, platform)) {

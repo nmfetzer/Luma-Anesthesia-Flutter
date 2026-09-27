@@ -11,10 +11,16 @@ import 'package:luma_anesthesia/ce/ce_course2_demo_data.dart';
 import 'package:luma_anesthesia/ce/ce_course3_demo_data.dart';
 
 class LibraryRepo extends CeRepository {
-  LibraryRepo(this.courseNumber, {this.provider = false, this.access = true});
+  LibraryRepo(
+    this.courseNumber, {
+    this.provider = false,
+    this.access = true,
+    this.sandbox = false,
+  });
   @override
   final int courseNumber;
   bool provider, access, fail = false;
+  bool sandbox;
   String? user = 'learner';
   final events = StreamController<String?>.broadcast();
   final calls = <String>[];
@@ -42,7 +48,8 @@ class LibraryRepo extends CeRepository {
       return {
         'has_access': access,
         'is_provider': provider,
-        'is_preview': provider,
+        'is_preview': provider || sandbox,
+        'is_sandbox': sandbox,
         'profile': {'full_name': 'Test Learner', 'credentials': 'CRNA'},
         'module_statuses': {
           'course_${courseNumber}_module_1': {
@@ -67,6 +74,7 @@ void main() {
     double width = 1280,
     bool provider = false,
     bool access = true,
+    bool sandbox = false,
   }) async {
     t.view.physicalSize = Size(width, 1000);
     t.view.devicePixelRatio = 1;
@@ -74,7 +82,7 @@ void main() {
     addTearDown(t.view.resetDevicePixelRatio);
     final repos = [
       for (final n in [1, 2, 3])
-        LibraryRepo(n, provider: provider, access: access),
+        LibraryRepo(n, provider: provider, access: access, sandbox: sandbox),
     ];
     for (final repo in repos) {
       addTearDown(repo.events.close);
@@ -121,6 +129,20 @@ void main() {
       expect(t.takeException(), isNull);
     });
   }
+  testWidgets('sandbox preview never exposes the provider dashboard', (
+    t,
+  ) async {
+    await mount(t, sandbox: true);
+    expect(find.textContaining('Sandbox preview'), findsNWidgets(3));
+    expect(find.text('Provider dashboard'), findsNothing);
+    expect(find.textContaining('Creator access'), findsNothing);
+    await t.tap(find.text('Open course').first);
+    await t.pumpAndSettle();
+    expect(
+      find.textContaining('Apple sandbox preview is unlocked'),
+      findsOneWidget,
+    );
+  });
   testWidgets('provider dashboard is separate and disappears on sign out', (
     t,
   ) async {

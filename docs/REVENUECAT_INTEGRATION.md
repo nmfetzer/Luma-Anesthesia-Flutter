@@ -2,6 +2,8 @@
 
 ## Status
 
+Follow-on implementation: [Apple Sandbox and App Review Setup](APPLE_SANDBOX_REVIEW.md) supersedes the sandbox activation instructions below. Its migration and edge changes were separately approved and deployed September 27, 2026. It uses `LUMA_APPLE_REVIEW_ENABLED=true` with both customer flags false, plus server-managed dedicated test accounts; it does not use the old global sandbox environment switches. No test accounts are enrolled yet and native acceptance remains outstanding.
+
 Flutter integration is implemented with checkout disabled by default. The subscription verifier and reviewed access migration were deployed September 27, 2026 with owner approval; no customer sales were enabled. This is not a claim of a completed real-device purchase or store-submission readiness. Existing CE and Quick Reference work was preserved; no RevenueCat dashboard products, offerings or entitlements were changed.
 
 ## Existing configuration used
@@ -53,7 +55,7 @@ The bounded-lease design avoids depending on webhook delivery for subscription e
 2. Obtain the Luma Anesthesia Apple and Google public SDK keys. Do not use Nurse keys, a test-store key, or a secret REST key in Flutter.
 3. Select the correct saved RevenueCat REST credential. Two saved entries currently have the same name/host, so neither was chosen arbitrarily.
 4. Review and approve the exact SQL and Edge Function deployment. Set the server-only secret through Supabase secrets, never commit it.
-5. Implement and test a secure sandbox/App Review path for the actual submission build. The current production handler explicitly blocks sandbox grants in project `xuckkusbbcxplpqclbxt`; testing only a separate debug environment does not make the submission build ready.
+5. Deploy the separately reviewed sandbox/App Review implementation, enroll dedicated accounts and follow its native acceptance checklist. Testing only a separate debug environment does not make the submission build ready.
 6. Test purchase and restore on signed iOS/Android builds, then enable the production build flag only after acceptance.
 
 Apple requires the In-App Purchase capability and supported platform setup; Android purchase activity configuration must also be correct, per [RevenueCat’s Flutter installation guide](https://www.revenuecat.com/docs/getting-started/installation/flutter). Current Android activity uses `singleTop`; actual signing, store-app matching, and native capability checks remain pending.
@@ -62,7 +64,7 @@ Apple requires the In-App Purchase capability and supported platform setup; Andr
 
 Default: `LUMA_BILLING_ENABLED=false`. The web path remains non-purchasing even if the flag is true.
 
-For a configured, approved native test build only:
+For Apple testing, use `scripts/build_apple_review.sh` and the dedicated setup guide. The following customer/Google configuration is historical and must not be used to turn on customer sales during Apple review setup:
 
 ```sh
 flutter run \
@@ -78,7 +80,7 @@ The code rejects keys without the expected `appl_`/`goog_` prefix. These placeho
 - `REVENUECAT_SECRET_API_KEY`: correct RevenueCat v1-compatible secret; server only.
 - `LUMA_BILLING_SERVER_ENABLED=true`: independent server activation switch.
 - Supabase-provided URL, anon key, and service-role key.
-- `LUMA_ALLOW_SANDBOX=true`: test environment only, explicitly rejected for the production project.
+- The follow-on sandbox implementation replaces the old `LUMA_ALLOW_SANDBOX` switch with explicit server-managed enrollment and separate test records.
 - Deploy as `revenuecat-sync` after applying the reviewed SQL. Auth is validated inside the handler; configure the Edge Function gateway appropriately for the project's JWT signing setup.
 
 ## Native acceptance checks

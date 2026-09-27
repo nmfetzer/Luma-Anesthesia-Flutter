@@ -14,10 +14,13 @@ const userClient = (authorization: string) => createClient(url, anon, {
 
 Deno.serve(createHandler({
   enabled,
-  // Production sandbox/App Review requires a separate, reviewed solution.
-  // Do not silently mix test purchases with production bonus histories.
-  allowSandbox: Deno.env.get("LUMA_ALLOW_SANDBOX") === "true" &&
-    !!url && new URL(url).hostname !== "xuckkusbbcxplpqclbxt.supabase.co",
+  async reviewAllowed(authorization, userId) {
+    const { data, error } = await userClient(authorization).rpc("luma_billing_policy");
+    if (error || data?.user_id !== userId || typeof data.apple_review !== "boolean") {
+      throw new Error("Billing policy unavailable");
+    }
+    return data.apple_review;
+  },
   now: Date.now,
   async user(authorization) {
     const { data: { user }, error } = await userClient(authorization).auth.getUser();
@@ -32,8 +35,9 @@ Deno.serve(createHandler({
     if (!response.ok) throw new Error("Provider unavailable");
     return await response.json();
   },
-  async record(userId, snapshot) {
-    const { error } = await createClient(url, serviceKey, options).rpc("record_revenuecat_access", {
+  async record(userId, snapshot, sandbox) {
+    const rpc = sandbox ? "record_revenuecat_sandbox_access" : "record_revenuecat_access";
+    const { error } = await createClient(url, serviceKey, options).rpc(rpc, {
       p_user_id: userId, p_active: snapshot.active, p_valid_until: snapshot.validUntil,
       p_checked_at: snapshot.checkedAt, p_product_id: snapshot.productId,
     });
