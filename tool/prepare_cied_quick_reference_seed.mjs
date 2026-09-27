@@ -2,8 +2,9 @@
 // Usage: node tool/prepare_cied_quick_reference_seed.mjs /path/to/approved.md
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import {finalizeRows} from './quick_reference_release.mjs';
 
-const source = fs.readFileSync(process.argv[2], 'utf8');
+const source = fs.readFileSync(process.argv[2] ?? 'supabase/seeds/cied_quick_reference.md', 'utf8');
 const definitions = [
   ['critical', 'Critical distinctions', ['magnet', 'asynchronous', 'pacing dependent', 'Micra', 'reactivation']],
   ['decision', 'Quick decision table', ['magnet', 'reprogramming', 'pacing dependent', 'EMI', 'above umbilicus', 'below umbilicus', 'no EMI']],
@@ -45,6 +46,8 @@ const rows = definitions.map(([slug, title, keywords], index) => {
     version: '2026-09-27',
   };
 });
+finalizeRows(rows);
+export {rows};
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 let sql = '-- Owner-approved AICDs & Pacemakers; atomic, idempotent content publication.\nbegin;\n\n';
 for (const row of rows) {

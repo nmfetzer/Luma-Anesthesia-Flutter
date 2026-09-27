@@ -168,7 +168,7 @@ void main() {
       }
       expect(tile('/special-considerations'), findsNothing);
       expect(tile('/diagnostics'), findsNothing);
-      expect(find.text('Coming soon'), findsNothing);
+      expect(find.text('Coming soon'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

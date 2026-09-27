@@ -61,4 +61,19 @@ if (existsSync(workerPath)) {
       '  async open() { return null; }\n\n' + worker.slice(end));
   }
 }
+// RevenueCat's web plugin eagerly loads its bundled checkout library even
+// though LumaBilling deliberately disables checkout on web. Do not ship that
+// unused storage-dependent SDK in an embedded preview. A no-op asset lets the
+// plugin's load event finish, but intentionally provides no checkout API.
+// Keep the real bundle untouched in native / production builds.
+const purchasesPath = resolve(directory,
+  'assets/packages/purchases_flutter/assets/web/purchases_js_hybrid_mappings.js');
+if (existsSync(purchasesPath)) {
+  const billing = readFileSync(resolve('lib/billing/revenuecat_billing.dart'), 'utf8');
+  if (!billing.includes('if (!RevenueCatConfig.enabled || kIsWeb) return;')) {
+    throw new Error('Web billing guard changed; review preview checkout isolation.');
+  }
+  writeFileSync(purchasesPath,
+    '// Embedded preview: checkout is disabled by LumaBilling; no web SDK loaded.\n');
+}
 console.log('Prepared Flutter preview for nested hosting.');

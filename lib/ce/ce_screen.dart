@@ -469,7 +469,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         'Planned U.S. price: \$249.99. Includes one month of complimentary Luma Anesthesia clinical access, once per account. Final local pricing will come from Apple or Google at checkout.',
       ),
       copy(
-        'The CE bundle includes three months of complimentary access, once per account. Bonus windows do not stack, and they do not pause or replace an existing paid subscription. No automatic subscription enrollment.',
+        'Maximum three complimentary calendar months per account across stores. The bundle includes three months total, or two additional months if you already received the course month. The two months follow any remaining CE bonus access; otherwise they start on the original verified bundle purchase date. Additional course purchases and restores add no months. Refunds do not reset eligibility. Existing paid subscription billing is unchanged. No automatic subscription enrollment.',
       ),
     ]),
     ExpansionTile(

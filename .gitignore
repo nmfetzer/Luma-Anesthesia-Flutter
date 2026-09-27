@@ -35,3 +35,10 @@ tools/package-lock.json
 
 # Large data exports (imported to Supabase instead)
 assets/data/medications-full.json
+
+# Full fetched articles and local before/after DB snapshots are audit working
+# material, not distributable content or app assets. Commit the review report.
+docs/quick-reference-audit/*.json
+docs/quick-reference-audit/*.jsonl
+docs/quick-reference-audit/*.txt
+docs/quick-reference-audit/reviewed-delta.sql

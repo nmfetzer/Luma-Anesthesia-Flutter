@@ -20,8 +20,8 @@ BEGIN
   ASSERT NOT public.has_clinical_premium_access(), 'Old restored bonus stays expired';
   expiry := public.record_verified_ce_bonus('PLAY_STORE', '__test_active',
     '__test_bundle', u, now());
-  ASSERT expiry = ((now() AT TIME ZONE 'UTC') + interval '3 months') AT TIME ZONE 'UTC',
-    'Three calendar months';
+  ASSERT expiry = ((now() AT TIME ZONE 'UTC') + interval '2 months') AT TIME ZONE 'UTC',
+    'Expired course then bundle grants only two calendar months';
   ASSERT public.has_clinical_premium_access(), 'Bonus unlocks premium';
   ASSERT public.record_verified_ce_bonus('PLAY_STORE', '__test_active',
     '__test_bundle', u, now()) = expiry, 'Replay retains original expiry';
@@ -32,7 +32,9 @@ BEGIN
   ASSERT public.record_verified_ce_bonus('APP_STORE', '__test_repeat_course',
     '__test_course', u, now()) IS NULL, 'Second course earns no more months';
   ASSERT (SELECT count(*) FROM public.luma_ce_bonus_purchases
-    WHERE user_id = u AND bonus_awarded) = 2, 'One lifetime bonus of each kind';
+    WHERE user_id = u AND bonus_awarded) = 2, 'Course and upgrade recorded';
+  ASSERT (SELECT sum(awarded_months) FROM public.luma_ce_bonus_purchases
+    WHERE user_id = u) = 3, 'Lifetime cap includes expired course month';
   BEGIN
     PERFORM public.record_verified_ce_bonus('PLAY_STORE', '__test_active',
       '__test_bundle', current_setting('luma.other_user')::uuid, now());

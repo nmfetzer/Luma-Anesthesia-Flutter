@@ -62,7 +62,7 @@ void main() {
     'Akovaz',
   ]) {
     test('bolus search: $query', () {
-      expect(results(query), ['hypotension-bolus']);
+      expect(results(query), contains('hypotension-bolus'));
     });
   }
   for (final query in [
@@ -73,14 +73,21 @@ void main() {
     'epi ideal body weight',
   ]) {
     test('infusion search: $query', () {
-      expect(results(query), ['hypotension-infusion']);
+      expect(results(query), contains('hypotension-infusion'));
     });
   }
   test('safety search and no invented dose matches', () {
-    expect(results('norepinephrine extravasation'), ['hypotension-safety']);
+    expect(
+      results('norepinephrine extravasation'),
+      contains('hypotension-safety'),
+    );
     expect(results('phentolamine'), ['hypotension-safety']);
-    expect(results('ephedrine infusion'), isEmpty);
-    expect(results('dopamine bolus'), isEmpty);
+    // Search returns sections containing both terms, not generated regimens.
+    expect(
+      results('ephedrine infusion'),
+      isNot(contains('hypotension-infusion')),
+    );
+    expect(results('dopamine bolus'), isNot(contains('hypotension-bolus')));
     expect(results('phenylephrinex'), isEmpty);
     expect(results('nicardipine'), isEmpty);
   });
