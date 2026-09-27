@@ -18,7 +18,7 @@ Future<void> main() async {
       ),
     );
   }
-  runApp(const LumaApp(allowSocialSignIn: false, showEkgDraft: true));
+  runApp(const LumaApp(allowSocialSignIn: false, showDiagnosticsDraft: true));
 }
 
 class _PreviewMemoryStorage extends GotrueAsyncStorage {

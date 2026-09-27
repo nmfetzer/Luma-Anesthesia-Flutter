@@ -14,7 +14,7 @@ import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
 import 'screens/luma_assistant_screen.dart';
-import 'ekg/ekg_screen.dart';
+import 'diagnostics/diagnostics_screen.dart';
 import 'crisis/crisis_screen.dart';
 import 'crisis/provider_support_screen.dart';
 import 'special_considerations/special_considerations_screen.dart';
@@ -42,9 +42,11 @@ Future<void> main() async {
 
 class LumaApp extends StatelessWidget {
   const LumaApp(
-      {super.key, this.allowSocialSignIn = true, this.showEkgDraft = false});
+      {super.key,
+      this.allowSocialSignIn = true,
+      this.showDiagnosticsDraft = false});
   final bool allowSocialSignIn;
-  final bool showEkgDraft;
+  final bool showDiagnosticsDraft;
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +81,12 @@ class LumaApp extends StatelessWidget {
             ),
           );
         }
-        if (settings.name == '/diagnostics' || settings.name == '/ekg') {
+        if (settings.name == '/diagnostics') {
           return MaterialPageRoute(
             settings: settings,
-            builder: (_) => EkgScreen(showClinicalDraft: showEkgDraft),
+            builder: (_) => DiagnosticsScreen(
+              showClinicalDraft: showDiagnosticsDraft,
+            ),
           );
         }
         if (settings.name == '/luma-ai') {

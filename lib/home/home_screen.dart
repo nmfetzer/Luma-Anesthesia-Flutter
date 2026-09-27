@@ -212,7 +212,7 @@ class _Greeting extends StatelessWidget {
                 tile.route,
                 keywords: '${tile.subtitle ?? ''} '
                     '${tile.route == '/special-considerations' ? 'special considerations conditions' : ''} '
-                    '${tile.route == '/diagnostics' ? 'EKG ECG rhythms' : ''} '
+                    '${tile.route == '/diagnostics' ? 'labs laboratory values CBC BMP CMP sodium potassium hemoglobin platelets creatinine ABG acid base PFT spirometry echo TEE imaging CXR POCUS ultrasound carotid Doppler' : ''} '
                     '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia emergency' : ''}',
               ),
             const HomeSearchSection('Luma AI', '/luma-ai',
