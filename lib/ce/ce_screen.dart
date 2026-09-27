@@ -676,23 +676,27 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         copy(
           'If all three attempts are submitted without passing, contact info@cehalo.com for assistance.',
         ),
-      ExpansionTile(
-        title: const Text('Learning objectives'),
-        children: [
-          for (final objective in module['objectives'] as List)
-            copy(objective as String),
-          const SizedBox(height: 12),
-        ],
+      Material(
+        color: Colors.transparent,
+        child: ExpansionTile(
+          title: const Text('Learning objectives'),
+          children: [
+            for (final objective in module['objectives'] as List)
+              copy(objective as String),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     ]),
-    panel([
-      label('REMAINING ${11 - availableModules.length} MODULES'),
-      const SizedBox(height: 10),
-      title('More modules to come', size: 22),
-      copy(
-        'The remaining approved course content will appear here as each revised module is loaded. No unfinished module is represented as available.',
-      ),
-    ], color: LumaColors.creamElevated),
+    if (availableModules.length < 11)
+      panel([
+        label('REMAINING ${11 - availableModules.length} MODULES'),
+        const SizedBox(height: 10),
+        title('More modules to come', size: 22),
+        copy(
+          'The remaining approved course content will appear here as each revised module is loaded. No unfinished module is represented as available.',
+        ),
+      ], color: LumaColors.creamElevated),
     button('Edit course registration', () => go('details'), secondary: true),
   ];
 

@@ -96,6 +96,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('This field is required'), findsNWidgets(3));
       expect(tester.takeException(), isNull);
+      await tester.enterText(find.byType(TextFormField).at(0), 'Catalog Tester');
+      await tester.enterText(find.byType(TextFormField).at(1), 'CRNA');
+      await tester.enterText(find.byType(TextFormField).at(3), 'Rochester, NY');
+      await tester.ensureVisible(save);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('11 of 11 modules loaded'), findsOneWidget);
+      expect(find.text('More modules to come'), findsNothing);
+      expect(find.text('REMAINING 0 MODULES'), findsNothing);
+      expect(tester.takeException(), isNull);
     });
   }
   test(
