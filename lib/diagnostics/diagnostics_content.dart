@@ -50,8 +50,8 @@ const diagnosticCategories = [
   DiagnosticCategory(
     'pocus',
     'POCUS',
-    'Focused cardiac, lung, vascular, and abdominal ultrasound.',
-    'point of care ultrasound FAST',
+    'Focused cardiac, lung, gastric, and airway ultrasound.',
+    'point of care ultrasound gastric airway IVC perfusion',
   ),
   DiagnosticCategory(
     'carotid',

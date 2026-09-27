@@ -5,6 +5,8 @@ import '../widgets/luma_home_button.dart';
 import 'diagnostics_content.dart';
 import 'abg_content.dart';
 import 'abg_screen.dart';
+import 'clinical_modules.dart';
+import 'clinical_module_screen.dart';
 
 class DiagnosticsScreen extends StatefulWidget {
   const DiagnosticsScreen({
@@ -34,7 +36,14 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
             LabValuesScreen(showClinicalDraft: widget.showClinicalDraft),
           'abg' =>
             AbgReferenceScreen(showClinicalDraft: widget.showClinicalDraft),
-          _ => _PreparationScreen(category: category),
+          _ => widget.showClinicalDraft &&
+                  clinicalModules.any((m) => m.id == category.id)
+              ? ClinicalModuleScreen(
+                  module:
+                      clinicalModules.firstWhere((m) => m.id == category.id),
+                  showClinicalDraft: widget.showClinicalDraft,
+                )
+              : _PreparationScreen(category: category),
         },
       ),
     );
@@ -130,7 +139,13 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
                                         : category.id == 'abg' &&
                                                 widget.showClinicalDraft
                                             ? '${abgTopics.length} reference cards · Review draft'
-                                            : 'In preparation',
+                                            : widget.showClinicalDraft &&
+                                                    clinicalModules.any(
+                                                      (m) =>
+                                                          m.id == category.id,
+                                                    )
+                                                ? '${clinicalModules.firstWhere((m) => m.id == category.id).topics.length} reference cards · Review draft'
+                                                : 'In preparation',
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: LumaColors.inkMuted,

@@ -81,7 +81,7 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                                 'and clinical context.'),
                           ),
                           _CompensationTable(),
-                          _Section(section: gapReference),
+                          ClinicalReferenceSection(section: gapReference),
                         ],
                       ),
                     ),
@@ -155,9 +155,11 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                               const EdgeInsets.fromLTRB(16, 0, 16, 16),
                           children: [
                             if (topic.differential.isNotEmpty)
-                              _DifferentialTable(rows: topic.differential),
+                              ClinicalDifferentialTable(
+                                rows: topic.differential,
+                              ),
                             for (final section in topic.sections)
-                              _Section(section: section),
+                              ClinicalReferenceSection(section: section),
                           ],
                         ),
                       ),
@@ -247,9 +249,14 @@ class _CompensationTable extends StatelessWidget {
       );
 }
 
-class _DifferentialTable extends StatelessWidget {
-  const _DifferentialTable({required this.rows});
+class ClinicalDifferentialTable extends StatelessWidget {
+  const ClinicalDifferentialTable({
+    super.key,
+    required this.rows,
+    this.title = 'Differential at a glance',
+  });
   final List<AbgDifferential> rows;
+  final String title;
 
   Widget _cell(String text, {bool heading = false}) => Padding(
         padding: const EdgeInsets.all(12),
@@ -268,9 +275,9 @@ class _DifferentialTable extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Text(
-              'Differential at a glance',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             if (constraints.maxWidth >= 640)
@@ -356,8 +363,8 @@ class _DifferentialTable extends StatelessWidget {
       );
 }
 
-class _Section extends StatelessWidget {
-  const _Section({required this.section});
+class ClinicalReferenceSection extends StatelessWidget {
+  const ClinicalReferenceSection({super.key, required this.section});
   final AbgSection section;
 
   @override
