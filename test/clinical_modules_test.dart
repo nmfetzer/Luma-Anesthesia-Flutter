@@ -141,9 +141,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(carotidTopics.first.title));
     await tester.pumpAndSettle();
-    expect(find.text('Native ICA criteria at a glance'), findsOneWidget);
+    expect(
+        find.text('Native internal carotid artery criteria'), findsOneWidget);
     expect(find.byType(Table), findsNothing);
-    expect(find.text('IAC 2023'), findsWidgets);
+    expect(find.text('Source: IAC 2023 recommendations'), findsWidgets);
     expect(tester.takeException(), isNull);
     await tester.scrollUntilVisible(
       find.byType(TextField),

@@ -138,7 +138,7 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                               ClinicalDifferentialTable(
                                 rows: topic.differential,
                                 title: module.id == 'carotid'
-                                    ? 'Native ICA criteria at a glance'
+                                    ? 'Native internal carotid artery criteria'
                                     : 'Differential at a glance',
                               ),
                             for (final section in topic.sections)
