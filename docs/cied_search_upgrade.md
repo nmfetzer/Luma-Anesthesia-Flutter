@@ -68,6 +68,11 @@ New topics still need curated section metadata; this is not unrestricted AI sear
 - Flutter release web build from `lib/preview_main.dart` succeeded.
 - Browser reader checks use a local-only response fixture for protected bodies;
   real anonymous body denial is checked separately. No access bypass is shipped.
+- Mobile and desktop search, source-linked reader and decision-table layout
+  were checked. No horizontal page overflow was found.
+- The existing preview preparation script now disables only pdfrx's optional
+  persistent font cache in generated embedded-preview files; the library's
+  in-memory font behavior remains. Production/native storage is unchanged.
 
 ## Launch locally
 

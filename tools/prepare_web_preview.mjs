@@ -1,6 +1,6 @@
 // Run after: flutter build web --release -t lib/preview_main.dart
 // Preview hosting may mount the bundle below a nested URL rather than "/".
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const directory = process.argv[2] || 'build/web';
@@ -42,5 +42,23 @@ const memoryStorage = `(() => {
 if (dart.includes('localStorage')) {
   writeFileSync(dartPath,
     memoryStorage + dart.replaceAll('localStorage', 'lumaPreviewMemoryStorage'));
+}
+// pdfrx keeps fonts in memory during a worker session already. Its optional
+// persistent font cache is unavailable inside this preview host. Return the
+// library's documented "no database" value; loadAll/put/clear handle it safely.
+// This only touches generated preview files, never production/native sources.
+const workerPath = resolve(directory, 'assets/packages/pdfrx/assets/pdfium_worker.js');
+if (existsSync(workerPath)) {
+  const worker = readFileSync(workerPath, 'utf8');
+  if (worker.includes('indexedDB')) {
+    const start = worker.indexOf('  async open() {', worker.indexOf('class PdfFontPersistentCache {'));
+    const end = worker.indexOf('  async loadAll() {', start);
+    if (start < 0 || end < start ||
+        !worker.slice(start, end).includes('indexedDB.open(this.dbName, 1)')) {
+      throw new Error('Unexpected PDF font cache; review preview compatibility.');
+    }
+    writeFileSync(workerPath, worker.slice(0, start) +
+      '  async open() { return null; }\n\n' + worker.slice(end));
+  }
 }
 console.log('Prepared Flutter preview for nested hosting.');
