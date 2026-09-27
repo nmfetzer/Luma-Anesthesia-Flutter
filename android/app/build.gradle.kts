@@ -15,8 +15,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.luma_anesthesia"
+        // Existing Luma Anesthesia store identity; keep independent of the Kotlin namespace.
+        applicationId = "com.base6a35a143e93e5ed18ad346be.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

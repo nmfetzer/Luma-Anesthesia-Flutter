@@ -15,6 +15,8 @@ User-supplied RevenueCat screenshots identify project `69adc637`, offering `defa
 
 Only `$rc_monthly` and `$rc_annual` packages containing these matching products and periods are displayed. Shared Nurse and ICU/lifetime mappings are left untouched and cannot be selected by this code.
 
+The September 27 RevenueCat Apps screenshot confirms `com.base6a35a143e93e5ed18ad346be.app` for both Luma Anesthesia store entries. Flutter's iOS Debug/Profile/Release bundle identifiers and Android application ID now match it. RunnerTests uses the same identifier with `.RunnerTests` appended. Android's Kotlin namespace and the existing `com.luma.anesthesia` OAuth callback scheme are unchanged. Public SDK keys remain masked in the supplied screenshot and are not configured.
+
 ## Implemented
 
 - RevenueCat `purchases_flutter` integration, resolved locally to 10.13.2.
@@ -45,7 +47,7 @@ No webhook is deployed. The bounded-lease design avoids depending on webhook del
 
 ## Activation requirements
 
-1. Confirm the actual existing iOS bundle ID and Android application ID. The checked-out native targets still contain `com.example.lumaAnesthesia` and `com.example.luma_anesthesia`; do not guess replacements.
+1. Native app identifiers now match the existing RevenueCat entries. Verify matching Apple provisioning and Google upload signing before native testing; the Android release target still uses debug signing and is not submission-ready.
 2. Obtain the Luma Anesthesia Apple and Google public SDK keys. Do not use Nurse keys, a test-store key, or a secret REST key in Flutter.
 3. Select the correct saved RevenueCat REST credential. Two saved entries currently have the same name/host, so neither was chosen arbitrarily.
 4. Review and approve the exact SQL and Edge Function deployment. Set the server-only secret through Supabase secrets, never commit it.
