@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/luma_theme.dart';
 import '../widgets/clinical_source_link.dart';
 import '../widgets/luma_home_button.dart';
+import 'quick_reference_chart.dart';
 import 'quick_reference_repository.dart';
 
 const quickReferenceBlue = Color(0xFF176AD6);
@@ -67,7 +68,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       labelText: 'Search Quick References',
-                      hintText: 'GLP1, bipolar and AICD, magnet…',
+                      hintText: 'GLP1, bipolar and AICD, nicardipine…',
                       prefixIcon: const Icon(
                         Icons.search,
                         color: quickReferenceBlue,
@@ -374,42 +375,52 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
                               ? 'Clinical reference, not a declaration of clearance. '
                                     'Individualize assessment and follow local policy. '
                                     'GLP-1 guidance is separately sourced from the cardiovascular guideline.'
-                              : 'Clinical reference, not a patient-specific device prescription. '
+                              : widget.section.referenceId == 'aicds-pacemakers'
+                              ? 'Clinical reference, not a patient-specific device prescription. '
                                     'Confirm the exact device and magnet response with the CIED team; '
-                                    'follow manufacturer instructions and local policy.',
+                                    'follow manufacturer instructions and local policy.'
+                              : 'Adult monitored IV reference. Verify dose, units, concentration, '
+                                    'contraindications and patient-specific BP/HR targets; follow local policy.',
                           style: const TextStyle(fontSize: 13, height: 1.5),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      MarkdownBody(
-                        data: _content!.body,
-                        selectable: true,
-                        onTapLink: (text, href, title) =>
-                            ClinicalSourceLink.open(context, href),
-                        styleSheet: MarkdownStyleSheet(
-                          p: const TextStyle(
-                            fontSize: 16,
-                            height: 1.6,
-                            color: LumaColors.inkPrimary,
-                          ),
-                          h3: const TextStyle(
-                            fontSize: 19,
-                            height: 1.35,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          h3Padding: const EdgeInsets.only(top: 14, bottom: 10),
-                          listBullet: const TextStyle(
-                            fontSize: 16,
-                            height: 1.6,
-                          ),
-                          listIndent: 20,
-                          blockSpacing: 14,
-                          a: const TextStyle(
-                            color: quickReferenceBlue,
-                            decoration: TextDecoration.underline,
+                      if (widget.section.referenceId ==
+                          'antihypertensive-dosing')
+                        QuickReferenceChart(body: _content!.body)
+                      else
+                        MarkdownBody(
+                          data: _content!.body,
+                          selectable: true,
+                          onTapLink: (text, href, title) =>
+                              ClinicalSourceLink.open(context, href),
+                          styleSheet: MarkdownStyleSheet(
+                            p: const TextStyle(
+                              fontSize: 16,
+                              height: 1.6,
+                              color: LumaColors.inkPrimary,
+                            ),
+                            h3: const TextStyle(
+                              fontSize: 19,
+                              height: 1.35,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            h3Padding: const EdgeInsets.only(
+                              top: 14,
+                              bottom: 10,
+                            ),
+                            listBullet: const TextStyle(
+                              fontSize: 16,
+                              height: 1.6,
+                            ),
+                            listIndent: 20,
+                            blockSpacing: 14,
+                            a: const TextStyle(
+                              color: quickReferenceBlue,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
           ),
