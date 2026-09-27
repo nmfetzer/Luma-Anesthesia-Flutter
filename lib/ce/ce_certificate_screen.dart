@@ -170,7 +170,7 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Course ${widget.repository.courseNumber} · ${widget.repository.courseTitle}\n20.00 MAC Ed CE credits (${widget.repository.pharmacologyCredits} Pharmacology & Therapeutics; ${widget.repository.painCredits} Pain Management).',
+                    'Course ${widget.repository.courseNumber} · ${widget.repository.courseTitle}\n20.00 MAC Ed CE credits${widget.repository.hasDesignatedCredits ? ' (${widget.repository.pharmacologyCredits} Pharmacology & Therapeutics; ${widget.repository.painCredits} Pain Management)' : ''}.',
                     style: const TextStyle(height: 1.6),
                   ),
                   const SizedBox(height: 20),

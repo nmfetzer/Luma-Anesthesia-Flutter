@@ -425,21 +425,18 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     ),
     const SizedBox(height: 20),
     if (!repo.isDemo)
-      button(
-        repo.courseNumber == 1
-            ? 'Browse Course 2: Uncommon but Catastrophic Anesthesia Events'
-            : 'Browse Course 1: A Medication Review for the Experienced CRNA',
-        () => Navigator.of(context).push<void>(
-          MaterialPageRoute(
-            builder: (_) => CeCourseScreen(
-              repository: SupabaseCeRepository(
-                courseNumber: repo.courseNumber == 1 ? 2 : 1,
+      for (final other in [1, 2, 3].where((n) => n != repo.courseNumber))
+        button(
+          'Browse Course $other: ${SupabaseCeRepository(courseNumber: other).courseTitle}',
+          () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => CeCourseScreen(
+                repository: SupabaseCeRepository(courseNumber: other),
               ),
             ),
           ),
+          secondary: true,
         ),
-        secondary: true,
-      ),
     panel([
       label('YOUR LEARNING PATH'),
       copy(
@@ -449,13 +446,17 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       Row(
         children: [
           Expanded(child: stat('${repo.moduleCount}', 'course modules')),
-          Expanded(
-            child: stat(
-              repo.pharmacologyCredits,
-              'Pharmacology &\nTherapeutics',
+          if (repo.hasDesignatedCredits)
+            Expanded(
+              child: stat(
+                repo.pharmacologyCredits,
+                'Pharmacology &\nTherapeutics',
+              ),
             ),
-          ),
-          Expanded(child: stat(repo.painCredits, 'Pain Management')),
+          if (repo.hasDesignatedCredits)
+            Expanded(child: stat(repo.painCredits, 'Pain Management')),
+          if (!repo.hasDesignatedCredits)
+            Expanded(child: stat('15', 'questions per quiz')),
         ],
       ),
       copy(
@@ -507,11 +508,14 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         'CE courses are purchased separately. A Luma clinical subscription does not unlock this course.',
       ),
       copy(
-        'Planned U.S. price: \$249.99. Includes one month of complimentary Luma Anesthesia clinical access, once per account. Final local pricing will come from Apple or Google at checkout.',
+        repo.courseNumber == 1
+            ? 'Planned U.S. price: \$249.99. Includes one month of complimentary Luma Anesthesia clinical access, once per account. Final local pricing will come from Apple or Google at checkout.'
+            : 'Course pricing and store checkout are pending launch configuration. No purchase is available in this preview.',
       ),
-      copy(
-        'Maximum three complimentary calendar months per account across stores. The bundle includes three months total, or two additional months if you already received the course month. The two months follow any remaining CE bonus access; otherwise they start on the original verified bundle purchase date. Additional course purchases and restores add no months. Refunds do not reset eligibility. Existing paid subscription billing is unchanged. No automatic subscription enrollment.',
-      ),
+      if (repo.courseNumber == 1)
+        copy(
+          'Maximum three complimentary calendar months per account across stores. The bundle includes three months total, or two additional months if you already received the course month. The two months follow any remaining CE bonus access; otherwise they start on the original verified bundle purchase date. Additional course purchases and restores add no months. Refunds do not reset eligibility. Existing paid subscription billing is unchanged. No automatic subscription enrollment.',
+        ),
     ]),
     ExpansionTile(
       tilePadding: const EdgeInsets.symmetric(horizontal: 8),
@@ -519,8 +523,10 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 20),
       children: [
         copy(catalog!['approval_statement'] as String),
-        copy(catalog!['pharmacology_statement'] as String),
-        copy(catalog!['pain_statement'] as String),
+        if (repo.hasDesignatedCredits)
+          copy(catalog!['pharmacology_statement'] as String),
+        if (repo.hasDesignatedCredits)
+          copy(catalog!['pain_statement'] as String),
         copy(
           'The 20.00-credit approval applies to the complete program, not an individual module. Use Course certificate to review requirements and retrieve your certificate when eligible. Creator previews do not award credit.',
         ),
@@ -642,7 +648,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   ];
 
   List<Widget> modules() => [
-    label('COURSE 01  /  YOUR MODULES'),
+    label(
+      'COURSE ${repo.courseNumber.toString().padLeft(2, '0')}  /  YOUR MODULES',
+    ),
     const SizedBox(height: 12),
     title('Build on your expertise.'),
     copy(
@@ -691,14 +699,15 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
       ),
       const SizedBox(height: 12),
       title(moduleTitle),
-      copy(
-        '${module['pharmacology_credits']} Pharmacology & Therapeutics  •  ${module['pain_credits']} Pain Management',
-      ),
+      if (repo.hasDesignatedCredits)
+        copy(
+          '${module['pharmacology_credits']} Pharmacology & Therapeutics  •  ${module['pain_credits']} Pain Management',
+        ),
       const SizedBox(height: 18),
       stageRow(
         '01',
         'Learner content',
-        '${module['page_count'] ?? 17}-page clinical module with references',
+        '${module['page_count'] ?? 17}-page module with references',
         status['read'] == true,
       ),
       stageRow(
@@ -1139,7 +1148,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
         if (record['completed_at'] != null)
           copy('Recorded: ${record['completed_at']}'),
         copy(
-          'Module allocation: ${module['credits']} CE credits (${module['pharmacology_credits']} Pharmacology & Therapeutics; ${module['pain_credits']} Pain Management). This is not the full 20.00-credit program.',
+          repo.hasDesignatedCredits
+              ? 'Module allocation: ${module['credits']} CE credits (${module['pharmacology_credits']} Pharmacology & Therapeutics; ${module['pain_credits']} Pain Management). This is not the full 20.00-credit program.'
+              : 'Module allocation: ${module['credits']} CE credits. This is not the full 20.00-credit program.',
         ),
         copy(
           'Your full-program certificate requires all ${repo.moduleCount} modules. Creator previews do not earn credit; AANA submission is handled separately by the provider.',

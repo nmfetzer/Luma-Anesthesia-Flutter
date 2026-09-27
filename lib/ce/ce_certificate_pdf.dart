@@ -29,8 +29,11 @@ Future<Uint8List> buildCeCertificatePdf(
   bool serverTemplate = false,
 }) async {
   final course2 = record['course_id'] == '1047241';
-  final courseNumber = course2 ? 2 : 1;
-  final courseTitle = course2
+  final course3 = record['course_id'] == '1047243';
+  final courseNumber = course3 ? 3 : (course2 ? 2 : 1);
+  final courseTitle = course3
+      ? 'Legal Essentials for the CRNA'
+      : course2
       ? 'Uncommon but Catastrophic Anesthesia Events'
       : 'A Medication Review for the Experienced CRNA';
   final preview = record['is_preview'] != false;
@@ -279,15 +282,19 @@ Future<Uint8List> buildCeCertificatePdf(
               pw.SizedBox(height: compact ? 12 : 27),
               pw.Divider(color: PdfColors.grey400, thickness: .5),
               for (final statement in [
-                course2
+                course3
+                    ? ceApprovalStatement.replaceFirst('1047239', '1047243')
+                    : course2
                     ? ceApprovalStatement.replaceFirst('1047239', '1047241')
                     : ceApprovalStatement,
-                course2
-                    ? cePharmacologyStatement.replaceFirst('17.50', '10.50')
-                    : cePharmacologyStatement,
-                course2
-                    ? cePainStatement.replaceFirst('2.50', '1.00')
-                    : cePainStatement,
+                if (!course3)
+                  course2
+                      ? cePharmacologyStatement.replaceFirst('17.50', '10.50')
+                      : cePharmacologyStatement,
+                if (!course3)
+                  course2
+                      ? cePainStatement.replaceFirst('2.50', '1.00')
+                      : cePainStatement,
                 ceCaliforniaStatement,
               ]) ...[
                 text(statement, size: 9, color: PdfColors.black),

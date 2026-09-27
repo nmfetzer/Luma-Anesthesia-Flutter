@@ -4,13 +4,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class CeRepository {
   int get courseNumber => 1;
-  String get courseId => courseNumber == 2 ? '1047241' : '1047239';
-  String get courseTitle => courseNumber == 2
-      ? 'Uncommon but Catastrophic Anesthesia Events'
-      : 'A Medication Review for the Experienced CRNA';
+  String get courseId =>
+      {1: '1047239', 2: '1047241', 3: '1047243'}[courseNumber]!;
+  String get courseTitle => {
+    1: 'A Medication Review for the Experienced CRNA',
+    2: 'Uncommon but Catastrophic Anesthesia Events',
+    3: 'Legal Essentials for the CRNA',
+  }[courseNumber]!;
+  bool get hasDesignatedCredits => courseNumber != 3;
   int get moduleCount => courseNumber == 2 ? 10 : 11;
-  String get pharmacologyCredits => courseNumber == 2 ? '10.50' : '17.50';
-  String get painCredits => courseNumber == 2 ? '1.00' : '2.50';
+  String get pharmacologyCredits =>
+      {1: '17.50', 2: '10.50', 3: '0'}[courseNumber]!;
+  String get painCredits => {1: '2.50', 2: '1.00', 3: '0'}[courseNumber]!;
   bool get isDemo => false;
   bool get signedIn;
   String? get accountId => null;
@@ -26,7 +31,7 @@ abstract class CeRepository {
 
 class SupabaseCeRepository extends CeRepository {
   SupabaseCeRepository({this.courseNumber = 1})
-    : assert(courseNumber == 1 || courseNumber == 2);
+    : assert(courseNumber >= 1 && courseNumber <= 3);
   @override
   final int courseNumber;
   SupabaseClient get client => Supabase.instance.client;

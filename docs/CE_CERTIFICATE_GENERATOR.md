@@ -1,6 +1,6 @@
 # CE HALO Course 1 · Certificate Generator Handoff
 
-The approved certificate design is integrated with server-authorized award records, private PDF archives, and provider-only reporting. Course 2 uses the same layout with its own title, approval, credit designations, records, and archive.
+The approved certificate design is integrated with server-authorized award records, private PDF archives, and provider-only reporting. Courses 2 and 3 use the same layout with their own titles, approval wording, records, and archives.
 
 ## Using the certificate area
 
@@ -12,22 +12,23 @@ The approved certificate design is integrated with server-authorized award recor
 
 ## Official records and downloads
 
-An award requires a non-preview account, a verified course entitlement, released course, enabled and approved certificate settings, validated participation dates, and completion of every required module, quiz, and evaluation. Course 1 requires eleven modules; Course 2 requires ten.
+An award requires a non-preview account, a verified course entitlement, released course, enabled and approved certificate settings, validated participation dates, and completion of every required module, quiz, and evaluation. Courses 1 and 3 require eleven modules each; Course 2 requires ten.
 
 The server saves an immutable award snapshot. The authenticated download function renders the approved template, stores the PDF in a private bucket, and records its SHA-256 checksum. Subsequent downloads retrieve those archived bytes rather than regenerating a certificate from edited registration details.
 
 - **Monthly records:** Choose “Provider records” inside the relevant course, then “Full-course certificates,” select the month, and export CSV. Module activity and evaluations are a separate view.
-- **Reporting:** Course 1 uses Course ID 1047239 and reporting class 196397. Course 2 uses Course ID 1047241 and reporting class 196400. Class numbers remain in provider records, not learner certificates.
+- **Reporting:** Course 1 uses Course ID 1047239 and reporting class 196397. Course 2 uses Course ID 1047241 and reporting class 196400. Course 3 uses Course ID 1047243 and reporting class 196402. Class numbers remain in provider records, not learner certificates.
+- **Course 3 approval:** Legal Essentials for the CRNA is approved for 20.00 MAC Ed CE credits. Its final approval letter lists no Pharmacology & Therapeutics or Pain Management designation, so the older sample certificate's 1.00 pharmacology credit is omitted.
 - **Manual AANA submission:** Exporting a CSV or generating a certificate does not submit credits to AANA. Confirm the portal’s current import requirements before uploading.
 - **Corrections:** Do not overwrite issued awards or archived PDFs. A formal correction/revocation workflow has not been added.
 
 ## Current release state
 
-The approved design and signature are stored for both courses. Both courses remain unreleased for ordinary learners, official issuance is disabled, and there are zero official awards.
+The approved design and signature are stored for all three courses. All remain unreleased for ordinary learners, official issuance is disabled, and there are zero official awards.
 
 The backend certificate functions and private archives are deployed. Local PDF rendering, browser previews/downloads, database authorization, immutable records, provider exports, and anonymous-download rejection were tested. No real certificate was issued and no learner email was sent during testing.
 
-Native iOS/Android purchase and download/share testing, end-to-end authorized official issuance in a controlled test environment, and launch configuration remain required. Course 2 store-product mapping and price have deliberately not been invented.
+Native iOS/Android purchase and download/share testing, end-to-end authorized official issuance in a controlled test environment, and launch configuration remain required. Course 2 and Course 3 store-product mappings and prices have deliberately not been invented.
 
 ## Account changes
 

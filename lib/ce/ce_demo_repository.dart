@@ -96,7 +96,11 @@ class DemoCeRepository extends CeRepository {
                     ),
                     'account_id': 'design-preview',
                     'course_id': courseId,
-                    'reporting_class': courseNumber == 2 ? '196400' : '196397',
+                    'reporting_class': {
+                      1: '196397',
+                      2: '196400',
+                      3: '196402',
+                    }[courseNumber],
                     'quiz_attempts': [
                       {'score': m.lastScore, 'number': m.number},
                     ],
