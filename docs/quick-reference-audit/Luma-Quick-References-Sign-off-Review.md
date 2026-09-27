@@ -2,6 +2,21 @@
 
 Review date: September 27, 2026. The entire published library was reviewed: **24 guides containing 59 sections**, not a sample. Verified corrections were applied to 16 sections; the complete clinical review copy reflects the content read back from Supabase after those updates.
 
+## Latest recheck after bronchospasm additions
+
+The entire current library was reread after the owner-approved ketamine and magnesium additions, including all 59 published section bodies. No additional source-supported dosing discrepancy or cross-guide contradiction was identified in this recheck; no further clinical content or database edits were made. The 16 corrected sections described below belong to the earlier audit, not new changes made during this recheck.
+
+- **Live consistency:** All 59 live sections exactly matched the generated review files, including bodies, titles, versions, keywords and publication status. The refreshed companion clinical copy includes the bronchospasm additions.
+- **Evidence coverage:** The source register now covers 103 unique URLs. This recheck reused the same-day evidence from the earlier audit and retrieved the three additional bronchospasm sources; it was not a new independent retrieval of all 103 URLs.
+- **Ketamine:** The 10–50 mg IV rescue-adjunct dose is supported by the perioperative emergency manual, while the card appropriately states that it is not routine first-line therapy and that evidence for improved severe-asthma outcomes is limited. The 2022 systematic review does not establish benefit in refractory severe asthma, so this should not be described as proven outcome-improving asthma treatment ([Stanford manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf); [systematic review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9482594/)).
+- **Magnesium:** The 2 g IV over 20 minutes adjunct regimen is documented in anesthesia guidance; the hypotension, neuromuscular-blockade potentiation and recovery-monitoring cautions remain visible. Supporting perioperative literature includes expert reviews and case reports rather than definitive adult perioperative outcome trials ([anesthesia management reference](https://e-safe-anaesthesia.org/e_library/05/Bronchospasm_during_anaesthesia_Update_2011.pdf); [perioperative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC11702345/)).
+- **Search regression checks:** Passed for GLP1/aspiration, bipolar/AICD, the supported electrocautery misspelling, WPW/orthodromic/adenosine, droperidol/QTc, bronchospasm/ketamine, bronchospasm/magnesium and wheezing/MgSO4, among others. This verifies tested retrieval behavior, not an ability to understand every arbitrary query.
+- **Free access and privacy:** Fresh database checks returned 59 bodies for guests and 59 for authenticated unpaid users. Unpublished content remained hidden, and no client write policies were present; test fixtures were rolled back.
+- **Automated verification:** The full current Flutter suite passed **458 tests**, including all 59 sections at normal and 150% text size on a 375 × 812 layout, for 118 section/scale checks. Fresh static analysis reported **zero errors, zero warnings and 84 informational notices**.
+- **Release scope:** This recheck updates review documentation only. The approved clinical content is already in Supabase; no new native binary, App Store submission or preview rebuild was required for this review.
+
+The result supports continued owner editorial review of the current charts, not an unconditional guarantee that every clinical use is safe. Patient-specific decisions, local concentrations and protocols, exact device models and independent clinical governance remain outside what automated tests or this AI-assisted review can certify.
+
 ## Bottom line
 
 The library is ready for your clinical editorial review and sign-off, with the local-policy choices below made explicit. The audit found and corrected safety wording, missing administration details, cross-guide inconsistencies and source-quality gaps; it is not independent physician/pharmacist certification, institutional protocol approval, or a claim that a short reference replaces a complete emergency algorithm.
@@ -51,7 +66,7 @@ No additional source-supported dosing discrepancy was identified within the revi
 | Local Anesthetic Maxima | 2 | Reviewed lower weight-based/absolute ceilings, route restrictions, conversion, lipid rescue and modified resuscitation; added additive toxicity and observation ([Iowa protocols](https://iowaprotocols.medicine.uiowa.edu/protocols/maximum-recommended-doses-and-duration-local-anesthetics); [ASRA](https://asra.com/docs/default-source/guidelines-articles/local-anesthetic-systemic-toxicity-rgb.pdf?sfvrsn=33b348e_2)). |
 | PONV | 1 | Reviewed prophylaxis timing, rescue-class selection, repeat-dose limits and QT risk; strengthened amisulpride timing and droperidol US-label warnings ([2025 consensus summary, UIC 2026](https://dig.pharmacy.uic.edu/faqs/2026-2/may-2026-faqs/what-are-current-recommendations-for-prevention-and-treatment-of-post-operative-nausea-and-vomiting-ponv/); [droperidol label](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=147e033d-d997-4ef6-8bb5-a9ba372590b2)). |
 | Neuromuscular Blockade | 2 | Reviewed intubation versus RSI doses, succinylcholine exclusions, sugammadex depth/weight criteria, neostigmine and quantitative recovery; strengthened three primary labels and cisatracurium RSI caution ([ASA NMB guideline](https://pubs.asahq.org/anesthesiology/article/138/1/13/137379/2023-American-Society-of-Anesthesiologists)). |
-| Bronchospasm | 1 | Reviewed differential diagnosis, inhaled therapy, severe perioperative IV rescue, steroid limitations, ventilation and anaphylaxis separation ([Stanford emergency manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf)). |
+| Bronchospasm | 1 | Reviewed differential diagnosis, inhaled therapy, severe perioperative IV rescue, steroid limitations, ventilation and anaphylaxis separation; subsequently rechecked the approved ketamine and magnesium adjunct doses, adverse effects, monitoring and evidence limitations ([Stanford emergency manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf); [ketamine systematic review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9482594/); [perioperative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC11702345/); [magnesium administration reference](https://e-safe-anaesthesia.org/e_library/05/Bronchospasm_during_anaesthesia_Update_2011.pdf)). |
 | Anaphylaxis | 1 | Reviewed monitored-IV versus IM treatment, concentrations, infusion conversion, fluids, refractory shock and tryptase timing; explicitly retains experienced-clinician/local-protocol scope ([RCUK perioperative algorithm](https://www.resus.org.uk/sites/default/files/2024-01/2526%20AAP%20RCUK%20periop%20anaphylaxis-8C.pdf)). |
 | Pre-Op Glucose | 1 | Reviewed ADA versus ambulatory targets, metabolic decompensation, monitoring, insulin adjustment, SGLT2 and GLP-1 considerations; reconciled metformin with the cardiovascular guide ([ADA 2026](https://pmc.ncbi.nlm.nih.gov/articles/PMC12690180/)). |
 | ACLS Medications | 2 | Reviewed adult arrest versus pulse-present regimens, epinephrine concentration, antiarrhythmics, atropine limitations and special-cause exclusions against 2025 algorithms ([2025 AHA adult ALS](https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support/)). |
@@ -69,6 +84,8 @@ These are practice-policy choices or product-scope limitations, not unresolved a
 - **Scope boundaries:** Adult content is not pediatric dosing; PALS is not neonatal resuscitation; local-anesthetic infiltration limits are not neuraxial/topical/liposomal instructions. These boundaries are visible in the content and should remain part of the approved product.
 
 ## Technical verification
+
+The table below preserves the original audit results and deployment history. The latest recheck counts and results are recorded at the beginning of this report.
 
 | Check | Result |
 |---|---|
@@ -110,3 +127,14 @@ Owner approval was explicitly provided in this conversation on September 27, 202
 - **Remaining requested edits:** None specified with this approval.
 
 The companion “Clinical Sign-off Copy” contains the exact reviewed text of all 59 live sections, with their versions and inline source links. It is the content to review alongside the app, not a substitute for checking how the information is used clinically.
+
+## Final owner sign-off after full-library recheck
+
+Nicole Fetzer explicitly approved the rechecked library on September 27, 2026 at 1:33 PM EDT: “sign off and add to app.” This records the owner's approval, not clinical certification by the AI reviewer.
+
+- **Approved scope:** All 24 guides and 59 sections in the refreshed Clinical Sign-off Copy, including the ketamine and magnesium bronchospasm rows and flexible search.
+- **Review baseline:** Recheck commit `fc7f6e9`, including the clinical addition from `3b0f7e5`.
+- **Publication confirmation:** A fresh live Supabase readback after this approval exactly matched all 59 approved sections, including content, versions, keywords and publication status. The approved content was already published, so no duplicate content write was necessary.
+- **Free access confirmation:** All 59 bodies were available to guests and authenticated unpaid users. Unpublished content remained hidden and client writes remained disallowed.
+- **Release boundary:** The approved content is live in the app's connected database. This does not represent a new native binary or App Store release.
+- **Remaining requested changes:** None specified with this final approval.

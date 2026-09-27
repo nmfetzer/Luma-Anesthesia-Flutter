@@ -1,6 +1,6 @@
 # Quick Reference Source Retrieval Register
 
-Review date: September 27, 2026. All 100 unique URLs in the verified published content returned substantive source text during this audit. This records retrieval and review provenance, not independent clinical certification or a guarantee of future URL availability.
+Review date: September 27, 2026. All 103 unique URLs in the verified published content returned substantive source text during this audit. This records retrieval and review provenance, not independent clinical certification or a guarantee of future URL availability.
 
 | Source | Retrieval |
 |---|---|
@@ -48,6 +48,10 @@ Review date: September 27, 2026. All 100 unique URLs in the verified published c
 | [Reference ID: 5745719](https://www.rapiblyk.com/fileadmin/user_upload/MediaLibrary_Rapiblyk/Documents/Rapiblyk_Full_Prescribing_Information.pdf) | Retrieved; 28,948 characters of full text or targeted extract |
 | [ACC/AHA Task Force on Clinical Practice Guidelines](https://professional.heart.org/-/media/PHD-Files-2/Science-News/2/2024/2024-Guideline-for-Perioperative-Cardiovascular-Management-slide-set.pdf?sc_lang=en) | Retrieved; 74,172 characters of full text or targeted extract |
 | [Emergency Manual](https://web.stanford.edu/dept/anesthesia/em/epic-manual.pdf) | Retrieved; 96,017 characters of full text or targeted extract |
+| [Use of ketamine in patients with refractory severe asthma ...](https://pmc.ncbi.nlm.nih.gov/articles/PMC9482594/) | Retrieved; 9,758 characters of full text or targeted extract |
+| [[PDF] Management of bronchospasm during general anaesthesia](https://e-safe-anaesthesia.org/e_library/05/Bronchospasm_during_anaesthesia_Update_2011.pdf) | Retrieved; 3,896 characters of full text or targeted extract |
+| [A Contemporary Approach to the Treatment of Perioperative ... - PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11702345/) | Retrieved; 9,873 characters of full text or targeted extract |
+| [2023 American Society of Anesthesiologists Practice Guidelines for Monitoring and Antagonism of Neuromuscular Blockade: A Report by the American Society of Anesthesiologists Task Force on Neuromuscular Blockade](https://pubs.asahq.org/anesthesiology/article/138/1/13/137379/2023-American-Society-of-Anesthesiologists) | Retrieved; 70,559 characters of full text or targeted extract |
 | [Dosing and Dilution of Perioperative Vasoactives](https://cvanes.stanford.edu/perioperative-vasoactives/) | Retrieved; 1,376 characters of full text or targeted extract |
 | [HIGHLIGHTS OF PRESCRIBING INFORMATION](https://www.dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=728734e7-1684-4b37-980c-f1dfd408b436&type=display) | Retrieved; 21,953 characters of full text or targeted extract |
 | [label - accessdata.fda.gov](https://www.accessdata.fda.gov/drugsatfda_docs/label/2025/216830s000lbl.pdf) | Retrieved; 20,618 characters of full text or targeted extract |
@@ -76,7 +80,6 @@ Review date: September 27, 2026. All 100 unique URLs in the verified published c
 | [Label: SUGAMMADEX injection - DailyMed](https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=d9d4467c-97ae-462a-9722-cc8d62db3e83) | Retrieved; 72,968 characters of full text or targeted extract |
 | [Vecuronium Bromide](https://labeling.pfizer.com/ShowLabeling.aspx?id=4648) | Retrieved; 4,397 characters of full text or targeted extract |
 | [highlights of prescribing information - Pfizer](https://labeling.pfizer.com/ShowLabeling.aspx?id=15414) | Retrieved; 4,540 characters of full text or targeted extract |
-| [2023 American Society of Anesthesiologists Practice Guidelines for Monitoring and Antagonism of Neuromuscular Blockade: A Report by the American Society of Anesthesiologists Task Force on Neuromuscular Blockade](https://pubs.asahq.org/anesthesiology/article/138/1/13/137379/2023-American-Society-of-Anesthesiologists) | Retrieved; 70,559 characters of full text or targeted extract |
 | [The contemporary pulmonary artery catheter. Part 2 - PMC - NIH](https://pmc.ncbi.nlm.nih.gov/articles/PMC7917533/) | Retrieved; 81,967 characters of full text or targeted extract |
 | [Formulas](https://accessanesthesiology.mhmedical.com/content.aspx?bookid=1944&sectionid=143523327) | Retrieved; 3,317 characters of full text or targeted extract |
 | [highlights of prescribing information - accessdata.fda.gov](https://www.accessdata.fda.gov/drugsatfda_docs/label/2019/019115s033lbl.pdf) | Retrieved; 65,732 characters of full text or targeted extract |
