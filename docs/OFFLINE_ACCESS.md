@@ -43,7 +43,7 @@ The web renderer can fetch its own fallback font during startup; the preview is 
 
 ## Verification completed
 
-- **Full merged Flutter suite:** 516 tests passed.
+- **Full Flutter suite before the final concurrent CE-library merge:** 516 tests passed. After that merge, all 42 targeted offline, CE-learning, CE-library, and app-navigation tests passed; the navigation expectation was updated for the new CE library screen.
 - **Static analysis:** No errors or warnings; 108 informational lint findings remain in the combined app.
 - **Release compilation:** Flutter web release preview built successfully after merging the concurrent CE and billing changes.
 - **New offline tests:** 23 tests covering cache encryption, account separation, sign-out, expiry, corruption, clock rollback, partial downloads, storage failures, public-only web behavior, entitlement and CE-bonus expiry, and file-backed storage across cache instances.

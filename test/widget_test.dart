@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/main.dart';
-import 'package:luma_anesthesia/ce/ce_screen.dart';
+import 'package:luma_anesthesia/ce/ce_library_screen.dart';
 import 'package:luma_anesthesia/crisis/provider_support_screen.dart';
 import 'package:luma_anesthesia/launch/deferred_section_screen.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -51,8 +51,8 @@ void main() {
           isA<DeferredSectionScreen>(),
         );
       }
-      expect(screen('/ce-halo'), isA<CeCourseScreen>());
-      expect(screen('/ce-halo/courses'), isA<CeCourseScreen>());
+      expect(screen('/ce-halo'), isA<CeLibraryScreen>());
+      expect(screen('/ce-halo/courses'), isA<CeLibraryScreen>());
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     },
