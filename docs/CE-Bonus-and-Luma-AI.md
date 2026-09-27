@@ -69,8 +69,17 @@ At verification there were zero enabled CE products and zero customer bonus rows
   paywall widget assertions. Flutter widget tests were not executed in this
   environment because the required Flutter/Dart toolchain is not installed.
 - No Google products, paid entitlements, subscription billing, or native
-  purchase feature flags were changed. Automatic CE receipt verification and
-  activation remain a separate unfinished integration.
+  purchase feature flags were changed.
+
+### Apple webhook follow-up
+
+An authenticated Apple CE webhook and service-only atomic event adapter were
+deployed with Nicole's approval on September 27. Granting remains disabled until
+the exact RevenueCat app ID, webhook secret and activation flag are configured;
+the four Apple product mappings also remain disabled. See
+[Apple CE webhook setup](CE_REVENUECAT_WEBHOOK.md) for the deployed version,
+test results, dashboard setup and remaining real-device checks. Subscription
+billing and Google configuration are unchanged.
 
 Before launch: connect native billing, server receipt verification and refund
 notifications; test purchase, restore, duplicate events, account switching,
