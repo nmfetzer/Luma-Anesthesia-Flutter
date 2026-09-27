@@ -38,7 +38,9 @@ The original reviewed teaching pages and tables are preserved, with targeted cli
 
 All seven learner PDF checksums were verified against private Supabase resources. A rollback-only live test passed for the eleven-module catalog, private assessment responses without answer keys, hints, grading, registration inheritance, evaluations, independent progress, preview exclusion, and provider authorization.
 
-The merged app passed all 167 Flutter tests, the focused CE analyzer, and a production web build. Production JavaScript was checked for the new question IDs and answer-key fields; they were absent. Answer-bearing preview fixtures are restricted to the isolated preview entry point.
+The final merged app passed all 301 Flutter tests, the focused CE analyzer, and the production web build. The final CE preview build and browser checks also passed. Production JavaScript was checked for the new question IDs and answer-key fields; they were absent. Answer-bearing preview fixtures are restricted to the isolated preview entry point.
+
+Desktop testing covered all seven new module selections and the full Module 11 reading, hint, assessment, evaluation, completion, and provider CSV workflow. Mobile testing covered Module 10 reading and quiz hints at 390px. Screenshot previews accompany the final handoff. Hosted-preview deployment did not return a result and was cancelled; no new hosted preview URL is claimed. This does not affect the Supabase upload or GitHub changes.
 
 ## Release boundary
 
