@@ -109,6 +109,13 @@ class WelcomeSlideThree extends StatelessWidget {
             style: LumaText.body(),
           ),
           const SizedBox(height: 18),
+          Text('Quick References', style: LumaText.featureTitle()),
+          const SizedBox(height: 6),
+          Text(
+            'Tap Quick Ref for searchable, source-linked guidance. Start with Pre-Op Clearance Guidelines, including GLP-1 considerations.',
+            style: LumaText.body(),
+          ),
+          const SizedBox(height: 18),
           const _FeatureGrid(),
         ],
       ),
