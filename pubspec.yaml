@@ -22,6 +22,8 @@ dependencies:
   markdown: ^7.3.0
   # Tested PDF viewer version; requires the Dart 3.13 toolchain.
   pdfrx: 2.6.5
+  pdf: 3.13.1
+  printing: 5.15.1
 dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:
@@ -37,3 +39,6 @@ flutter:
     - assets/branding/luma_symbol_halo.png
     - assets/branding/google_g.png
     - assets/branding/luma_assistant.png
+    - assets/branding/ce_halo_symbol.png
+    - assets/fonts/DejaVuSans.ttf
+    - assets/fonts/DejaVuSans-Bold.ttf

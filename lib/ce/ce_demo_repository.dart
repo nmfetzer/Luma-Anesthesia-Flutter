@@ -24,6 +24,45 @@ class DemoCeRepository extends CeRepository {
       unlocked = true;
       return {};
     }
+    if (action == 'certificate') {
+      if (!unlocked || profile.isEmpty) {
+        throw Exception('Complete preview registration first');
+      }
+      if (payload['action'] == 'issue') {
+        throw Exception('Preview accounts cannot earn CE credits.');
+      }
+      if (payload['action'] == 'preview') {
+        return {
+          'state': 'preview',
+          'certificate': {
+            'id': 'PREVIEW-NOT-VALID',
+            'is_preview': true,
+            'course_id': '1047239',
+            'learner': Map.of(profile),
+            'credits_awarded': 0,
+            'pharmacology_credits': 0,
+            'pain_credits': 0,
+            'provider_city_state': 'Buffalo, New York',
+            'signer_name': 'Nicole M Fetzer, MS, CRNA',
+            'signer_title': 'Owner, CE HALO LLC',
+          },
+        };
+      }
+      return {
+        'state': 'pending',
+        'can_issue': false,
+        'can_preview': true,
+        'reason': 'Provider preview only. No CE credit is awarded.',
+        'modules': [
+          for (final m in (demoCatalog['modules'] as List))
+            {
+              'id': m['id'],
+              'title': m['title'],
+              'complete': _modules[m['id']]?.completion.isNotEmpty ?? false,
+            },
+        ],
+      };
+    }
     if (action == 'records') {
       final rows = payload['include_preview'] == true
           ? _modules.values

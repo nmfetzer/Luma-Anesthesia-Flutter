@@ -29,7 +29,12 @@ class SupabaseCeRepository extends CeRepository {
     Map<String, dynamic> payload = const {},
   ]) async {
     try {
-      final result = action == 'records'
+      final result = action == 'certificate'
+          ? await client.rpc(
+              'ce_course1_certificate',
+              params: {'p_action': payload['action'] ?? 'status'},
+            )
+          : action == 'records'
           ? await client.rpc(
               'ce_course1_records',
               params: {

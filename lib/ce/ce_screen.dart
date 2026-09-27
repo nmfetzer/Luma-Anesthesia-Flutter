@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/luma_theme.dart';
 import 'ce_repository.dart';
 import 'ce_records_screen.dart';
+import 'ce_certificate_screen.dart';
 
 const ceNavy = Color(0xFF102A3A);
 const ceGold = Color(0xFFE1BD7F);
@@ -78,6 +79,10 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   }
 
   bool get preview => repo.isDemo || status['is_preview'] == true;
+
+  void openCertificate() => Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => CeCertificateScreen(repository: repo)),
+  );
 
   @override
   void initState() {
@@ -573,6 +578,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
     copy(
       '${availableModules.length} of 11 modules loaded. Complete each module’s content, assessment and evaluation.',
     ),
+    button('Course certificate', openCertificate, secondary: true),
     const SizedBox(height: 22),
     for (final m in availableModules)
       Padding(
@@ -1064,8 +1070,9 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
           'Module allocation: ${module['credits']} CE credits (${module['pharmacology_credits']} Pharmacology & Therapeutics; ${module['pain_credits']} Pain Management). This is not the full 20.00-credit program.',
         ),
         copy(
-          '${availableModules.length} of 11 modules are loaded. Certificate generation and AANA CE reporting are not available in this release.',
+          'Your full-program certificate requires all 11 modules. Creator previews do not earn credit; AANA submission is handled separately by the provider.',
         ),
+        button('Course certificate', openCertificate, secondary: true),
         button('Return to modules', () => go('modules')),
       ]),
     ];
