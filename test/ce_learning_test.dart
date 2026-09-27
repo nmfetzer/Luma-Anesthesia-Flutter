@@ -156,6 +156,67 @@ void main() {
       );
     },
   );
+  test(
+    'Module 3 has its own bank, hints, evaluation and linked records',
+    () async {
+      final repo = DemoCeRepository();
+      await repo.call('demo_unlock');
+      await repo.call('profile', {
+        'full_name': 'Module Three Learner',
+        'credentials': 'CRNA',
+        'location': 'Rochester, NY',
+      });
+      final catalog = await repo.call('catalog');
+      final modules = catalog['modules'] as List;
+      final metadata = modules.singleWhere(
+        (m) => m['id'] == 'course_1_module_3',
+      );
+      expect(metadata['objectives'].length, 5);
+      expect(metadata['evaluation_items'].length, 5);
+      const m2 = {'module_id': 'course_1_module_2'};
+      const m3 = {'module_id': 'course_1_module_3'};
+      await repo.call('read', m2);
+      final prior = await repo.call('quiz', m2);
+      expect((await repo.call('access', m3))['read'], false);
+      await repo.call('read', m3);
+      final attempt = await repo.call('quiz', m3);
+      expect(attempt['questions'].length, 15);
+      for (final q in attempt['questions'] as List) {
+        expect(q['module_id'], 'course_1_module_3');
+        final hint = await repo.call('hint', {
+          ...m3,
+          'question_id': q['question_id'],
+        });
+        expect(hint['eliminated'].length, 2);
+        expect(
+          (hint['eliminated'] as List).contains(q['correct_choice']),
+          false,
+        );
+      }
+      final score = await repo.call('submit', {
+        ...m3,
+        'answers': {
+          for (final q in attempt['questions'] as List)
+            q['question_id']: q['correct_choice'],
+        },
+      });
+      expect(score['score'], 15);
+      final complete = await repo.call('evaluate', {
+        ...m3,
+        'ratings': List.filled(10, 1),
+        'learned': 'Pediatric re-sedation differs from initial titration.',
+        'barriers': 'None',
+        'attestation': true,
+      });
+      expect(complete['module_id'], 'course_1_module_3');
+      expect(complete['learner']['full_name'], 'Module Three Learner');
+      expect(complete['module_credits'], 0);
+      expect((await repo.call('quiz', m2))['attempt_id'], prior['attempt_id']);
+      expect((await repo.call('records'))['total'], 0);
+      final ledger = await repo.call('records', {'include_preview': true});
+      expect(ledger['rows'][0]['module_id'], 'course_1_module_3');
+    },
+  );
   test('CSV protects formula cells and preserves structured records', () {
     final csv = ceRecordsCsv([
       {

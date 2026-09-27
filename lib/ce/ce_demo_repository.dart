@@ -94,8 +94,12 @@ class _DemoModuleRepository extends CeRepository {
   _DemoModuleRepository(this.metadata);
   final Map<String, dynamic> metadata;
   String get moduleId => metadata['id'] as String;
-  List<dynamic> get bank =>
-      moduleId == 'course_1_module_1' ? demoQuestions : demoGlp1Questions;
+  List<dynamic> get bank => switch (moduleId) {
+    'course_1_module_1' => demoQuestions,
+    'course_1_module_2' => demoGlp1Questions,
+    'course_1_module_3' => demoBenzodiazepineQuestions,
+    _ => throw StateError('No preview question bank for $moduleId'),
+  };
   @override
   bool get isDemo => true;
   @override
