@@ -1,0 +1,76 @@
+begin;
+do $$
+declare
+ u uuid; m text:='course_1_module_2'; args jsonb; a jsonb; a1 jsonb; r jsonb; h jsonb;
+ bank jsonb; answers jsonb; prior jsonb; completed jsonb; denied boolean; n int;
+begin
+ select user_id into u from public.ce_course1_reviewers limit 1;
+ assert u is not null;
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'is_anonymous',false)::text,true);
+ -- Only rollback-local state; never write official completions for the owner.
+ delete from public.ce_course1_state where user_id=u;
+ assert jsonb_array_length(public.ce_course1('catalog')->'modules')=2;
+ perform public.ce_course1('access');
+ perform public.ce_course1('profile','{"full_name":"Module Tester","credentials":"CRNA","aana_id":"12345","location":"Rochester, NY, USA"}');
+ perform public.ce_course1('read');
+ a1:=public.ce_course1('quiz');
+ select progress into prior from public.ce_course1_state where user_id=u;
+ args:=jsonb_build_object('module_id',m);
+ r:=public.ce_course1('access',args);
+ assert r->>'read'='false' and r->>'attempts_used'='0';
+ r:=public.ce_course1('document',args);
+ assert encode(sha256(decode(r->>'base64','base64')),'hex')=r->>'sha256';
+ perform public.ce_course1('read',args);
+ select data into bank from public.ce_course1_resources where id='glp1_questions';
+ a:=public.ce_course1('quiz',args);
+ assert jsonb_array_length(a->'questions')=15;
+ assert a->>'number'='1';
+ assert not jsonb_path_exists(a,'$.questions[*].correct_choice');
+ assert public.ce_course1('quiz',args)->>'attempt_id'=a->>'attempt_id';
+ denied:=false;
+ begin perform public.ce_course1('submit',args||jsonb_build_object('attempt_id',a1->>'attempt_id','answers','{}'::jsonb));
+ exception when others then denied:=true; end;
+ assert denied,'Cross-module submission denied';
+ for r in select value from jsonb_array_elements(a->'questions') loop
+   h:=public.ce_course1('hint',args||jsonb_build_object('attempt_id',a->>'attempt_id','question_id',r->>'question_id'));
+   assert jsonb_array_length(h->'eliminated')=2;
+   assert h->'eliminated'=(select value->'hint'->'eliminate_choices' from jsonb_array_elements(bank) where value->>'question_id'=r->>'question_id');
+   assert not(h->'eliminated' ? (select value->>'correct_choice' from jsonb_array_elements(bank) where value->>'question_id'=r->>'question_id'));
+ end loop;
+ select jsonb_object_agg(q->>'question_id',b->>'correct_choice') into answers
+ from jsonb_array_elements(a->'questions') q
+ join jsonb_array_elements(bank) b on q->>'question_id'=b->>'question_id';
+ r:=public.ce_course1('submit',args||jsonb_build_object('attempt_id',a->>'attempt_id','answers',answers));
+ assert r->>'score'='15' and r->>'passed'='true';
+ denied:=false;
+ begin perform public.ce_course1('evaluate',args||'{"ratings":[1,1,1,1,1,1,1,1,1,1,1],"learned":"Individual risk assessment","barriers":"None","attestation":true}'::jsonb);
+ exception when others then denied:=true; end;
+ assert denied,'Module 2 must require 10, not 11 ratings';
+ completed:=public.ce_course1('evaluate',args||'{"ratings":[1,1,1,1,1,1,1,1,1,1],"learned":"Individual risk assessment","barriers":"None","attestation":true}'::jsonb);
+ assert completed->>'module_id'=m and completed->>'module_credits'='0';
+ assert completed->'learner'->>'full_name'='Module Tester';
+ assert completed->>'location'='Rochester, NY, USA';
+ assert completed->>'user_id'=u::text;
+ assert public.ce_course1('evaluate',args)=completed,'Idempotent completion';
+ assert (select progress-'modules' from public.ce_course1_state where user_id=u)=prior,'Ketamine state unchanged';
+ assert public.ce_course1('quiz')->>'attempt_id'=a1->>'attempt_id','Ketamine resume preserved';
+ assert public.ce_course1_records(null,false,0)->>'total'='0','Exclude previews by default';
+ r:=public.ce_course1_records(null,true,0);
+ assert r->>'total'='1';
+ assert r->'rows'->0->'evaluation'->>'attestation'='true';
+ assert r->'rows'->0->>'full_course_awarded'='false';
+ assert public.ce_course1_records('2000-01',true,0)->>'total'='0';
+ assert public.ce_course1_records(null,true,100)->'rows'='[]'::jsonb;
+ denied:=false;
+ begin perform public.ce_course1_records('2026-13',true,0); exception when others then denied:=true; end;
+ assert denied;
+ delete from public.ce_course1_reviewers where user_id=u;
+ denied:=false;
+ begin perform public.ce_course1_records(null,true,0); exception when others then denied:=true; end;
+ assert denied,'Nonprovider records access denied';
+ assert public.ce_course1('access',args)->>'has_access'='false';
+ assert not has_table_privilege('authenticated','public.ce_course1_resources','select');
+end $$;
+select 'PASS: two-module isolation, private PDF hash, 15 questions, approved hints, registration inheritance, 10-rating evaluation, provider ledger authorization and pagination' as result;
+rollback;

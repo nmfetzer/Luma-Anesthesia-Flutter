@@ -29,10 +29,19 @@ class SupabaseCeRepository extends CeRepository {
     Map<String, dynamic> payload = const {},
   ]) async {
     try {
-      final result = await client.rpc(
-        'ce_course1',
-        params: {'p_action': action, 'p_payload': payload},
-      );
+      final result = action == 'records'
+          ? await client.rpc(
+              'ce_course1_records',
+              params: {
+                'p_month': payload['month'],
+                'p_include_preview': payload['include_preview'] ?? false,
+                'p_offset': payload['offset'] ?? 0,
+              },
+            )
+          : await client.rpc(
+              'ce_course1',
+              params: {'p_action': action, 'p_payload': payload},
+            );
       return Map<String, dynamic>.from(result as Map);
     } on PostgrestException catch (error) {
       throw Exception(error.message);

@@ -77,7 +77,7 @@ begin
  '{"ratings":[5,5,5,5,5,5,5,5,5,5,5],"learned":"Reviewed ketamine pharmacology","barriers":"None","location":"Buffalo, NY, USA","signature":"Preview Tester","attestation":true}');
  assert completion->>'module_credits'='0';
  assert completion->>'is_preview'='true';
- assert completion->>'location'='Buffalo, NY, USA';
+ assert completion->>'location'='Rochester, NY, USA', 'Location inherited from registration, not evaluation';
  assert completion->>'course_complete'='false';
  assert public.ce_course1('evaluate','{}')=completion;
  denied:=false;

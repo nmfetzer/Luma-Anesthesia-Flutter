@@ -1,5 +1,7 @@
 # CE HALO Course 1: implementation and launch checklist
 
+> Updated September 27, 2026: see [Module 2 and provider records](CE_MODULE_2_FINAL_HANDOFF.md) for the current two-module implementation, one-time course registration and provider records export. That update supersedes the original module-count and evaluation-signature descriptions below.
+
 Course 1 is staged in the Luma Anesthesia Flutter codebase and Supabase project `xuckkusbbcxplpqclbxt`. This is a learning-flow implementation, not an active store checkout or an App Store release.
 
 ## Course and content
