@@ -41,6 +41,8 @@ class HomeMenuDrawer extends StatelessWidget {
                   _link(context, 'Vasopressors, Infusions, & Transfusions',
                       '/vasopressors-infusions'),
                   _sectionLabel('CLINICAL'),
+                  _link(context, 'Quick References', '/quick-references',
+                      accent: const Color(0xFF69AAFF)),
                   _link(context, 'Pathophysiology & Anesthesia Considerations',
                       '/special-considerations'),
                   _link(context, 'Surgical Case Prep', '/surgical-prep'),
