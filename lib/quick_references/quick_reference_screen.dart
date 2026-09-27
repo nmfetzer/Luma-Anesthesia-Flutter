@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../theme/luma_theme.dart';
 import '../widgets/clinical_source_link.dart';
 import '../widgets/luma_home_button.dart';
@@ -31,7 +33,8 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
   @override
   void initState() {
     super.initState();
-    _repository = widget.repository ??
+    _repository =
+        widget.repository ??
         SupabaseQuickReferenceRepository(Supabase.instance.client);
     _search = TextEditingController(text: widget.initialQuery);
     _catalog = _repository.catalog();
@@ -64,9 +67,11 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       labelText: 'Search Quick References',
-                      hintText: 'GLP1, beta blockers, PCI…',
-                      prefixIcon:
-                          const Icon(Icons.search, color: quickReferenceBlue),
+                      hintText: 'GLP1, bipolar and AICD, magnet…',
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: quickReferenceBlue,
+                      ),
                       suffixIcon: _search.text.isEmpty
                           ? null
                           : IconButton(
@@ -91,8 +96,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                       }
                       if (snapshot.hasError) {
                         return _Notice(
-                          text:
-                              'Quick References could not load. Check your connection and try again.',
+                          text: 'Quick References could not load. Check your connection and try again.',
                           action: 'Try again',
                           onAction: () => setState(() {
                             _catalog = _repository.catalog();
@@ -100,8 +104,8 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                         );
                       }
                       final all = snapshot.data ?? [];
-                      final searching =
-                          normalizeReferenceQuery(_search.text).isNotEmpty;
+                      final searching = normalizeReferenceQuery(_search.text)
+                          .isNotEmpty;
                       final sections = all
                           .where(
                             (s) =>
@@ -118,8 +122,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                       }
                       if (sections.isEmpty) {
                         return const _Notice(
-                          text:
-                              'No matching sections. Try a medication name or another clinical term.',
+                          text: 'No matching sections. Try a medication name or another clinical term.',
                         );
                       }
                       if (!searching && _referenceId == null) {
@@ -318,98 +321,97 @@ class _QuickReferenceReaderState extends State<QuickReferenceReader>
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _failed
-                    ? _Notice(
-                        text:
-                            'This section could not load. Check your connection and try again.',
-                        action: 'Try again',
-                        onAction: _load,
-                      )
-                    : _content == null
-                        ? _Notice(
-                            text:
-                                'This clinical reference requires eligible Luma clinical access. Sign in to your account, or review access options.',
-                            action: 'Sign in',
-                            onAction: () async {
-                              await Navigator.of(context).pushNamed('/account');
-                              if (mounted) _load();
-                            },
-                            secondaryAction: 'Access options',
-                            onSecondaryAction: () async {
-                              await Navigator.of(context)
-                                  .pushNamed('/subscribe');
-                              if (mounted) _load();
-                            },
-                          )
-                        : ListView(
-                            padding: const EdgeInsets.fromLTRB(22, 12, 22, 36),
-                            children: [
-                              Text(
-                                widget.section.referenceTitle,
-                                style: const TextStyle(
-                                  color: quickReferenceBlue,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                widget.section.title,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Content version ${_content!.version} · Adult noncardiac surgery',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFEAF2FF),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'Clinical reference, not a declaration of clearance. '
-                                  'Individualize assessment and follow local policy. '
-                                  'GLP-1 guidance is separately sourced from the cardiovascular guideline.',
-                                  style: TextStyle(fontSize: 13, height: 1.5),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              MarkdownBody(
-                                data: _content!.body,
-                                selectable: true,
-                                onTapLink: (text, href, title) =>
-                                    ClinicalSourceLink.open(context, href),
-                                styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(
-                                    fontSize: 16,
-                                    height: 1.6,
-                                    color: LumaColors.inkPrimary,
-                                  ),
-                                  h3: const TextStyle(
-                                    fontSize: 19,
-                                    height: 1.35,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                  h3Padding: const EdgeInsets.only(
-                                    top: 14,
-                                    bottom: 10,
-                                  ),
-                                  listBullet: const TextStyle(
-                                    fontSize: 16,
-                                    height: 1.6,
-                                  ),
-                                  listIndent: 20,
-                                  blockSpacing: 14,
-                                  a: const TextStyle(
-                                    color: quickReferenceBlue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ],
+                ? _Notice(
+                    text: 'This section could not load. Check your connection and try again.',
+                    action: 'Try again',
+                    onAction: _load,
+                  )
+                : _content == null
+                ? _Notice(
+                    text: 'This clinical reference requires eligible Luma clinical access. Sign in to your account, or review access options.',
+                    action: 'Sign in',
+                    onAction: () async {
+                      await Navigator.of(context).pushNamed('/account');
+                      if (mounted) _load();
+                    },
+                    secondaryAction: 'Access options',
+                    onSecondaryAction: () async {
+                      await Navigator.of(context).pushNamed('/subscribe');
+                      if (mounted) _load();
+                    },
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(22, 12, 22, 36),
+                    children: [
+                      Text(
+                        widget.section.referenceTitle,
+                        style: const TextStyle(
+                          color: quickReferenceBlue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        widget.section.title,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Content version ${_content!.version} · '
+                        '${widget.section.referenceId == 'pre-op-clearance-guidelines' ? 'Adult noncardiac surgery' : 'Adult perioperative reference'}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAF2FF),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          widget.section.referenceId ==
+                                  'pre-op-clearance-guidelines'
+                              ? 'Clinical reference, not a declaration of clearance. '
+                                    'Individualize assessment and follow local policy. '
+                                    'GLP-1 guidance is separately sourced from the cardiovascular guideline.'
+                              : 'Clinical reference, not a patient-specific device prescription. '
+                                    'Confirm the exact device and magnet response with the CIED team; '
+                                    'follow manufacturer instructions and local policy.',
+                          style: const TextStyle(fontSize: 13, height: 1.5),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      MarkdownBody(
+                        data: _content!.body,
+                        selectable: true,
+                        onTapLink: (text, href, title) =>
+                            ClinicalSourceLink.open(context, href),
+                        styleSheet: MarkdownStyleSheet(
+                          p: const TextStyle(
+                            fontSize: 16,
+                            height: 1.6,
+                            color: LumaColors.inkPrimary,
                           ),
+                          h3: const TextStyle(
+                            fontSize: 19,
+                            height: 1.35,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          h3Padding: const EdgeInsets.only(top: 14, bottom: 10),
+                          listBullet: const TextStyle(
+                            fontSize: 16,
+                            height: 1.6,
+                          ),
+                          listIndent: 20,
+                          blockSpacing: 14,
+                          a: const TextStyle(
+                            color: quickReferenceBlue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),
@@ -432,29 +434,29 @@ class _Notice extends StatelessWidget {
   final VoidCallback? onSecondaryAction;
   @override
   Widget build(BuildContext context) => Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.menu_book_outlined,
-                color: quickReferenceBlue,
-                size: 36,
-              ),
-              const SizedBox(height: 16),
-              Text(text, textAlign: TextAlign.center),
-              if (action != null) ...[
-                const SizedBox(height: 18),
-                FilledButton(onPressed: onAction, child: Text(action!)),
-              ],
-              if (secondaryAction != null)
-                TextButton(
-                  onPressed: onSecondaryAction,
-                  child: Text(secondaryAction!),
-                ),
-            ],
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.menu_book_outlined,
+            color: quickReferenceBlue,
+            size: 36,
           ),
-        ),
-      );
+          const SizedBox(height: 16),
+          Text(text, textAlign: TextAlign.center),
+          if (action != null) ...[
+            const SizedBox(height: 18),
+            FilledButton(onPressed: onAction, child: Text(action!)),
+          ],
+          if (secondaryAction != null)
+            TextButton(
+              onPressed: onSecondaryAction,
+              child: Text(secondaryAction!),
+            ),
+        ],
+      ),
+    ),
+  );
 }

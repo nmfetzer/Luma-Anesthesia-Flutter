@@ -4,6 +4,58 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 String normalizeReferenceQuery(String value) =>
     value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
 
+// Deliberately curated, not edit-distance matching: never guess drug names,
+// doses, device models, or discard clinically meaningful "no"/"not".
+const _searchFillers = {
+  'a',
+  'an',
+  'and',
+  'the',
+  'with',
+  'for',
+  'in',
+  'on',
+  'of',
+  'to',
+  'is',
+  'are',
+  'does',
+  'do',
+  'can',
+  'i',
+  'use',
+  'using',
+  'patient',
+  'patients',
+  'have',
+  'has',
+};
+const _searchAliases = {
+  'aicd': 'icd',
+  'aicds': 'icd',
+  'icds': 'icd',
+  'defibrillator': 'icd',
+  'defibrillators': 'icd',
+  'pacemakers': 'pacemaker',
+  'pacer': 'pacemaker',
+  'pacers': 'pacemaker',
+  'ppm': 'pacemaker',
+  'bovie': 'cautery',
+  'electrocautery': 'cautery',
+  'electrocuatery': 'cautery',
+  'electrocautary': 'cautery',
+  'electrosurgery': 'cautery',
+  'electrosurgical': 'cautery',
+  'magnets': 'magnet',
+};
+
+List<String> _referenceTokens(String value) => value
+    .toLowerCase()
+    .split(RegExp(r'[^a-z0-9]+'))
+    .where((word) => word.isNotEmpty && !_searchFillers.contains(word))
+    .map((word) => _searchAliases[word] ?? word)
+    .toList();
+
 class QuickReferenceSection {
   const QuickReferenceSection({
     required this.id,
@@ -31,19 +83,19 @@ class QuickReferenceSection {
   bool matches(String query) {
     final normalized = normalizeReferenceQuery(query);
     if (normalized.isEmpty) return true;
+    final tokens = _referenceTokens(query);
+    if (tokens.isEmpty) return false;
     final fields = [title, referenceTitle, ...keywords];
     if (fields
         .any((field) => normalizeReferenceQuery(field).contains(normalized))) {
       return true;
     }
-    final tokens = query
-        .toLowerCase()
-        .split(RegExp(r'\s+'))
-        .map(normalizeReferenceQuery)
-        .where((s) => s.isNotEmpty);
+    final fieldTokens = fields.expand(_referenceTokens).toSet();
     return tokens.every(
-      (token) =>
-          fields.any((field) => normalizeReferenceQuery(field).contains(token)),
+      (token) => fieldTokens.any(
+        (word) =>
+            word == token || (token.length >= 3 && word.startsWith(token)),
+      ),
     );
   }
 }

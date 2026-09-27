@@ -1,6 +1,6 @@
 # Searchable Quick References
 
-This addition implements the owner's approved Quick References request in the existing Flutter app and connected Supabase project. It adds only the first approved guide, **Pre-Op Clearance Guidelines**, with 12 separately searchable sections.
+This addition implements the owner's approved Quick References request in the existing Flutter app and connected Supabase project. It initially added **Pre-Op Clearance Guidelines**, with 12 separately searchable sections. The subsequent approved **AICDs & Pacemakers** guide adds 11 sections and flexible multi-keyword search; see [CIED search upgrade](cied_search_upgrade.md) for the current release and verification notes.
 
 ## User-facing behavior
 
@@ -69,4 +69,4 @@ flutter pub get &&
 flutter run -d chrome
 ```
 
-If Git refuses the pull because of local edits or divergent history, stop and reconcile those edits; do not reset the checkout. The command launches the local Flutter app using its configured Supabase backend, not a new App Store release. Sign in with the existing owner account to review protected clinical content. Open Quick Ref, then Pre-Op Clearance Guidelines, or search GLP1. Further guide additions are paused until the owner reviews this first guide.
+If Git refuses the pull because of local edits or divergent history, stop and reconcile those edits; do not reset the checkout. The command launches the local Flutter app using its configured Supabase backend, not a new App Store release. Sign in with the existing owner account to review protected clinical content. Open Quick Ref and browse either guide, or search GLP1 or bipolar and AICD.

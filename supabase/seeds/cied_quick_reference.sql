@@ -1,0 +1,255 @@
+-- Owner-approved AICDs & Pacemakers; atomic, idempotent content publication.
+begin;
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-critical','aicds-pacemakers','AICDs & Pacemakers',
+  'Critical distinctions',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','magnet','asynchronous','pacing dependent','Micra','reactivation'],0,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-critical','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Pacemaker magnet:** Often produces asynchronous pacing, but the response can be disabled, temporary, absent, or unsuitable for the patient; verify the actual response before relying on it. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **ICD/AICD magnet:** Generally suspends tachyarrhythmia treatment, but does not convert the device to asynchronous pacing or protect a pacing-dependent patient from EMI-related pacing inhibition. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Pacing-dependent ICD/CRT-D:** When clinically significant electromagnetic interference (EMI) is anticipated, plan asynchronous pacing by reprogramming and separately suspend tachyarrhythmia therapy; a magnet alone is not an adequate pacing plan. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Micra:** Has no magnet-response mode; use device programming when asynchronous pacing is needed. ([Medtronic magnet guidance](https://wwwp.medtronic.com/crs-upload/letters/102/102_D00874408--rev_B_Magnet-ICD.pdf))
+- **Before leaving monitored care:** Restore required pacing settings and confirm that ICD tachyarrhythmia therapies are enabled; removing a magnet does not reverse programmer-based deactivation. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-decision','aicds-pacemakers','AICDs & Pacemakers',
+  'Quick decision table',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','magnet','reprogramming','pacing dependent','EMI','above umbilicus','below umbilicus','no EMI'],1,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-decision','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+This table is a planning aid, not an automatic order to apply a magnet. Select the pathway using device identity, pacing dependence, actual EMI exposure, generator location, magnet behavior, and access to the device. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+| Situation | Pacing plan | ICD therapy plan |
+|---|---|---|
+| No meaningful EMI expected | Often no mode change; continue appropriate monitoring and rescue readiness. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf)) | Often no suspension needed when EMI is unlikely. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf)) |
+| Pacemaker/CRT-P, pacing-dependent, significant EMI expected, especially above the umbilicus | Asynchronous pacing through reprogramming or a verified, continuously effective magnet response. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) | Not applicable to a pacing-only device. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) |
+| Pacemaker/CRT-P, not pacing-dependent, stable adequate intrinsic rhythm | Observation may be appropriate; have a response plan for inhibition or an inadequate rhythm under anesthesia. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) | Not applicable to a pacing-only device. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) |
+| ICD/CRT-D, not pacing-dependent, significant EMI expected | Usually no asynchronous conversion solely for EMI; assess actual pacing needs. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) | Suspend tachyarrhythmia therapy by programming or a confirmed, reliably maintained magnet response; provide external defibrillation backup. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) |
+| ICD/CRT-D, pacing-dependent, significant EMI expected | Reprogram to an appropriate asynchronous mode; preserve necessary resynchronization. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) | Suspend tachyarrhythmia therapy as a separate component of the device plan. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) |
+| Monopolar electrosurgery below the umbilicus, pectoral generator, return pad also below the umbilicus, current path away from the system | EMI risk is lower and routine mode change may be unnecessary; do not apply this shortcut to abdominal generators or current paths near the device/leads. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) | Individualize suspension rather than assuming every ICD requires a magnet or that every below-umbilicus case is risk-free. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf)) |','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-identify','aicds-pacemakers','AICDs & Pacemakers',
+  'Identify the device',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','identification','implant card','chest x ray','radiography','leadless','S-ICD','EV-ICD'],2,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-identify','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Permanent pacemaker / PPM:** Provides bradycardia pacing; a pacing-only system does not deliver ICD shocks. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **ICD / AICD:** Treats ventricular tachyarrhythmias; transvenous systems commonly also provide bradycardia pacing and antitachycardia pacing, depending on the model and settings. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **CRT-P versus CRT-D:** CRT-P provides resynchronization pacing without defibrillation, whereas CRT-D combines resynchronization and ICD functions; pacing and defibrillation management must be considered separately. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Leadless pacemaker:** An intracardiac device may be present without a palpable chest generator; identify the manufacturer and configuration rather than assuming all leadless devices behave alike. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **S-ICD / EV-ICD:** Identify the specific system and any separate pacemaker; their pacing capabilities are not interchangeable with a conventional transvenous ICD. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Identification sources:** Use the implant card, interrogation/remote report, EHR and device clinic; chest radiography can help identify leads, coils, and device type when records are unavailable. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-preop','aicds-pacemakers','AICDs & Pacemakers',
+  'Pre-op assessment and device-team plan',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','preop','interrogation','remote report','battery','pacing dependence','syncope','device plan'],3,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-preop','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+### Information to obtain
+
+- **Device details:** Type, manufacturer, model, location, implant indication, battery status, programmed mode, pacing/capture thresholds, sensing, lead integrity, and known advisories. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Pacing needs:** Underlying rhythm, rate, pacing burden, dependence, and whether losing AV synchrony or resynchronization would compromise hemodynamics. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+- **Magnet details:** Programmed response, observed response, expected rate, any timeout or delay, how to confirm activation, and whether the magnet can remain accessible and stable after positioning/draping. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Clinical change:** New syncope, worsening heart failure, recent ICD shocks/ATP, high arrhythmia burden, or suspected device malfunction warrants further assessment before elective care. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Procedure details:** Urgency, operative site, monopolar versus bipolar energy, expected current path, patient position, generator accessibility, and planned recovery location. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Ownership:** Document who will program the device, verify the perioperative response, restore settings, and confirm completion before discharge from monitored care. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+### How recent should interrogation be?
+
+- **AHA approach:** An interrogation from within approximately 3 months may be reviewed to assess recent activity and pacing burden; this is not a blanket rule that every patient needs a new same-day interrogation. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **ASA context:** The 2020 advisory reports agreement around interrogation within 3–6 months, while noting insufficient evidence for one optimal interval; an adequate remote report can provide needed information. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Clinical changes override the calendar:** Reassess if proper function is uncertain, symptoms have changed, or the available report cannot support the planned procedure. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+
+### Pacing dependence
+
+- **Meaning:** Dependence includes an absent intrinsic rhythm or an intrinsic rhythm inadequate for the patient''s needs; pacing percentage alone is not a complete clinical assessment. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Anesthesia effect:** A patient with an adequate awake rhythm may become dependent or functionally inadequate with anesthesia, altered autonomic tone, or medications. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Assessment method:** Review the ECG and interrogation with the device team; formal testing of an underlying rhythm requires appropriate programming expertise and monitoring, not an unmonitored bedside experiment. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-pacemaker-magnet','aicds-pacemakers','AICDs & Pacemakers',
+  'Pacemaker magnet protocol',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','magnet','asynchronous','AOO','VOO','DOO','magnet rate','Medtronic','Abbott','Boston Scientific','Biotronik','Edora','MicroPort','Sorin','St Jude','ERI','RRT'],4,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-pacemaker-magnet','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Confirm suitability:** Establish that the specific device produces a sustained, appropriate asynchronous response and that the magnet rate and chamber configuration meet the patient''s needs. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Test under monitoring:** Assess ECG response and a mechanical pulse signal before relying on the magnet; secure it in the manufacturer-recommended position and reassess after positioning. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Understand the modes:** AOO is asynchronous atrial pacing, VOO asynchronous ventricular pacing, and DOO asynchronous dual-chamber pacing; the correct choice depends on the patient''s rhythm and device system. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Prefer programming when needed:** Use a programmed plan if magnet response is absent/disabled, transient, hemodynamically unsuitable, inaccessible, or cannot be continuously maintained outside the sterile field. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Avoid routine asynchronous pacing without an indication:** Competition with an intrinsic rhythm can be proarrhythmic or hemodynamically unfavorable; “more pacing” is not automatically safer. ([Magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+- **Watch CRT behavior:** Magnet mode can change AV/VV timing or resynchronization in some CRT-P systems; do not assume that seeing paced beats means the patient''s usual resynchronization is preserved. ([Magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+
+### Common transvenous pacemaker magnet rates
+
+These are orientation values, not a substitute for exact-model interrogation or a magnet test. Initial test beats, battery state, older models, and programmed magnet response can change what is observed. ([Magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+
+| Manufacturer / scope | Common rate with satisfactory battery | Important qualification |
+|---|---|---|
+| Medtronic transvenous PM/CRT-P models covered by its magnet guide | 85 bpm. ([Medtronic](https://wwwp.medtronic.com/crs-upload/letters/102/102_D00874408--rev_B_Magnet-ICD.pdf)) | Commonly 65 bpm at RRT/ERI; selected models begin at 100 bpm for 5 beats, and older models may differ; excludes Micra. ([Medtronic](https://wwwp.medtronic.com/crs-upload/letters/102/102_D00874408--rev_B_Magnet-ICD.pdf)) |
+| Abbott transvenous pacemakers, many models | 100 bpm. ([Magnet review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) | Commonly 85 bpm at ERI, with older-model exceptions and possible magnet-response “Off”; do not apply this row to AVEIR. ([Magnet review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) |
+| Boston Scientific PM/CRT-P models covered by its guide | 100 bpm. ([Boston Scientific](https://www.bostonscientific.com/content/dam/bostonscientific/quality/education-resources/english/US_ACL_Magnet%20Use%20with%20BSC%20CIED_20210421.pdf)) | Battery-related rates include 90 and 85 bpm; the third pulse uses half the programmed pulse width in listed models, so observe capture. ([Boston Scientific](https://www.bostonscientific.com/content/dam/bostonscientific/quality/education-resources/english/US_ACL_Magnet%20Use%20with%20BSC%20CIED_20210421.pdf)) |
+| Biotronik Edora family | 90 bpm. ([Edora manual](https://manuals.biotronik.com/emanuals-professionals-rest/manual/Pacemaker/Edora/Edora/GB/en/Q?type=manual)) | Asynchronous magnet rate is 80 bpm at ERI; “Auto” provides only 10 asynchronous cycles, not sustained asynchronous protection. ([Edora manual](https://manuals.biotronik.com/emanuals-professionals-rest/manual/Pacemaker/Edora/Edora/GB/en/Q?type=manual)) |
+| MicroPort/Sorin pacemakers summarized in the review | 96 bpm. ([Magnet review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) | Commonly 80 bpm at ERI; output/timing and return-to-baseline behavior are model-specific. ([Magnet review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) |','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-icd-magnet','aicds-pacemakers','AICDs & Pacemakers',
+  'ICD/AICD and CRT-D magnet protocol',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','magnet','inhibit therapy','ATP','shocks','tachyarrhythmia','prone','lateral','external pads','Boston Scientific'],5,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-icd-magnet','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Define the goal:** Suspend inappropriate tachyarrhythmia treatment from EMI; a magnet is not a substitute for asynchronous programming when pacing protection is required. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Prepare rescue first:** Ensure a monitored environment, external defibrillation/pacing capability, and appropriately positioned external pads while ICD therapies are disabled. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Confirm the device-specific response:** Verify that magnet response is enabled and that the intended therapy suspension occurs; tones and their absence are model-dependent. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Maintain placement:** Keep the magnet continuously in the correct position throughout the period requiring therapy suspension; prone/lateral positioning, deep implants, or a nearby sterile field may favor reprogramming. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Separate treatment from detection:** Boston Scientific transvenous ICDs may continue detecting/recording arrhythmias while magnet application inhibits ATP and shocks; do not label all magnet responses as “detection off.” ([Boston Scientific](https://www.bostonscientific.com/content/dam/bostonscientific/quality/education-resources/english/US_ACL_Magnet%20Use%20with%20BSC%20CIED_20210421.pdf))
+- **Confirm recovery:** Magnet removal usually restores the prior treatment state, but model-specific delays and older-device exceptions exist; explicitly verify restoration rather than assuming every system reactivates immediately. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-exceptions','aicds-pacemakers','AICDs & Pacemakers',
+  'Magnet exceptions that change the plan',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','magnet','magnet not working','magnet response off','leadless','Micra','AVEIR','Biotronik','Medtronic','Abbott','Boston Scientific','St Jude','MicroPort','Sorin','S-ICD','MRI SureScan','telemetry','10 beats','8 hours','interrogation delay'],6,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-exceptions','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+| Device / feature | Why it matters |
+|---|---|
+| Biotronik pacemaker “Auto” | Only 10 asynchronous beats before returning to sensing-based behavior; select and verify an appropriate sustained response when EMI protection is required. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [Edora manual](https://manuals.biotronik.com/emanuals-professionals-rest/manual/Pacemaker/Edora/Edora/GB/en/Q?type=manual)) |
+| Biotronik ICD | No audible magnet-confirmation tone in the systems described by AHA; tachyarrhythmia detection/therapy automatically reactivates after 8 hours of continuous magnet application, requiring an explicit long-case plan. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/)) |
+| Abbott / Boston Scientific programmable response | Pacemaker response can be programmed off; some ICD settings can also prevent the expected therapy inhibition, so manufacturer name alone does not establish the response. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) |
+| Medtronic telemetry / MRI settings | In the pacemakers covered by its guide, active programmer telemetry or MRI SureScan “On” can prevent magnet operation; coordinate testing with the device team. ([Medtronic](https://wwwp.medtronic.com/crs-upload/letters/102/102_D00874408--rev_B_Magnet-ICD.pdf)) |
+| Boston Scientific S-ICD | Confirm model-specific magnet positioning over the lateral generator; audible confirmation stops after up to 60 seconds even though inhibition continues while the magnet remains detected, and prior MRI can affect beeper usability. ([Boston Scientific](https://www.bostonscientific.com/content/dam/bostonscientific/quality/education-resources/english/US_ACL_Magnet%20Use%20with%20BSC%20CIED_20210421.pdf)) |
+| MicroPort/Sorin ICDs in the review | Some pacing output/rate-response settings change with magnet application, without providing the asynchronous pacing plan needed for EMI; therapy inhibition may persist after removal in certain circumstances. ([Magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) |
+| CRT systems | Magnet-induced changes in pacing timing or ventricular activation may impair usual resynchronization; verify exact-model behavior and hemodynamic tolerance. ([Magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/)) |
+
+### Leadless devices
+
+- **Micra VR/AV:** No magnet response; a dependent patient requiring EMI protection needs a programmed asynchronous plan rather than an external magnet. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **AVEIR:** Magnet response depends on configuration: ventricular-only VOO, atrial-only AOO, and dual-chamber DOO as described by AHA; body habitus and intracardiac location can make reliable activation difficult. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **AVEIR VR model LSP112V:** The manufacturer manual specifies, before RRT and with response enabled, 100 bpm for 5 cycles followed by a battery-dependent rate; “Off” disables the response. ([Abbott AVEIR manual](https://manuals.eifu.abbott/content/dam/av/manuals-eifu/global/IS/en/ARTEN600186860_A.pdf))
+- **Clinical implication:** Do not rely on a leadless magnet plan unless actual activation and sustained capture are demonstrated; use programming when the response is unreliable. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+### Newer technical finding: verify response after interrogation
+
+- **2025 bench study:** In 23 tested devices, seven Biotronik ICDs did not enter magnet inhibition immediately after interrogation, with observed delays of 5–7 minutes; two tested Medtronic pacemakers showed approximately 1.5-minute delays. ([Kreimer et al., 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC12692141/))
+- **Evidence limit:** These were laboratory findings in selected models, not a universal waiting-time protocol or a reason to omit indicated interrogation; the practical safeguard is model-specific verification before EMI exposure. ([Kreimer et al., 2025](https://pmc.ncbi.nlm.nih.gov/articles/PMC12692141/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-electrocautery','aicds-pacemakers','AICDs & Pacemakers',
+  'Electrocautery and EMI precautions',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','bipolar','monopolar','cautery','electrocautery','electrosurgery','Bovie','ultrasonic','EMI','electromagnetic interference','return electrode','return pad','grounding pad','dispersive pad','below umbilicus','abdominal generator','whole body electrode','RF ablation','argon plasma'],7,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-electrocautery','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Energy choice:** Prefer bipolar electrosurgery or an ultrasonic device when appropriate; bipolar energy still should not be applied directly to the CIED system. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Monopolar technique:** Use the lowest effective energy and short, intermittent bursts, generally no longer than 5 seconds, with pauses when feasible. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Return electrode:** Choose placement so current travels away from, not through or near, the generator and leads; a contralateral lower-limb site may help depending on the operative field. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Below-umbilicus cases:** The lower-risk description assumes the return pad is also below the umbilicus and the device/current path does not create another hazard; an abdominal generator requires a separate assessment. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Whole-body return electrodes:** Avoid them in the AHA risk-mitigation approach because they can undermine assumptions about a current path remote from the device. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Other EMI procedures:** RF ablation and endoscopic monopolar/argon plasma techniques also require device planning; “not open surgery” does not mean no EMI risk. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-intraop','aicds-pacemakers','AICDs & Pacemakers',
+  'Intraoperative monitoring and troubleshooting',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','monitoring','ECG','pulse','capture','pacing inhibition','bradycardia','external pacing','inappropriate shock','repeated shocks','VT','VF','cardiac arrest','defibrillation','cardioversion','pad position'],8,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-intraop','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+### Monitoring and preparation
+
+- **Rhythm plus pulse:** Monitor ECG and a mechanical pulse signal, such as pulse-oximetry plethysmography or an arterial waveform when clinically indicated; cautery can obscure ECG and displayed pacing spikes are not proof of effective capture. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Rescue equipment:** Ensure immediate external pacing and defibrillation capability, with pads applied when ICD therapies are suspended. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Pad position:** Avoid placing defibrillation pads directly over the generator; use an anterior-posterior vector when feasible and keep pads as far from the generator as practical without compromising resuscitation. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Rate-responsive sensors:** Include sensor management in the device plan when procedural stimulation could cause inappropriate tachycardia; an ICD magnet does not reliably address this. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [magnet-management review](https://pmc.ncbi.nlm.nih.gov/articles/PMC8836758/))
+
+### Bradycardia, inhibition, or loss of capture
+
+- **Immediate assessment:** Stop the EMI source, assess rhythm and actual perfusion, and determine whether the problem is interference, loss of capture, or another cause of instability. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Rescue pacing:** Use external pacing and resuscitation as indicated while arranging device-team assistance; use a pacemaker magnet only when its response is known and appropriate, not as a blind response to every slow rhythm. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **ICD limitation:** Applying a magnet to an ICD does not solve EMI-induced bradycardia pacing inhibition; address pacing through programming or external support. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+
+### Repeated shocks or true VT/VF
+
+- **Suspected inappropriate shocks:** Stop EMI, rapidly assess the actual rhythm and pulse, and seek device-team assistance; verified magnet application can temporarily suppress inappropriate ICD therapy while external rescue capability is maintained. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **True unstable VT/VF or cardiac arrest:** Follow the appropriate resuscitation pathway without delaying indicated external cardioversion/defibrillation for a programmer, device confirmation, or an ideal pad position; remove an ICD magnet when restoring native therapy, but do not wait for internal therapy if external treatment is needed now. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **After rescue:** Arrange interrogation following external cardioversion/defibrillation, arrest, suspected ICD therapy, or device malfunction/reset. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf); [AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-postop','aicds-pacemakers','AICDs & Pacemakers',
+  'Post-op restoration and handoff',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','postop','PACU','reactivation','restore settings','interrogation','handoff','discharge','follow up'],9,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-postop','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Restore settings:** Remove any magnet when no longer required and have programmed changes reversed or replaced with an appropriate ongoing prescription by qualified personnel. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Confirm ICD protection:** Keep continuous monitoring and rescue capability until required pacing settings and ICD tachyarrhythmia therapies are restored; confirm reactivation before transfer out of monitored care. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Interrogate after significant events:** Arrest, external cardioversion/defibrillation, observed or suspected ICD treatment, suspected reset/malfunction, or substantial concerning EMI exposure warrants postprocedure device evaluation. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Emergency procedure without adequate pre-op evaluation:** Arrange postoperative interrogation rather than allowing the missing assessment to remain unresolved. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Uncomplicated low-risk case:** Immediate interrogation is not universally required after an uneventful, appropriately planned case with no concerning events; follow the device-team plan and routine follow-up when appropriate. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/); [ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Handoff content:** Device identity, dependence, programming changes, magnet use, perioperative events, restoration status, person confirming reactivation, and follow-up arrangements belong in the documented handoff. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+insert into public.quick_reference_catalog
+  (id,reference_id,reference_title,title,keywords,sort_order,is_published)
+values ('cied-urgent','aicds-pacemakers','AICDs & Pacemakers',
+  'Urgent case with incomplete device information',array['AICD','ICD','implantable defibrillator','pacemaker','PPM','CIED','CRT','CRT-P','CRT-D','biventricular','BiV','emergency','urgent','unknown device','missing records','interrogation','external pacing','defibrillation'],10,true)
+on conflict (id) do update set reference_id=excluded.reference_id,
+  reference_title=excluded.reference_title,title=excluded.title,keywords=excluded.keywords,
+  sort_order=excluded.sort_order,is_published=excluded.is_published;
+insert into public.quick_reference_sections (id,body,version)
+values ('cied-urgent','Adult perioperative clinical reference. Individualize with the anesthesia/CIED team, exact-model instructions, and institutional policy; not a patient-specific device prescription.
+
+- **Parallel preparation:** Use available records, device card, ECG, imaging if appropriate, and rapid device-team contact while establishing continuous monitoring and external pacing/defibrillation readiness. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))
+- **Do not guess the magnet response:** A magnet is neither universal pacing protection nor proof that an unidentified ICD''s therapies are suspended. ([AHA 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC12068544/))
+- **Urgency-specific decision:** The treating team must balance the urgency of surgery against unresolved device risk; after emergency surgery performed without appropriate device evaluation, arrange postoperative interrogation. ([ASA 2020](https://www.swa10.com/uploads/6/1/4/3/61438899/aicd_asa_2020.pdf))','2026-09-27')
+on conflict (id) do update set body=excluded.body,version=excluded.version,updated_at=now();
+
+commit;
