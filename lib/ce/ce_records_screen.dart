@@ -160,6 +160,12 @@ class _CeRecordsScreenState extends State<CeRecordsScreen> {
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
+            Text(
+              'Course ${widget.repository.courseNumber}: ${widget.repository.courseTitle}\n'
+              'AANA Course ID ${widget.repository.courseId}',
+              style: const TextStyle(fontWeight: FontWeight.w600, height: 1.5),
+            ),
+            const SizedBox(height: 12),
             const Text(
               'Provider-only records, filtered by actual completion month in America/New_York. Full-course certificates are separate from individual module activity.',
             ),
@@ -169,6 +175,7 @@ class _CeRecordsScreenState extends State<CeRecordsScreen> {
             ),
             const SizedBox(height: 22),
             DropdownButtonFormField<bool>(
+              isExpanded: true,
               initialValue: certificates,
               decoration: const InputDecoration(
                 labelText: 'Record type',
