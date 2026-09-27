@@ -126,9 +126,32 @@ void main() {
       await t.tap(find.text('My certificates'));
       await t.pumpAndSettle();
       expect(find.text('View certificate & requirements'), findsNWidgets(3));
+      final sizes = [
+        for (final n in [1, 2, 3])
+          t.getSize(find.byKey(ValueKey('ce-certificate-card-$n'))),
+      ];
+      expect(sizes[1], sizes[0]);
+      expect(sizes[2], sizes[0]);
       expect(t.takeException(), isNull);
     });
   }
+  testWidgets('locked certificate cards remain uniform with enlarged text', (
+    t,
+  ) async {
+    await mount(t, width: 390, access: false);
+    t.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(t.platformDispatcher.clearTextScaleFactorTestValue);
+    await t.tap(find.text('My certificates'));
+    await t.pumpAndSettle();
+    final sizes = [
+      for (final n in [1, 2, 3])
+        t.getSize(find.byKey(ValueKey('ce-certificate-card-$n'))),
+    ];
+    expect(sizes[1], sizes[0]);
+    expect(sizes[2], sizes[0]);
+    expect(find.text('View course access'), findsNWidgets(3));
+    expect(t.takeException(), isNull);
+  });
   testWidgets('sandbox preview never exposes the provider dashboard', (
     t,
   ) async {

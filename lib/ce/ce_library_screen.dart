@@ -301,32 +301,67 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
       'Official credits require all modules, passing quizzes, and evaluations. '
       'Creator previews do not award credits.',
     ),
-    for (final repo in repos)
-      Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(repo.courseTitle, style: lumaDisplay(size: 22)),
-              const SizedBox(height: 10),
-              Text('20.00 MAC Ed CE credits · Course ID ${repo.courseId}'),
-              const SizedBox(height: 16),
-              if (access[repo.courseNumber]?['has_access'] == true)
-                FilledButton(
-                  onPressed: () => openCertificate(repo),
-                  child: const Text('View certificate & requirements'),
-                )
-              else
-                OutlinedButton(
-                  onPressed: () => openCourse(repo),
-                  child: const Text('View course access'),
+    LayoutBuilder(
+      builder: (context, constraints) {
+        // Reserve the tallest title for every card, without truncating long names
+        // or relying on fixed heights that break at larger accessibility sizes.
+        final titleStyle = DefaultTextStyle.of(context).style
+            .merge(lumaDisplay(size: 22));
+        var titleHeight = 0.0;
+        for (final repo in repos) {
+          final painter = TextPainter(
+            text: TextSpan(text: repo.courseTitle, style: titleStyle),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout(maxWidth: constraints.maxWidth - 48);
+          if (painter.height > titleHeight) titleHeight = painter.height;
+          painter.dispose();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final repo in repos)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  key: ValueKey('ce-certificate-card-${repo.courseNumber}'),
+                  margin: EdgeInsets.zero,
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: titleHeight,
+                          child: Text(repo.courseTitle, style: titleStyle),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '20.00 MAC Ed CE credits · Course ID ${repo.courseId}',
+                        ),
+                        const SizedBox(height: 16),
+                        if (access[repo.courseNumber]?['has_access'] == true)
+                          FilledButton(
+                            onPressed: () => openCertificate(repo),
+                            child: const Text(
+                              'View certificate & requirements',
+                            ),
+                          )
+                        else
+                          OutlinedButton(
+                            onPressed: () => openCourse(repo),
+                            child: const Text('View course access'),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-            ],
-          ),
-        ),
-      ),
+              ),
+          ],
+        );
+      },
+    ),
   ];
 
   List<Widget> providerDashboard() => [
