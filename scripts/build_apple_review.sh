@@ -28,5 +28,13 @@ if [[ "$actual_version" != "3.0.0" || "$actual_build" != "$1" ]]; then
   exit 1
 fi
 echo "Verified archive: Luma Anesthesia $actual_version ($actual_build)."
+legacy_pdfium=$(find build/ios/archive/Runner.xcarchive/Products \
+  -iname '*pdfium*' -print -quit)
+if [[ -n "$legacy_pdfium" ]]; then
+  echo "Unexpected legacy PDFium found: $legacy_pdfium" >&2
+  echo "Do not upload. Run flutter clean, then rebuild this review archive." >&2
+  exit 1
+fi
+echo "Verified: no legacy PDFium framework in the archive."
 echo "Upload only this newly generated archive, not an older Organizer entry."
 echo "Customer checkout remains disabled; this command does not upload or release."

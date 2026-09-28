@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:pdfrx/pdfrx.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/luma_theme.dart';
@@ -11,6 +10,7 @@ import 'ce_repository.dart';
 import 'ce_certificate_screen.dart';
 import 'ce_participation_dates.dart';
 import 'ce_purchase_screen.dart';
+import 'ce_pdf_viewer.dart';
 
 const ceNavy = Color(0xFF102A3A);
 const ceGold = Color(0xFFE1BD7F);
@@ -1177,7 +1177,7 @@ class CePdfScreen extends StatelessWidget {
     body: Column(
       children: [
         Expanded(
-          child: PdfViewer.data(bytes, sourceName: '$title learner content'),
+          child: CePdfViewer(bytes: bytes, title: '$title learner content'),
         ),
         SafeArea(
           top: false,

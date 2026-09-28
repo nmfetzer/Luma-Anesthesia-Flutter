@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:pdfrx/pdfrx.dart';
 import 'package:printing/printing.dart';
 
 import 'ce_repository.dart';
 import 'ce_certificate_pdf.dart';
+import 'ce_pdf_viewer.dart';
 
 class CeCertificateScreen extends StatefulWidget {
   const CeCertificateScreen({super.key, required this.repository});
@@ -116,9 +116,9 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
                 ),
               ),
               Expanded(
-                child: PdfViewer.data(
-                  bytes!,
-                  sourceName:
+                child: CePdfViewer(
+                  bytes: bytes!,
+                  title:
                       'CE HALO Course ${widget.repository.courseNumber} certificate',
                 ),
               ),

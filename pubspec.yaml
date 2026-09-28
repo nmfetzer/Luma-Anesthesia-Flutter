@@ -23,8 +23,8 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_markdown_plus: ^1.0.12
   markdown: ^7.3.0
-  # Tested PDF viewer version; requires the Dart 3.13 toolchain.
-  pdfrx: 2.6.5
+  # CE viewing uses system PDFKit on iOS and the existing printing renderer
+  # elsewhere. Do not reintroduce the symbol-less iOS PDFium framework.
   pdf: 3.13.1
   printing: 5.15.1
   cryptography: ^2.9.0
