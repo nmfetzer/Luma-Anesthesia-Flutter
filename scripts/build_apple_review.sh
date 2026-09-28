@@ -13,8 +13,20 @@ fi
 cd "$(dirname "$0")/.."
 flutter pub get
 flutter build ipa --release \
-  --build-name=3.0 \
+  --build-name=3.0.0 \
   --build-number="$1" \
   --dart-define=LUMA_APPLE_REVIEW_ENABLED=true \
   --dart-define=LUMA_BILLING_ENABLED=false \
   --dart-define=LUMA_CE_BILLING_ENABLED=false
+
+# Check the archived app, not just Xcode's editable version label.
+app_plist="build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/Info.plist"
+actual_version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app_plist")
+actual_build=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app_plist")
+if [[ "$actual_version" != "3.0.0" || "$actual_build" != "$1" ]]; then
+  echo "Archive version mismatch: found $actual_version ($actual_build)." >&2
+  exit 1
+fi
+echo "Verified archive: Luma Anesthesia $actual_version ($actual_build)."
+echo "Upload only this newly generated archive, not an older Organizer entry."
+echo "Customer checkout remains disabled; this command does not upload or release."

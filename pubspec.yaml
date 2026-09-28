@@ -1,7 +1,9 @@
 name: luma_anesthesia
 description: "Luma Anesthesia — clinical reference for anesthesia providers."
 publish_to: "none"
-version: 0.1.0+1
+# Keep the release name aligned with scripts/build_apple_review.sh.
+# Supply a new unused --build-number for every App Store upload.
+version: 3.0.0+1
 
 environment:
   sdk: ">=3.13.0 <4.0.0"

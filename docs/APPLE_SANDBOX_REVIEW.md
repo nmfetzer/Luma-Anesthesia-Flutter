@@ -82,7 +82,11 @@ On the developer's Mac, after pulling the approved commit, run:
 bash scripts/build_apple_review.sh NEW_UNUSED_BUILD_NUMBER
 ```
 
-Replace the final argument with an unused positive integer build number. The script builds version `3.0`, uses the existing public Apple SDK key, enables only the review build flag, and keeps both customer purchase flags false. Signing, provisioning and upload remain the developer's Mac/App Store Connect steps. The script does not upload, submit or release anything.
+Replace the final argument with an unused positive integer build number. The script builds version `3.0.0`, uses the existing public Apple SDK key, enables only the review build flag, and keeps both customer purchase flags false. Signing, provisioning and upload remain the developer's Mac/App Store Connect steps. The script does not upload, submit or release anything.
+
+The project's default version is also `3.0.0`; the former `0.1.0` default was incompatible with the previously approved `2.3` reported by Apple. Each new upload still needs an unused build number. The script checks the actual archived app's version and build after building. Use the newly created archive, not an older Organizer entry. Confirm that `3.0.0` is an open, eligible version in App Store Connect; the repository cannot determine whether a later version has already been closed. Flutter maps build-name to `CFBundleShortVersionString` and build-number to `CFBundleVersion` ([Flutter iOS deployment](https://docs.flutter.dev/deployment/ios)).
+
+A missing `PDFium.framework` dSYM is a separate symbol-upload issue, not a version-number fix. Obtain symbols matching the exact framework build UUID from its supplier; do not rename another dSYM or fabricate UUID matches. Apple explains that binary and dSYM UUIDs must match and that symbol files are used for crash-report symbolication ([Apple debugging information](https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information)). The September 28 version correction does not claim to repair the PDFium symbols or validate a signed native archive.
 
 Test the exact intended submission build on a signed iPhone through Apple sandbox/TestFlight. A test-account allowlist cannot determine which Apple payment environment will open before checkout; do not use designated accounts to make purchases in a live production-store build. Do not change App Store availability as part of test setup.
 
