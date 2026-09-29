@@ -23,7 +23,8 @@ run('createdb',[db]);
 try {
   sql(`
     CREATE SCHEMA auth;
-    CREATE TABLE auth.users(id uuid PRIMARY KEY,is_anonymous boolean NOT NULL DEFAULT false);
+    CREATE TABLE auth.users(id uuid PRIMARY KEY,is_anonymous boolean NOT NULL DEFAULT false,
+      email_confirmed_at timestamptz,banned_until timestamptz);
     CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS
       $$ SELECT current_setting('request.jwt.claims',true)::jsonb $$;
     CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT (auth.jwt()->>'sub')::uuid $$;
@@ -53,6 +54,8 @@ try {
   }
   sql(read('supabase/migrations/20260927230000_apple_sandbox_review.sql'));
   console.log(sql(read('supabase/tests/apple_review.sql')));
+  sql(read('supabase/migrations/20260929020000_open_sandbox_testing.sql'));
+  console.log(sql(read('supabase/tests/open_sandbox_testing.sql')));
   for(const test of ['ce_bonus_three_month_cap.sql','revenuecat_ce_webhook.sql','apple_purchase_wiring.sql']) {
     sql(read('supabase/tests/'+test));
     console.log(`PASS: production regression ${test}`);
