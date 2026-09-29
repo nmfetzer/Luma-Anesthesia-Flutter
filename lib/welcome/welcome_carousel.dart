@@ -11,6 +11,7 @@
 // The "Get started" CTA on slide 4 calls the onFinish callback (wire to sign-in).
 
 import 'package:flutter/material.dart';
+
 import 'luma_theme.dart';
 import 'welcome_background.dart';
 import 'welcome_slides.dart';
@@ -68,12 +69,8 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
     // Icon-morph target values
     final heroSize = (size.height * 0.22).clamp(110.0, 190.0);
     final iconSize = isHero ? heroSize : 40.0;
-    final iconLeft = isHero
-        ? (size.width - iconSize) / 2
-        : 22.0;
-    final iconTop = isHero
-        ? safe.top + size.height * 0.15
-        : safe.top + 20.0;
+    final iconLeft = isHero ? (size.width - iconSize) / 2 : 22.0;
+    final iconTop = isHero ? safe.top + size.height * 0.15 : safe.top + 20.0;
 
     return Scaffold(
       backgroundColor: LumaColors.navyDeep,
@@ -84,8 +81,10 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
 
           // 2. Slide content (PageView)
           Positioned.fill(
-            top: safe.top,
-            bottom: 120,
+            // Keep scrolling content below the fixed brand mark and above the
+            // footer, including devices with a home-indicator safe area.
+            top: safe.top + (isHero ? 0 : 84),
+            bottom: safe.bottom + 120,
             child: PageView.builder(
               controller: _pageController,
               itemCount: _slideCount,
@@ -94,9 +93,11 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
                 // Push content below the hero icon area on slide 1
                 final topPad = i == 0
                     ? size.height * 0.15 + heroSize + 70
-                    : size.height * 0.28;
+                    : (size.height * 0.28 - 84)
+                          .clamp(12.0, double.infinity)
+                          .toDouble();
                 return SingleChildScrollView(
-                  padding: EdgeInsets.only(top: topPad),
+                  padding: EdgeInsets.only(top: topPad, bottom: 16),
                   child: switch (i) {
                     0 => const WelcomeSlideOne(),
                     1 => const WelcomeSlideTwo(),
@@ -114,10 +115,7 @@ class _WelcomeCarouselState extends State<WelcomeCarousel> {
             curve: Curves.easeInOutCubicEmphasized,
             left: iconLeft,
             top: iconTop,
-            child: _FloatingIcon(
-              size: iconSize,
-              floating: isHero,
-            ),
+            child: _FloatingIcon(size: iconSize, floating: isHero),
           ),
 
           // 4. Wordmark next to corner icon (slides 2-4)
@@ -166,13 +164,17 @@ class _FloatingIcon extends StatefulWidget {
   State<_FloatingIcon> createState() => _FloatingIconState();
 }
 
-class _FloatingIconState extends State<_FloatingIcon> with SingleTickerProviderStateMixin {
+class _FloatingIconState extends State<_FloatingIcon>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _float;
 
   @override
   void initState() {
     super.initState();
-    _float = AnimationController(vsync: this, duration: const Duration(seconds: 5))..repeat(reverse: true);
+    _float = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat(reverse: true);
   }
 
   @override
@@ -264,7 +266,9 @@ class _Footer extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(2),
-                color: active ? LumaColors.gold : LumaColors.cream.withOpacity(0.22),
+                color: active
+                    ? LumaColors.gold
+                    : LumaColors.cream.withOpacity(0.22),
               ),
             ),
           ),
@@ -277,11 +281,7 @@ class _Footer extends StatelessWidget {
     if (centered) {
       return Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          cta,
-          const SizedBox(height: 16),
-          dots,
-        ],
+        children: [cta, const SizedBox(height: 16), dots],
       );
     }
 

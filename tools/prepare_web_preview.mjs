@@ -70,7 +70,8 @@ const purchasesPath = resolve(directory,
   'assets/packages/purchases_flutter/assets/web/purchases_js_hybrid_mappings.js');
 if (existsSync(purchasesPath)) {
   const billing = readFileSync(resolve('lib/billing/revenuecat_billing.dart'), 'utf8');
-  if (!billing.includes('if (!RevenueCatConfig.enabled || kIsWeb) return;')) {
+  if (!billing.includes('if (kIsWeb) return;') &&
+      !billing.includes('if (!RevenueCatConfig.enabled || kIsWeb) return;')) {
     throw new Error('Web billing guard changed; review preview checkout isolation.');
   }
   writeFileSync(purchasesPath,

@@ -311,26 +311,58 @@ class _FeatureGrid extends StatelessWidget {
       ),
     ];
 
-    // Responsive grid: 2 columns on narrow phones, 3 columns everywhere else.
-    // Tiles size their height to content instead of stretching to a fixed
-    // aspect ratio, so they look balanced on both phone and desktop.
+    // Keep the long clinical title full-width. Three tiny phone columns split
+    // words and leave ragged rows; paired cards share their row's natural height.
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final columns = width < 380 ? 2 : 3;
-        const gap = 10.0;
-        final tileWidth = (width - gap * (columns - 1)) / columns;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: tiles
-              .map(
-                (t) => SizedBox(
-                  width: tileWidth,
-                  child: _FeatureTile(data: t),
+        final largeText = MediaQuery.textScalerOf(context).scale(15) > 19.5;
+        final columns = width < 300 || largeText ? 1 : 2;
+        const gap = 12.0;
+        final rows = <Widget>[];
+        void addRows(List<_FeatureData> group) {
+          for (var start = 0; start < group.length; start += columns) {
+            rows.add(
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var col = 0; col < columns; col++) ...[
+                      if (col > 0) const SizedBox(width: gap),
+                      Expanded(
+                        child: start + col < group.length
+                            ? _FeatureTile(
+                                data: group[start + col],
+                                wide: columns == 1,
+                                stackIcon: largeText || width < 300,
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ],
                 ),
-              )
-              .toList(),
+              ),
+            );
+          }
+        }
+
+        addRows(tiles.sublist(0, 4));
+        rows.add(
+          _FeatureTile(
+            data: tiles[4],
+            wide: true,
+            stackIcon: largeText || width < 300,
+          ),
+        );
+        addRows(tiles.sublist(5));
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var index = 0; index < rows.length; index++) ...[
+              if (index > 0) const SizedBox(height: gap),
+              rows[index],
+            ],
+          ],
         );
       },
     );
@@ -346,11 +378,37 @@ class _FeatureData {
 
 class _FeatureTile extends StatelessWidget {
   final _FeatureData data;
-  const _FeatureTile({required this.data});
+  final bool wide;
+  final bool stackIcon;
+  const _FeatureTile({
+    required this.data,
+    this.wide = false,
+    this.stackIcon = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          data.title,
+          style: LumaText.featureTitle().copyWith(fontSize: 15, height: 1.25),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          data.sub,
+          style: LumaText.featureSub().copyWith(
+            fontSize: 12,
+            color: LumaColors.cream.withOpacity(0.72),
+          ),
+        ),
+      ],
+    );
+    final icon = Icon(data.icon, size: 22, color: LumaColors.goldSoft);
     return Container(
+      key: ValueKey('welcome-feature-${data.title}'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: LumaColors.navy.withOpacity(0.45),
@@ -360,17 +418,20 @@ class _FeatureTile extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(data.icon, size: 22, color: LumaColors.goldSoft),
-          const SizedBox(height: 8),
-          Text(data.title, style: LumaText.featureTitle()),
-          const SizedBox(height: 4),
-          Text(data.sub, style: LumaText.featureSub()),
-        ],
-      ),
+      child: wide && !stackIcon
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                icon,
+                const SizedBox(width: 12),
+                Expanded(child: text),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [icon, const SizedBox(height: 8), text],
+            ),
     );
   }
 }
