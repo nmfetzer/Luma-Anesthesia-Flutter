@@ -1,5 +1,7 @@
 # Luma Anesthesia Apple Sandbox and App Review Setup
 
+September 28 update: [Open TestFlight Purchase Testing](OPEN_SANDBOX_TESTING.md) supersedes the manual-email-enrollment requirement below. The approved live migration automatically makes fresh, verified, non-owner/non-production accounts eligible for sandbox testing when they request checkout. It does not grant purchases or enable live customer sales. The remaining receipt, RevenueCat, native acceptance, reviewer-login and release checks still apply.
+
 Deployed September 27, 2026 after explicit approval. The backend is live; enrollment of designated accounts, RevenueCat dashboard changes and signed-iPhone acceptance remain separate steps. Customer checkout stays disabled. This document is not a claim of App Review approval or a completed Apple purchase.
 
 ## Deployment record
