@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/luma_home_button.dart';
+import '../widgets/premium_access_gate.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -17,21 +18,50 @@ import 'drug_detail_screen.dart';
 ///   - Transfusions: blood_products (all rows)
 ///
 /// Hemodynamic filters use medication.hemodynamic_tags (text[]).
-class VasopressorsScreen extends StatefulWidget {
+class VasopressorsScreen extends StatelessWidget {
   const VasopressorsScreen({
     super.key,
     this.loadMedications,
     this.loadBloodProducts,
+    this.checkAccess,
+    this.accessChanges,
   });
 
   final Future<List<Map<String, dynamic>>> Function()? loadMedications;
   final Future<List<Map<String, dynamic>>> Function()? loadBloodProducts;
+  final Future<bool> Function()? checkAccess;
+  final Stream<void>? accessChanges;
 
   @override
-  State<VasopressorsScreen> createState() => _VasopressorsScreenState();
+  Widget build(BuildContext context) => PremiumAccessGate(
+    checkAccess: checkAccess,
+    accessChanges: accessChanges,
+    builder: (_) => _VasopressorsContent(
+      loadMedications: loadMedications,
+      loadBloodProducts: loadBloodProducts,
+      checkAccess: checkAccess,
+      accessChanges: accessChanges,
+    ),
+  );
 }
 
-class _VasopressorsScreenState extends State<VasopressorsScreen> {
+class _VasopressorsContent extends StatefulWidget {
+  const _VasopressorsContent({
+    this.loadMedications,
+    this.loadBloodProducts,
+    this.checkAccess,
+    this.accessChanges,
+  });
+  final Future<List<Map<String, dynamic>>> Function()? loadMedications;
+  final Future<List<Map<String, dynamic>>> Function()? loadBloodProducts;
+  final Future<bool> Function()? checkAccess;
+  final Stream<void>? accessChanges;
+
+  @override
+  State<_VasopressorsContent> createState() => _VasopressorsScreenState();
+}
+
+class _VasopressorsScreenState extends State<_VasopressorsContent> {
   int _tabIndex = 0; // 0 = Vasopressors, 1 = Infusions, 2 = Transfusions
   String _activeFilter = 'ALL';
   final TextEditingController _searchCtrl = TextEditingController();
@@ -95,7 +125,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchMedications() async {
-    return OfflineLibrary(Supabase.instance.client).medications();
+    return OfflineLibrary(Supabase.instance.client).vasoMedications();
   }
 
   List<Map<String, dynamic>> get _currentList {
@@ -336,7 +366,14 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
 
   Widget _buildBody() {
     if (_tabIndex == 2) {
-      return BloodProductsView(load: widget.loadBloodProducts);
+      return BloodProductsView(
+        load: widget.loadBloodProducts,
+        wrapDetail: (detail) => PremiumAccessGate(
+          checkAccess: widget.checkAccess,
+          accessChanges: widget.accessChanges,
+          builder: (_) => detail,
+        ),
+      );
     }
     if (_loading) {
       return const Center(
@@ -404,7 +441,7 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
           child: Row(
             children: [
               Text(
-                '${list.length} OF ${_tabIndex == 0 ? _vasopressors.length : _infusions.length} DRUGS',
+                _tabIndex == 0 ? 'VASOPRESSORS' : 'INFUSIONS',
                 style: LumaTokens.eyebrow,
               ),
             ],
@@ -479,7 +516,14 @@ class _VasopressorsScreenState extends State<VasopressorsScreen> {
   }
 
   void _openDrugDetail(Map<String, dynamic> drug) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => DrugDetailScreen(drug: drug)));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PremiumAccessGate(
+          checkAccess: widget.checkAccess,
+          accessChanges: widget.accessChanges,
+          builder: (_) => DrugDetailScreen(drug: drug),
+        ),
+      ),
+    );
   }
 }

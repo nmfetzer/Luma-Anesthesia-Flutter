@@ -145,7 +145,10 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                             for (final reference in references.values)
                               Card(
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.all(20),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
                                   leading: const Icon(
                                     Icons.article_outlined,
                                     color: quickReferenceBlue,
@@ -153,13 +156,8 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                                   title: Text(
                                     reference.referenceTitle,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  subtitle: Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      '${all.where((s) => s.referenceId == reference.referenceId).length} ${all.where((s) => s.referenceId == reference.referenceId).length == 1 ? 'section' : 'sections'} · Tap to browse',
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   trailing: const Icon(Icons.chevron_right),
@@ -188,7 +186,7 @@ class _QuickReferencesScreenState extends State<QuickReferencesScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               searching
-                                  ? '${sections.length} matching ${sections.length == 1 ? 'section' : 'sections'}'
+                                  ? 'Matching references'
                                   : sections.first.referenceTitle,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,

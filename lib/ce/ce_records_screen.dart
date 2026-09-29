@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/luma_home_button.dart';
+
 import 'ce_repository.dart';
 import 'ce_export.dart';
 
@@ -148,7 +150,10 @@ class _CeRecordsScreenState extends State<CeRecordsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Provider records & exports')),
+    appBar: AppBar(
+      title: const Text('Provider records & exports'),
+      actions: const [LumaHomeButton()],
+    ),
     body: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 850),

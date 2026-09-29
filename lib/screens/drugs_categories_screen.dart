@@ -393,11 +393,13 @@ class _CategoryRow extends StatelessWidget {
                           : LumaColors.inkPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    isEmpty ? 'Coming soon' : '${item.count} drugs',
-                    style: lumaMono(size: 12, color: LumaColors.inkMuted),
-                  ),
+                  if (isEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Coming soon',
+                      style: lumaMono(size: 12, color: LumaColors.inkMuted),
+                    ),
+                  ],
                 ],
               ),
             ),

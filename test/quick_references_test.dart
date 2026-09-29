@@ -130,7 +130,7 @@ void main() {
       expect(find.text('Pre-Op Clearance Guidelines'), findsOneWidget);
       await tester.enterText(find.byType(TextField), 'GLP1');
       await tester.pumpAndSettle();
-      expect(find.text('1 matching section'), findsOneWidget);
+      expect(find.text('Matching references'), findsOneWidget);
       expect(find.text(other.title), findsNothing);
       await tester.tap(find.text(glp.title));
       await tester.pumpAndSettle();

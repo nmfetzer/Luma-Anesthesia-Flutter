@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../widgets/luma_home_button.dart';
+
 import '../theme/luma_theme.dart';
 import 'ce_certificate_screen.dart';
 import 'ce_records_screen.dart';
@@ -408,10 +410,11 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
             height: 36,
           ),
           const SizedBox(width: 10),
-          const Text('CE HALO'),
+          const Flexible(child: Text('CE HALO', maxLines: 1)),
         ],
       ),
       actions: [
+        const LumaHomeButton(),
         IconButton(
           tooltip: 'Refresh course access',
           onPressed: loading ? null : load,

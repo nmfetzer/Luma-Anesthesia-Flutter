@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
+import '../widgets/luma_home_button.dart';
+
 import 'package:printing/printing.dart';
 
 import 'ce_repository.dart';
@@ -98,7 +101,10 @@ class _CeCertificateScreenState extends State<CeCertificateScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Course certificate')),
+    appBar: AppBar(
+      title: const Text('Course certificate'),
+      actions: const [LumaHomeButton()],
+    ),
     backgroundColor: const Color(0xFFF6F5F1),
     body: bytes != null
         ? Column(

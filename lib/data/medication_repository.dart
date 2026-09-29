@@ -20,10 +20,14 @@ class MedicationRepository {
   static final MedicationRepository instance = MedicationRepository._();
 
   List<Medication>? _cache;
+  Future<List<Medication>>? _pending;
 
-  Future<List<Medication>> all() async {
-    if (_cache != null) return _cache!;
+  Future<List<Medication>> all() {
+    if (_cache != null) return Future.value(_cache!);
+    return _pending ??= _load().whenComplete(() => _pending = null);
+  }
 
+  Future<List<Medication>> _load() async {
     if (LumaConfig.supabaseConfigured) {
       final rows = await OfflineLibrary(Supabase.instance.client).medications();
       final medications = rows.map(Medication.fromJson).toList()

@@ -17,10 +17,12 @@ void main() {
   late DateTime now;
   bool offline = false, denied = false, partial = false;
   final paths = <String>[];
+  final requests = <Uri>[];
   setUp(() async {
     now = DateTime.now().toUtc();
     offline = denied = partial = false;
     paths.clear();
+    requests.clear();
     cache = OfflineCache(storage: MemoryCacheStorage(), clock: () => now);
     client = SupabaseClient(
       'https://fixture.supabase.co',
@@ -28,6 +30,7 @@ void main() {
       authOptions: const AuthClientOptions(autoRefreshToken: false),
       httpClient: MockClient((request) async {
         paths.add(request.url.path);
+        requests.add(request.url);
         if (offline) throw http.ClientException('Airplane mode');
         final path = request.url.path.split('/').last;
         Object? body;
@@ -73,7 +76,11 @@ void main() {
             ];
           case 'medication':
             body = [
-              {'id': 'med-1', 'name': 'Fixture'},
+              {
+                'id': 'med-1',
+                'name': 'Fixture',
+                'vasoactive_role': 'vasopressor',
+              },
             ];
           case 'blood_products':
             body = [
@@ -236,6 +243,24 @@ void main() {
         isNot(contains('public:download_complete')),
       );
       expect(OfflineLibrary.downloading, isFalse);
+    },
+  );
+  test('vasopressor browse requests only vasoactive rows', () async {
+    final rows = await library.vasoMedications();
+    expect(rows, hasLength(1));
+    final query = requests.last.queryParameters;
+    expect(query['vasoactive_role'], 'in.("vasopressor","infusion")');
+    expect(query['select'], isNot(contains('deep_dive_content')));
+    expect(paths.where((p) => p.endsWith('/medication')), hasLength(1));
+  });
+  test(
+    'vasopressor browse reuses a full offline medication download',
+    () async {
+      await library.medications();
+      offline = true;
+      cache.networkUnavailable = true;
+      final rows = await library.vasoMedications();
+      expect(rows.single['id'], 'med-1');
     },
   );
   test('online access revocation purges saved protected records', () async {

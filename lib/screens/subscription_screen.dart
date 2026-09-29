@@ -1,21 +1,18 @@
-import 'package:flutter/material.dart';
-
-import '../widgets/luma_home_button.dart';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../billing/revenuecat_billing.dart';
+import '../billing/subscription_billing.dart';
 import '../welcome/luma_theme.dart' as brand;
 import '../welcome/welcome_background.dart';
-import '../billing/subscription_billing.dart';
-import '../billing/revenuecat_billing.dart';
+import '../widgets/luma_home_button.dart';
 
-/// Custom native-store paywall. Access is granted only by server verification.
+/// One subscription page. Reference prices never authorize a transaction:
+/// checkout requires the actual store package and server purchase eligibility.
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key, this.openExternal, this.billing});
   final SubscriptionBilling? billing;
-
-  /// Optional launcher for testing legal links without opening a real browser.
   final Future<bool> Function(Uri)? openExternal;
 
   @override
@@ -28,6 +25,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       widget.billing ?? LumaBilling.instance.controller;
   SubscriptionTerm get _term =>
       _annual ? SubscriptionTerm.annual : SubscriptionTerm.monthly;
+  static const _ink = brand.LumaColors.navy;
+
   @override
   void initState() {
     super.initState();
@@ -46,12 +45,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   String _price(SubscriptionTerm term) =>
-      _billing.plan(term)?.price ?? 'Unavailable';
-  static const _ink = brand.LumaColors.navy;
-  static const _muted = Color(0xFF52606A);
+      _billing.plan(term)?.price ??
+      (term == SubscriptionTerm.annual ? r'$69.99' : r'$9.99');
 
-  TextStyle _body({double size = 14}) =>
-      brand.LumaText.body(size: size, color: _muted);
+  Future<void> _account() async {
+    await Navigator.pushNamed(context, '/account');
+    if (mounted) await _billing.refresh();
+  }
 
   Future<void> _openLegal(String address) async {
     try {
@@ -70,324 +70,265 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     }
   }
 
+  TextStyle _body([double size = 13]) =>
+      brand.LumaText.body(size: size, color: const Color(0xFF52606A));
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: brand.LumaColors.navyDeep,
-    body: Stack(
-      children: [
-        const WelcomeBackground(heroHaloOpacity: 0),
-        SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 580),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/branding/luma_symbol_halo.png',
-                          height: 44,
-                          fit: BoxFit.contain,
-                          excludeFromSemantics: true,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Luma Anesthesia',
-                            style: brand.LumaText.wordmark(),
-                          ),
-                        ),
-                        const LumaHomeButton(color: brand.LumaColors.cream),
-                        IconButton(
-                          tooltip: 'Close subscription options',
-                          onPressed: () => Navigator.of(context).maybePop(),
-                          color: brand.LumaColors.cream,
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: EdgeInsets.all(
-                        MediaQuery.sizeOf(context).width < 440 ? 24 : 36,
+  Widget build(BuildContext context) {
+    final loaded = _billing.plan(_term) != null;
+    final canBuy = _billing.canPurchase && loaded;
+    return Scaffold(
+      backgroundColor: brand.LumaColors.navyDeep,
+      body: Stack(
+        children: [
+          const WelcomeBackground(heroHaloOpacity: 0),
+          SafeArea(
+            child: Column(
+              children: [
+                // Navigation stays visible, including at large text sizes.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/branding/luma_symbol_halo.png',
+                        height: 38,
+                        fit: BoxFit.contain,
+                        excludeFromSemantics: true,
                       ),
-                      decoration: BoxDecoration(
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text('Luma', style: brand.LumaText.wordmark()),
+                      ),
+                      const LumaHomeButton(color: brand.LumaColors.cream),
+                      IconButton(
+                        tooltip: 'Close subscription options',
+                        onPressed: () => Navigator.of(context).maybePop(),
                         color: brand.LumaColors.cream,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: brand.LumaColors.goldSoft,
-                          width: 1,
-                        ),
+                        icon: const Icon(Icons.close),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'LUMA PREMIUM',
-                            style: _body(size: 12).copyWith(
-                              color: _ink,
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'A deeper understanding.\nA clearer perspective.',
-                            style: brand.LumaText.title(size: 32, color: _ink),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Unlock subscriber-only anesthesia reference content. '
-                            'Creating an account alone does not unlock paid sections.',
-                            style: _body(size: 16),
-                          ),
-                          const SizedBox(height: 24),
-                          _benefit(
-                            Icons.menu_book_outlined,
-                            'Explore Crisis Hub references',
-                            'Organized clinical crisis reading. Mental health '
-                                'and provider recovery support always remain free.',
-                          ),
-                          _benefit(
-                            Icons.account_tree_outlined,
-                            'Pathophysiology & Anesthesia Considerations',
-                            'Condition-specific clinical references, perioperative '
-                                'considerations, and extended reading.',
-                          ),
-                          _benefit(
-                            Icons.medication_outlined,
-                            'Explore Drug Library Deep Dives',
-                            'Extended medication reading is subscription-only. '
-                                'All other Drug Library content remains free.',
-                          ),
-                          _benefit(
-                            Icons.account_tree_outlined,
-                            'Free tools stay free',
-                            'Basic Drug Library content, Quick References, and '
-                                'provider mental health support do not require a subscription.',
-                          ),
-                          _benefit(
-                            Icons.fact_check_outlined,
-                            'Keep the evidence in view',
-                            'Follow references and patient-specific cautions '
-                                'as you study and prepare.',
-                          ),
-                          const SizedBox(height: 8),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final plans = [
-                                _plan(
-                                  true,
-                                  'Annual',
-                                  _price(SubscriptionTerm.annual),
-                                  '/ year',
-                                  'Billed annually. Auto-renews.',
-                                ),
-                                _plan(
-                                  false,
-                                  'Monthly',
-                                  _price(SubscriptionTerm.monthly),
-                                  '/ month',
-                                  'Billed monthly. Auto-renews.',
-                                ),
-                              ];
-                              if (constraints.maxWidth < 350) {
-                                return Column(
-                                  children: [
-                                    plans[0],
-                                    const SizedBox(height: 12),
-                                    plans[1],
-                                  ],
-                                );
-                              }
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(child: plans[0]),
-                                  const SizedBox(width: 12),
-                                  Expanded(child: plans[1]),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _billing.plan(_term) == null
-                                ? 'Store pricing is unavailable here. No payment will be taken.'
-                                : 'Luma Premium ${_annual ? 'Annual' : 'Monthly'}: '
-                                      'a ${_annual ? '1-year' : '1-month'} auto-renewable subscription '
-                                      'at ${_price(_term)} per ${_annual ? 'year' : 'month'}. '
-                                      'Any eligible store offer is shown in the confirmation sheet.',
-                            style: _body(size: 12),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Subscriptions automatically renew unless canceled. '
-                            'Cancel before your next renewal to avoid another charge. '
-                            'Access continues through the paid subscription period.',
-                            style: _body(size: 12),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            subscriptionBillingNotice(
-                              Theme.of(context).platform,
-                              isWeb: kIsWeb,
-                            ),
-                            style: _body(size: 12),
-                          ),
-                          const SizedBox(height: 12),
-                          FilledButton(
-                            onPressed:
-                                _billing.canPurchase &&
-                                    _billing.plan(_term) != null
-                                ? () => _billing.purchase(_term)
-                                : null,
-                            child: Text(
-                              _billing.busy
-                                  ? 'Please wait…'
-                                  : _billing.verified
-                                  ? 'Premium access verified'
-                                  : !_billing.available
-                                  ? 'Purchases coming soon'
-                                  : 'Subscribe ${_annual ? 'annually' : 'monthly'}',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _billing.message ??
-                                (_billing.available
-                                    ? 'Payment is completed securely through your app store. '
-                                          'Access begins after server verification.'
-                                    : _billing.unavailableMessage),
-                            textAlign: TextAlign.center,
-                            style: _body(size: 12),
-                          ),
-                          const SizedBox(height: 16),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 8,
-                            children: [
-                              TextButton(
-                                onPressed: _billing.busy
-                                    ? null
-                                    : () async {
-                                        await Navigator.pushNamed(
-                                          context,
-                                          '/account',
-                                        );
-                                        if (mounted) await _billing.refresh();
-                                      },
-                                child: const Text('Sign in / My account'),
-                              ),
-                              TextButton(
-                                onPressed:
-                                    _billing.available &&
-                                        _billing.signedIn &&
-                                        _billing.serverReady &&
-                                        !_billing.busy
-                                    ? _billing.restore
-                                    : null,
-                                child: const Text('Restore purchases'),
-                              ),
-                              if (_billing.available)
-                                TextButton(
-                                  onPressed: _billing.busy
-                                      ? null
-                                      : _billing.refresh,
-                                  child: const Text('Refresh access'),
-                                ),
-                            ],
-                          ),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 8,
-                            children: [
-                              TextButton(
-                                onPressed: () => _openLegal(
-                                  'https://lumaeducationalapps.com/terms-of-use-eula',
-                                ),
-                                child: const Text('Terms of Use / EULA'),
-                              ),
-                              TextButton(
-                                onPressed: () => _openLegal(
-                                  'https://lumaeducationalapps.com/privacy-policy-1',
-                                ),
-                                child: const Text('Privacy Policy'),
-                              ),
-                            ],
-                          ),
-                          const Divider(height: 32),
-                          const CeAccessMessage(),
-                          const SizedBox(height: 16),
-                          OutlinedButton(
-                            onPressed: () =>
-                                Navigator.pushNamed(context, '/ce-halo'),
-                            child: const Text('Explore CE access'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Clinical reference and education. Not a substitute '
-                      'for clinical judgment or local protocols.',
-                      textAlign: TextAlign.center,
-                      style: brand.LumaText.body(
-                        size: 12,
-                        color: brand.LumaColors.cream,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 560),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: brand.LumaColors.cream,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: brand.LumaColors.goldSoft,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'LUMA PREMIUM',
+                                style: _body(11).copyWith(
+                                  letterSpacing: 1.6,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Your clinical companion',
+                                style: brand.LumaText.title(
+                                  size: 26,
+                                  color: _ink,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              _benefit(
+                                'Vasopressors, Infusions & Transfusions',
+                              ),
+                              _benefit('Crisis Hub clinical references'),
+                              _benefit(
+                                'Pathophysiology & Anesthesia Considerations',
+                              ),
+                              _benefit('Drug Library Deep Dives'),
+                              const SizedBox(height: 8),
+                              if (MediaQuery.textScalerOf(context).scale(14) >
+                                  21)
+                                Column(
+                                  children: [
+                                    _plan(false, 'Monthly'),
+                                    const SizedBox(height: 10),
+                                    _plan(true, 'Yearly'),
+                                  ],
+                                )
+                              else
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(child: _plan(false, 'Monthly')),
+                                    const SizedBox(width: 10),
+                                    Expanded(child: _plan(true, 'Yearly')),
+                                  ],
+                                ),
+                              const SizedBox(height: 7),
+                              Text(
+                                loaded
+                                    ? '${_annual ? '1-year' : '1-month'} auto-renewable subscription. '
+                                          'Billed ${_price(_term)} per ${_annual ? 'year' : 'month'}.'
+                                    : 'Prices shown in USD. Your app store confirms local pricing before purchase.',
+                                style: _body(11),
+                              ),
+                              const SizedBox(height: 10),
+                              FilledButton(
+                                onPressed: _billing.busy || _billing.verified
+                                    ? null
+                                    : !_billing.signedIn
+                                    ? _account
+                                    : canBuy
+                                    ? () => _billing.purchase(_term)
+                                    : null,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: _ink,
+                                  foregroundColor: brand.LumaColors.cream,
+                                  minimumSize: const Size.fromHeight(48),
+                                ),
+                                child: Text(
+                                  _billing.busy
+                                      ? 'Please wait…'
+                                      : _billing.verified
+                                      ? 'Premium access verified'
+                                      : !_billing.signedIn
+                                      ? 'Sign in to subscribe'
+                                      : !_billing.available
+                                      ? 'Purchases coming soon'
+                                      : 'Subscribe ${_annual ? 'annually' : 'monthly'}',
+                                ),
+                              ),
+                              if (_billing.signedIn && _billing.message != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    _billing.message!,
+                                    style: _body(12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              if (!_billing.available)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    'Preview only. Store purchases are not enabled here.',
+                                    style: _body(11),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 8,
+                                children: [
+                                  TextButton(
+                                    onPressed:
+                                        _billing.available &&
+                                            _billing.signedIn &&
+                                            _billing.serverReady &&
+                                            !_billing.busy
+                                        ? _billing.restore
+                                        : null,
+                                    child: const Text('Restore purchases'),
+                                  ),
+                                  TextButton(
+                                    onPressed: _billing.busy
+                                        ? null
+                                        : _billing.signedIn
+                                        ? _billing.refresh
+                                        : _account,
+                                    child: Text(
+                                      _billing.signedIn
+                                          ? 'Refresh access'
+                                          : 'Create account',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Subscriptions automatically renew unless canceled at least '
+                                '24 hours before the end of the current period. '
+                                '${subscriptionBillingNotice(Theme.of(context).platform, isWeb: kIsWeb)}',
+                                style: _body(11),
+                              ),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  TextButton(
+                                    onPressed: () => _openLegal(
+                                      'https://cehalo.com/terms-of-use-eula',
+                                    ),
+                                    child: const Text('Terms of Use / EULA'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => _openLegal(
+                                      'https://cehalo.com/privacy-policy',
+                                    ),
+                                    child: const Text('Privacy Policy'),
+                                  ),
+                                ],
+                              ),
+                              const Divider(height: 12),
+                              Text(
+                                'No app subscription is required for AANA-approved CE. '
+                                'Courses are purchased separately.',
+                                textAlign: TextAlign.center,
+                                style: _body(12),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/ce-halo'),
+                                child: const Text('Explore CE access'),
+                              ),
+                              Text(
+                                'Basic Drug Library, Quick References and provider mental health support stay free.',
+                                textAlign: TextAlign.center,
+                                style: _body(11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 
-  Widget _benefit(IconData icon, String title, String description) => Padding(
-    padding: const EdgeInsets.only(bottom: 20),
+  Widget _benefit(String label) => Padding(
+    padding: const EdgeInsets.only(bottom: 5),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: _ink, size: 22),
-        const SizedBox(width: 12),
+        const Icon(Icons.check, size: 17, color: _ink),
+        const SizedBox(width: 8),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: _body().copyWith(
-                  color: _ink,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(description, style: _body()),
-            ],
-          ),
+          child: Text(label, style: _body(13).copyWith(color: _ink)),
         ),
       ],
     ),
   );
 
-  Widget _plan(
-    bool annual,
-    String name,
-    String price,
-    String period,
-    String note,
-  ) {
+  Widget _plan(bool annual, String label) {
     final selected = annual == _annual;
+    final price = _price(
+      annual ? SubscriptionTerm.annual : SubscriptionTerm.monthly,
+    );
     return Semantics(
       button: true,
       selected: selected,
-      label: '$name plan, $price $period',
+      label: '$label plan, $price per ${annual ? 'year' : 'month'}',
       child: Material(
         color: selected ? const Color(0xFFEDE4D2) : brand.LumaColors.cream,
         shape: RoundedRectangleBorder(
@@ -400,38 +341,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () => setState(() => _annual = annual),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      selected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color: _ink,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: _body().copyWith(
-                          color: _ink,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  label,
+                  style: _body(13)
+                      .copyWith(color: _ink, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
-                Text(price, style: brand.LumaText.title(size: 28, color: _ink)),
-                Text(period, style: _body()),
-                const SizedBox(height: 8),
-                Text(note, style: _body(size: 12)),
+                const SizedBox(height: 4),
+                Text(price, style: brand.LumaText.title(size: 24, color: _ink)),
+                Text(annual ? 'per year' : 'per month', style: _body(11)),
               ],
             ),
           ),
@@ -441,21 +363,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 }
 
-/// Web is a preview, not an Apple or Google checkout surface.
 String subscriptionBillingNotice(
   TargetPlatform platform, {
   required bool isWeb,
 }) {
   const apple =
-      'Payment is charged to your Apple Account at purchase confirmation. '
-      'Renewal is charged within 24 hours before the next subscription period. '
+      'Payment is charged to your Apple Account at confirmation. '
+      'Renewal is charged within 24 hours before the next period. '
       'Manage or cancel in Settings > your name > Subscriptions.';
   const google =
       'Payment is charged through your Google Play account. '
       'Manage or cancel in Google Play > Payments & subscriptions > Subscriptions.';
   if (isWeb) {
-    return 'For iOS purchases: $apple\n\n'
-        'For Android purchases: $google\n\n'
+    return 'For iOS purchases: $apple\n'
+        'For Android purchases: $google\n'
         'Store billing is not available in this Chrome preview.';
   }
   return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS
@@ -465,7 +386,6 @@ String subscriptionBillingNotice(
 
 class CeAccessMessage extends StatelessWidget {
   const CeAccessMessage({super.key});
-
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -474,77 +394,41 @@ class CeAccessMessage extends StatelessWidget {
         'Your CE. Your choice.',
         style: brand.LumaText.title(size: 24, color: brand.LumaColors.navy),
       ),
-      const SizedBox(height: 8),
-      Text(
+      const SizedBox(height: 12),
+      const Text(
         'No app subscription is required to access AANA-approved CE content. '
         'Courses and bundles are purchased separately.',
-        style: brand.LumaText.body(size: 14, color: brand.LumaColors.navy),
       ),
       const SizedBox(height: 16),
-      _bonus('1 course purchase', '1 complimentary month, one time'),
+      const Text(
+        '1 course purchase: 1 complimentary month, one time.\n'
+        'Bundle purchase: up to 3 complimentary months total.',
+      ),
       const SizedBox(height: 12),
-      _bonus('Bundle purchase', 'Up to 3 complimentary months total'),
-      const SizedBox(height: 12),
-      Text(
-        'Planned activation: access is added to your account after a '
-        'verified course purchase. No code and no automatic subscription '
-        'charge. Maximum 3 bonus months per account across stores. '
-        'If you already received the course month, the bundle adds only '
-        '2 more months after any remaining CE bonus access. Additional '
-        'course purchases and restores add no months. Existing paid '
-        'subscription billing is unchanged. '
+      const Text(
+        'Planned activation: access is added after a verified course purchase. '
+        'No code and no automatic subscription charge. '
+        'Maximum 3 bonus months per account across stores. '
+        'If you already received the course month, the bundle adds only 2 more months '
+        'after any remaining CE bonus access. Additional course purchases and restores '
+        'add no months. Existing paid subscription billing is unchanged. '
         'Course purchases and bonus activation are coming soon.',
-        style: brand.LumaText.body(size: 12, color: const Color(0xFF52606A)),
-      ),
-    ],
-  );
-
-  Widget _bonus(String title, String value) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Icon(
-        Icons.check_circle_outline,
-        color: brand.LumaColors.navy,
-        size: 20,
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: '$title\n',
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              TextSpan(text: value),
-            ],
-          ),
-          style: brand.LumaText.body(size: 14, color: brand.LumaColors.navy),
-        ),
       ),
     ],
   );
 }
 
-/// The CE entry point stays outside the app-subscription gate.
-/// No courses, approval identifiers or checkout products are fabricated.
 class CeAccessScreen extends StatelessWidget {
   const CeAccessScreen({super.key});
-
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('CE HALO'),
       actions: const [LumaHomeButton()],
     ),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 580),
-          child: const CeAccessMessage(),
-        ),
-      ),
+    body: const SingleChildScrollView(
+      padding: EdgeInsets.all(24),
+      child: Center(child: SizedBox(width: 580, child: CeAccessMessage())),
     ),
   );
 }

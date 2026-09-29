@@ -134,10 +134,14 @@ class OfflineLibrary {
     String fields,
     String order, {
     String? publishedColumn,
+    bool vasoOnly = false,
   }) async {
     final rows = <Map<String, dynamic>>[];
     for (var offset = 0; ; offset += 200) {
       var query = client.from(table).select(fields);
+      if (vasoOnly) {
+        query = query.inFilter('vasoactive_role', ['vasopressor', 'infusion']);
+      }
       if (publishedColumn != null)
         query = query.eq(publishedColumn, 'published');
       final ordered = table == 'quick_reference_catalog'
@@ -184,6 +188,34 @@ class OfflineLibrary {
     'id',
     force: force,
   );
+
+  /// Do not download the full 55-field medication library to open one section.
+  /// These are the same public fields available in the free Drug Library;
+  /// the premium section itself is guarded by PremiumAccessGate.
+  Future<List<Map<String, dynamic>>> vasoMedications() async {
+    Object? data;
+    try {
+      data = await cache.load(
+        'vaso-medications',
+        () => fetchRows(
+          'medication',
+          medicationPublicFields,
+          'id',
+          vasoOnly: true,
+        ),
+      );
+    } on OfflineUnavailable {
+      // A complete offline library download also satisfies this smaller view.
+      data = await cache.saved('medications');
+    }
+    return (data as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .where(
+          (row) => ['vasopressor', 'infusion'].contains(row['vasoactive_role']),
+        )
+        .toList();
+  }
+
   Future<List<Map<String, dynamic>>> blood({bool force = false}) =>
       rows('blood', 'blood_products', '*', 'id', force: force);
   Future<List<Map<String, dynamic>>> quickCatalog({bool force = false}) =>

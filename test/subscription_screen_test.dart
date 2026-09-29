@@ -37,18 +37,19 @@ void main() {
     );
     expect(logo.fit, BoxFit.contain);
     expect(find.text('LUMA PREMIUM'), findsOneWidget);
-    expect(find.text('Unavailable'), findsNWidgets(2));
-    expect(find.textContaining('Store pricing is unavailable'), findsOneWidget);
+    expect(find.text(r'$9.99'), findsOneWidget);
+    expect(find.text(r'$69.99'), findsOneWidget);
+    expect(find.textContaining('Prices shown in USD'), findsOneWidget);
     expect(
       find.textContaining('automatically renew unless canceled'),
       findsOneWidget,
     );
-    final checkout = find.widgetWithText(FilledButton, 'Purchases coming soon');
-    expect(tester.widget<FilledButton>(checkout).onPressed, isNull);
+    final checkout = find.widgetWithText(FilledButton, 'Sign in to subscribe');
+    expect(tester.widget<FilledButton>(checkout).onPressed, isNotNull);
     await tester.ensureVisible(find.text('Monthly'));
     await tester.tap(find.text('Monthly'));
     await tester.pump();
-    expect(find.textContaining('Store pricing is unavailable'), findsOneWidget);
+    expect(find.textContaining('Prices shown in USD'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -97,8 +98,8 @@ void main() {
       await tester.pump();
     }
     expect(opened.map((uri) => uri.toString()), [
-      'https://lumaeducationalapps.com/terms-of-use-eula',
-      'https://lumaeducationalapps.com/privacy-policy-1',
+      'https://cehalo.com/terms-of-use-eula',
+      'https://cehalo.com/privacy-policy',
     ]);
   });
 
@@ -140,23 +141,15 @@ void main() {
         find.textContaining('No app subscription is required'),
         findsOneWidget,
       );
-      expect(
-        find.textContaining('bonus activation are coming soon'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('Maximum 3 bonus months per account across stores'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('the bundle adds only 2 more months'),
-        findsOneWidget,
-      );
       await tester.ensureVisible(find.text('Explore CE access'));
       await tester.tap(find.text('Explore CE access'));
       await tester.pumpAndSettle();
       expect(find.text('CE HALO'), findsOneWidget);
       expect(find.byType(CeAccessScreen), findsOneWidget);
+      expect(
+        find.textContaining('Maximum 3 bonus months per account across stores'),
+        findsOneWidget,
+      );
       expect(
         find.textContaining('No app subscription is required'),
         findsOneWidget,
@@ -167,8 +160,8 @@ void main() {
   testWidgets('account link remains separate from checkout', (tester) async {
     await tester.pumpWidget(app());
     await tester.pump();
-    await tester.ensureVisible(find.text('Sign in / My account'));
-    await tester.tap(find.text('Sign in / My account'));
+    await tester.ensureVisible(find.text('Sign in to subscribe'));
+    await tester.tap(find.text('Sign in to subscribe'));
     await tester.pumpAndSettle();
     expect(find.text('Account destination'), findsOneWidget);
   });
@@ -186,4 +179,28 @@ void main() {
     await tester.pump();
     expect(tester.takeException(), isNull);
   });
+
+  for (final size in [
+    const Size(320, 740),
+    const Size(390, 844),
+    const Size(820, 1180),
+    const Size(1180, 820),
+  ]) {
+    testWidgets('plans, subscribe and pinned Home are usable at $size', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(app());
+      await tester.pump();
+      expect(find.text(r'$9.99').hitTestable(), findsOneWidget);
+      expect(find.text(r'$69.99').hitTestable(), findsOneWidget);
+      expect(find.text('Sign in to subscribe').hitTestable(), findsOneWidget);
+      await tester.ensureVisible(find.text('Explore CE access'));
+      expect(find.text('Home').hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../widgets/luma_home_button.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../auth/account_access.dart';
@@ -49,7 +52,10 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Reset password')),
+    appBar: AppBar(
+      title: const Text('Reset password'),
+      actions: const [LumaHomeButton()],
+    ),
     body: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),

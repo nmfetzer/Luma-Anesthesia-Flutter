@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/luma_home_button.dart';
+
 import '../billing/ce_billing.dart';
 import '../billing/revenuecat_billing.dart';
 import '../billing/subscription_billing.dart';
@@ -33,7 +35,10 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('CE courses & purchases')),
+    appBar: AppBar(
+      title: const Text('CE courses & purchases'),
+      actions: const [LumaHomeButton()],
+    ),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [

@@ -3,6 +3,9 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
+import '../widgets/luma_home_button.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/luma_theme.dart';
@@ -265,6 +268,7 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
               ),
         title: const Text('CE HALO'),
         actions: [
+          const LumaHomeButton(),
           IconButton(
             tooltip: 'Contact CE HALO',
             onPressed: () => launchUrl(Uri.parse('mailto:info@cehalo.com')),
@@ -1173,7 +1177,10 @@ class CePdfScreen extends StatelessWidget {
   final String title;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text('$title • Learner content')),
+    appBar: AppBar(
+      title: Text('$title • Learner content'),
+      actions: const [LumaHomeButton()],
+    ),
     body: Column(
       children: [
         Expanded(

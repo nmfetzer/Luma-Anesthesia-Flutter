@@ -13,8 +13,9 @@ import '../offline/offline_library.dart';
 
 /// Blood Products list view — reads from `blood_products` table.
 class BloodProductsView extends StatefulWidget {
-  const BloodProductsView({super.key, this.load});
+  const BloodProductsView({super.key, this.load, this.wrapDetail});
   final Future<List<Map<String, dynamic>>> Function()? load;
+  final Widget Function(Widget)? wrapDetail;
 
   @override
   State<BloodProductsView> createState() => _BloodProductsViewState();
@@ -152,7 +153,10 @@ class _BloodProductsViewState extends State<BloodProductsView> {
                         ),
                       ),
                       for (final p in entry.value) ...[
-                        _BloodProductCard(product: p),
+                        _BloodProductCard(
+                          product: p,
+                          wrapDetail: widget.wrapDetail,
+                        ),
                         const SizedBox(height: 10),
                       ],
                     ],
@@ -168,7 +172,8 @@ class _BloodProductsViewState extends State<BloodProductsView> {
 
 class _BloodProductCard extends StatelessWidget {
   final Map<String, dynamic> product;
-  const _BloodProductCard({required this.product});
+  final Widget Function(Widget)? wrapDetail;
+  const _BloodProductCard({required this.product, this.wrapDetail});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +185,10 @@ class _BloodProductCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => _BloodProductDetail(product: product),
+            builder: (_) {
+              final detail = _BloodProductDetail(product: product);
+              return wrapDetail?.call(detail) ?? detail;
+            },
           ),
         );
       },

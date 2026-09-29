@@ -47,6 +47,8 @@ void main() {
           CrisisHubScreen(repository: crisis),
           QuickReferencesScreen(repository: quick),
           VasopressorsScreen(
+            checkAccess: () async => true,
+            accessChanges: const Stream.empty(),
             loadMedications: () async => drugs,
             loadBloodProducts: () async => blood,
           ),
