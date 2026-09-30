@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'subscription_billing.dart';
 import 'ce_billing.dart';
+import 'ce_store_catalog.dart';
 import 'checkout_policy.dart';
 
 class RevenueCatConfig {
@@ -100,13 +101,16 @@ class LumaBilling with WidgetsBindingObserver {
   }
 }
 
-class RevenueCatGateway implements BillingGateway, CeBillingGateway {
+class RevenueCatGateway
+    implements BillingGateway, CeBillingGateway, CeStoreDiagnosticSource {
   RevenueCatGateway(this.client, this.key, this.platform);
   final SupabaseClient client;
   final String key;
   final TargetPlatform platform;
   final Map<String, Package> _packages = {};
-  final Map<String, Package> _cePackages = {};
+  final _ceCatalog = CeStoreCatalog();
+  @override
+  String get ceStoreDiagnostic => _ceCatalog.diagnostic;
   @override
   bool get ceSupported =>
       (RevenueCatConfig.ceEnabled || RevenueCatConfig.appleReview) &&
@@ -126,23 +130,10 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
 
   @override
   Future<List<CeStoreProduct>> ceProducts() async {
-    _cePackages.clear();
     if (!ceSupported) {
       return [];
     }
-    final offering = (await Purchases.getOfferings()).all['crna_courses'];
-    final result = <CeStoreProduct>[];
-    for (final package in offering?.availablePackages ?? <Package>[]) {
-      final product = package.storeProduct;
-      if (!CeProduct.accepts(product.identifier) ||
-          product.subscriptionPeriod != null ||
-          _cePackages.containsKey(product.identifier)) {
-        continue;
-      }
-      _cePackages[product.identifier] = package;
-      result.add(CeStoreProduct(product.identifier, product.priceString));
-    }
-    return result;
+    return _ceCatalog.load();
   }
 
   @override
@@ -194,8 +185,8 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
         'CE checkout is not enabled for this account.',
       );
     }
-    final package = _cePackages[product.id];
-    if (!ceSupported || package == null || !CeProduct.accepts(product.id)) {
+    final params = _ceCatalog.purchaseParams(product.id);
+    if (!ceSupported || params == null || !CeProduct.accepts(product.id)) {
       throw const BillingFailure('This CE purchase is not available.');
     }
     // Avoid opening another sheet while a prior successful store transaction
@@ -212,7 +203,7 @@ class RevenueCatGateway implements BillingGateway, CeBillingGateway {
         'Refresh CE access. If access remains unavailable, contact info@cehalo.com.',
       );
     }
-    await Purchases.purchase(PurchaseParams.package(package));
+    await Purchases.purchase(params);
   });
   @override
   String? get userId {

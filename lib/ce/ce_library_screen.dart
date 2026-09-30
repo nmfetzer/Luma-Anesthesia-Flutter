@@ -9,6 +9,8 @@ import 'ce_certificate_screen.dart';
 import 'ce_records_screen.dart';
 import 'ce_repository.dart';
 import 'ce_screen.dart';
+import 'ce_purchase_screen.dart';
+import '../billing/ce_billing.dart';
 
 /// The production library uses the same repositories and server access checks
 /// as each course. Injected repositories are for isolated previews and tests.
@@ -460,6 +462,7 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
                 }.entries)
                   if (item.key != 'provider' || provider)
                     TextButton(
+                      key: ValueKey('ce-library-${item.key}'),
                       onPressed: () => showSection(item.key),
                       style: TextButton.styleFrom(
                         backgroundColor: section == item.key
@@ -473,6 +476,20 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
                       ),
                       child: Text(item.value),
                     ),
+                TextButton(
+                  key: const ValueKey('ce-library-bundle'),
+                  onPressed: () async {
+                    await Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/ce-purchase'),
+                        builder: (_) =>
+                            const CePurchaseScreen(productId: CeProduct.bundle),
+                      ),
+                    );
+                    if (mounted) await load();
+                  },
+                  child: const Text('Three-course bundle'),
+                ),
               ],
             ),
           ),

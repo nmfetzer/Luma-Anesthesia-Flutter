@@ -9,13 +9,15 @@ class QuickReferenceRouteObserver extends NavigatorObserver {
     '/account',
     '/subscribe',
     '/ce-halo',
+    '/ce-purchase',
     '/quick-references',
     '/quick-reference-detail',
   };
 
   void _update() {
     final route = _routes.isEmpty ? null : _routes.last;
-    final show = route is PageRoute && !_hidden.contains(route.settings.name);
+    final path = Uri.tryParse(route?.settings.name ?? '')?.path;
+    final show = route is PageRoute && !_hidden.contains(path);
     // Navigator can notify during build; defer the overlay update.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       visible.value = show;
@@ -91,51 +93,52 @@ class _QuickReferenceShortcutState extends State<QuickReferenceShortcut> {
   Widget build(BuildContext context) => Overlay(initialEntries: [_entry]);
 
   Widget _buildContents(BuildContext context) => ValueListenableBuilder<bool>(
-        valueListenable: widget.observer.visible,
-        builder: (context, visible, _) => Stack(
-          children: [
-            widget.child,
-            if (visible && MediaQuery.viewInsetsOf(context).bottom == 0)
-              Positioned(
-                right: 18,
-                bottom: MediaQuery.paddingOf(context).bottom + 18,
-                child: Tooltip(
-                  message: 'Quick References',
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFCFAF6),
-                      foregroundColor: const Color(0xFF205D9F),
-                      surfaceTintColor: Colors.transparent,
-                      elevation: 2,
-                      shadowColor: const Color(0x3308192B),
-                      minimumSize: const Size(112, 48),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      shape: const StadiumBorder(
-                        side: BorderSide(color: Color(0xFFDCD5C9)),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onPressed: () => widget.navigatorKey.currentState
-                        ?.pushNamed('/quick-references'),
-                    icon: const ExcludeSemantics(
-                      child: CustomPaint(
-                        size: Size(18, 24),
-                        painter: _QuickReferenceBoltPainter(),
-                      ),
-                    ),
-                    label: const Text(
-                      'Quick Ref',
-                      semanticsLabel: 'Quick References',
-                    ),
+    valueListenable: widget.observer.visible,
+    builder: (context, visible, _) => Stack(
+      children: [
+        widget.child,
+        if (visible && MediaQuery.viewInsetsOf(context).bottom == 0)
+          Positioned(
+            right: 18,
+            bottom: MediaQuery.paddingOf(context).bottom + 18,
+            child: Tooltip(
+              message: 'Quick References',
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFCFAF6),
+                  foregroundColor: const Color(0xFF205D9F),
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 2,
+                  shadowColor: const Color(0x3308192B),
+                  minimumSize: const Size(112, 48),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  shape: const StadiumBorder(
+                    side: BorderSide(color: Color(0xFFDCD5C9)),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                onPressed: () => widget.navigatorKey.currentState?.pushNamed(
+                  '/quick-references',
+                ),
+                icon: const ExcludeSemantics(
+                  child: CustomPaint(
+                    size: Size(18, 24),
+                    painter: _QuickReferenceBoltPainter(),
+                  ),
+                ),
+                label: const Text(
+                  'Quick Ref',
+                  semanticsLabel: 'Quick References',
+                ),
               ),
-          ],
-        ),
-      );
+            ),
+          ),
+      ],
+    ),
+  );
 }
 
 /// Original slender bolt used in the selected option D concept.

@@ -108,7 +108,9 @@ void main() {
     expect(find.text('AICDs & Pacemakers'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'bipolar and AICD');
     await tester.pumpAndSettle();
-    expect(find.text('2 matching sections'), findsOneWidget);
+    // Counts were intentionally removed from browse/search UI for launch.
+    expect(find.text('2 matching sections'), findsNothing);
+    expect(find.text('Electrocautery and EMI precautions'), findsOneWidget);
     expect(
       find.textContaining('a match is not a treatment recommendation'),
       findsOneWidget,

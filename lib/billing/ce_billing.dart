@@ -41,3 +41,8 @@ abstract interface class CeBillingGateway {
   Future<CePurchaseStatus> ceStatus(String expectedUser);
   Future<void> purchaseCe(CeStoreProduct product);
 }
+
+/// Safe product-loading diagnostics only: no receipts, credentials or accounts.
+abstract interface class CeStoreDiagnosticSource {
+  String get ceStoreDiagnostic;
+}

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/billing/ce_billing.dart';
@@ -32,7 +33,8 @@ class CeFake implements BillingGateway, CeBillingGateway {
   }
 
   @override
-  Future<List<CeStoreProduct>> ceProducts() async => const [
+  Future<List<CeStoreProduct>> ceProducts() async => storeProducts;
+  List<CeStoreProduct> storeProducts = const [
     CeStoreProduct(CeProduct.medication, '€249,99'),
     CeStoreProduct(CeProduct.bundle, '€499,99'),
   ];
@@ -54,12 +56,45 @@ class CeFake implements BillingGateway, CeBillingGateway {
 }
 
 void main() {
+  setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
+  Widget app(SubscriptionBilling billing, String id) => MaterialApp(
+    builder: (context, child) => MediaQuery(
+      data: MediaQuery.of(context).copyWith(disableAnimations: true),
+      child: child!,
+    ),
+    home: CePurchaseScreen(billing: billing, productId: id),
+  );
+  testWidgets(
+    'missing price is retryable, not described as an unreleased course',
+    (tester) async {
+      final fake = CeFake()..enabled.add(CeProduct.uncommon);
+      final c = SubscriptionBilling(gateway: fake);
+      await tester.pumpWidget(app(c, CeProduct.uncommon));
+      await tester.pumpAndSettle();
+      expect(find.text('Not available for purchase yet'), findsNothing);
+      expect(find.text('Price could not be loaded'), findsOneWidget);
+      expect(c.canPurchaseCe(CeProduct.uncommon), isFalse);
+      fake.storeProducts = [
+        ...fake.storeProducts,
+        const CeStoreProduct(CeProduct.uncommon, '€179,99'),
+      ];
+      await tester.ensureVisible(find.text('Retry loading price'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Retry loading price'));
+      await tester.pumpAndSettle();
+      expect(find.text('Purchase for €179,99'), findsOneWidget);
+      expect(c.canPurchaseCe(CeProduct.uncommon), isTrue);
+      expect(fake.purchases, 0);
+      await tester.pumpWidget(const SizedBox());
+      c.dispose();
+    },
+  );
   testWidgets(
     'CE storefront displays localized price without opening checkout',
     (tester) async {
       final fake = CeFake();
       final c = SubscriptionBilling(gateway: fake);
-      await tester.pumpWidget(MaterialApp(home: CePurchaseScreen(billing: c)));
+      await tester.pumpWidget(app(c, CeProduct.medication));
       await tester.pumpAndSettle();
       expect(find.text('Purchase for €249,99'), findsOneWidget);
       expect(
@@ -67,6 +102,8 @@ void main() {
         findsOneWidget,
       );
       expect(fake.purchases, 0);
+      await tester.ensureVisible(find.text('Purchase for €249,99'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Purchase for €249,99'));
       await tester.pumpAndSettle();
       expect(fake.purchases, 1);
@@ -83,14 +120,17 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final c = SubscriptionBilling();
-    await tester.pumpWidget(MaterialApp(home: CePurchaseScreen(billing: c)));
+    await tester.pumpWidget(app(c, CeProduct.medication));
     await tester.pumpAndSettle();
     expect(
-      find.textContaining('Apple checkout is being prepared'),
+      find.textContaining('Design preview. Complete purchases'),
       findsOneWidget,
     );
     expect(tester.takeException(), null);
-    await tester.drag(find.byType(ListView), const Offset(0, -2000));
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, -2000),
+    );
     await tester.pumpAndSettle();
     expect(tester.takeException(), null);
     await tester.pumpWidget(const SizedBox());

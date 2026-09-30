@@ -55,6 +55,15 @@ class SubscriptionBilling extends ChangeNotifier {
       ? gateway as CeBillingGateway
       : null;
   bool get ceAvailable => ceGateway != null;
+  String get ceStoreDiagnostic => gateway is CeStoreDiagnosticSource
+      ? (gateway as CeStoreDiagnosticSource).ceStoreDiagnostic
+      : '';
+  bool ceAwaitingVerification(String id) => _awaitingCe.contains(id);
+  bool cePriceMissing(String id) =>
+      ceReady &&
+      ceStatus?.enabled.contains(id) == true &&
+      ceStatus?.owned.contains(id) != true &&
+      !ceProducts.any((product) => product.id == id);
   bool canPurchaseCe(String id) =>
       ceAvailable &&
       signedIn &&

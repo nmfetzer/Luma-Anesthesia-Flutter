@@ -387,9 +387,14 @@ class _CeCourseScreenState extends State<CeCourseScreen> {
   }
 
   void openPurchases() => run(() async {
-    await Navigator.of(
-      context,
-    ).push<void>(MaterialPageRoute(builder: (_) => const CePurchaseScreen()));
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        settings: const RouteSettings(name: '/ce-purchase'),
+        builder: (_) => CePurchaseScreen(
+          productId: CePurchaseScreen.productForCourse(repo.courseNumber),
+        ),
+      ),
+    );
     await refresh();
   });
 
