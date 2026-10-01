@@ -65,6 +65,13 @@ const _tiles = [
     style: HomeTileStyle.parchment,
     route: '/quick-references',
   ),
+  HomeTileData(
+    titlePlain: 'The First Days',
+    titleAccent: 'in the OR',
+    subtitle: 'Clinical onboarding for SRNAs & anesthesia residents · PDF',
+    style: HomeTileStyle.parchment,
+    route: '/first-days-in-or',
+  ),
 ];
 
 class HomeScreen extends StatelessWidget {

@@ -26,6 +26,7 @@ import 'welcome/welcome_gate.dart';
 import 'screens/password_recovery_screen.dart';
 import 'ce/ce_library_screen.dart';
 import 'ce/ce_purchase_screen.dart';
+import 'references/or_onboarding_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
@@ -140,6 +141,12 @@ class _LumaAppState extends State<LumaApp> {
           : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (path == OrOnboardingScreen.route) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const OrOnboardingScreen(),
+          );
+        }
         if (path == '/ce-purchase') {
           return MaterialPageRoute(
             settings: settings,

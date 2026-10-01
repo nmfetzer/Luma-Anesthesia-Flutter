@@ -10,6 +10,7 @@ class QuickReferenceRouteObserver extends NavigatorObserver {
     '/subscribe',
     '/ce-halo',
     '/ce-purchase',
+    '/first-days-in-or',
     '/quick-references',
     '/quick-reference-detail',
   };

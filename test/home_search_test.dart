@@ -119,7 +119,9 @@ void main() {
     },
   );
 
-  testWidgets('special considerations alias opens the restored library', (tester) async {
+  testWidgets('special considerations alias opens the restored library', (
+    tester,
+  ) async {
     await openSearch(tester);
     await tester.enterText(
       find.byType(TextField).last,
@@ -132,7 +134,9 @@ void main() {
     expect(find.text('Condition library opened'), findsOneWidget);
   });
 
-  testWidgets('other deferred sections stay excluded from search', (tester) async {
+  testWidgets('other deferred sections stay excluded from search', (
+    tester,
+  ) async {
     await openSearch(tester);
     await tester.enterText(find.byType(TextField).last, 'academy');
     await tester.pumpAndSettle();
@@ -155,31 +159,34 @@ void main() {
     const Size(768, 1024),
     const Size(1280, 800),
   ]) {
-    testWidgets('six launch tiles include pathophysiology at $size', (
-      tester,
-    ) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
-      await tester.pump(const Duration(milliseconds: 100));
-      Finder tile(String route) =>
-          find.byWidgetPredicate((w) => w is HomeTile && w.data.route == route);
-      expect(find.byType(HomeTile), findsNWidgets(6));
-      for (final path in [
-        '/drug-library',
-        '/crisis-guidelines',
-        '/vasopressors-infusions',
-        '/ce-halo',
-        '/quick-references',
-        '/special-considerations',
-      ]) {
-        expect(tile(path), findsOneWidget);
-      }
-      expect(tile('/diagnostics'), findsNothing);
-      expect(find.text('Coming soon'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+    testWidgets(
+      'launch tiles include pathophysiology and onboarding at $size',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+        await tester.pump(const Duration(milliseconds: 100));
+        Finder tile(String route) => find.byWidgetPredicate(
+          (w) => w is HomeTile && w.data.route == route,
+        );
+        expect(find.byType(HomeTile), findsNWidgets(7));
+        for (final path in [
+          '/drug-library',
+          '/crisis-guidelines',
+          '/vasopressors-infusions',
+          '/ce-halo',
+          '/quick-references',
+          '/special-considerations',
+          '/first-days-in-or',
+        ]) {
+          expect(tile(path), findsOneWidget);
+        }
+        expect(tile('/diagnostics'), findsNothing);
+        expect(find.text('Coming soon'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
 }

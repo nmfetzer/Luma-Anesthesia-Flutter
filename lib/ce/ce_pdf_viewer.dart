@@ -7,10 +7,17 @@ import 'package:printing/printing.dart';
 /// Displays already-authorized PDF bytes. This widget does not fetch documents,
 /// write files, change course access, or generate a replacement certificate.
 class CePdfViewer extends StatelessWidget {
-  const CePdfViewer({super.key, required this.bytes, required this.title});
+  const CePdfViewer({
+    super.key,
+    required this.bytes,
+    required this.title,
+    this.errorMessage =
+        'Unable to display this PDF. Return to the course and try again.',
+  });
 
   final Uint8List bytes;
   final String title;
+  final String errorMessage;
 
   static const nativeViewType = 'com.cehalo.luma/pdf-view';
 
@@ -43,13 +50,10 @@ class CePdfViewer extends StatelessWidget {
       canDebug: false,
       dynamicLayout: false,
       maxPageWidth: 1400,
-      onError: (_, __) => const Center(
+      onError: (_, __) => Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text(
-            'Unable to display this PDF. Return to the course and try again.',
-            textAlign: TextAlign.center,
-          ),
+          padding: const EdgeInsets.all(24),
+          child: Text(errorMessage, textAlign: TextAlign.center),
         ),
       ),
     );
