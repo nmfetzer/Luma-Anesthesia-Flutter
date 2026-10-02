@@ -24,6 +24,8 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
         expect(find.text('Coming soon'), findsOneWidget);
         expect(find.byType(LumaAiTile), findsNothing);
+        await tester.tap(find.text('Coming soon'));
+        await tester.pump(const Duration(milliseconds: 300));
         expect(find.text('• Luma AI'), findsOneWidget);
         expect(find.text('• Diagnostics'), findsOneWidget);
         expect(
