@@ -69,11 +69,16 @@ class _WelcomeGateState extends State<WelcomeGate> {
   }
 
   @override
-  Widget build(BuildContext context) => _completed == null
-      ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-      : _completed!
-      ? _policiesAccepted
-            ? widget.child
-            : PolicyAgreementScreen(onAccept: _acceptPolicies)
-      : WelcomeCarousel(onFinish: _finish);
+  // MaterialApp.builder places this gate above its Navigator. Supply an overlay
+  // even before the Navigator is mounted: desktop tooltips and text-selection
+  // controls require it. Keep the gate outside navigation to block deep links.
+  Widget build(BuildContext context) => Overlay.wrap(
+    child: _completed == null
+        ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+        : _completed!
+        ? _policiesAccepted
+              ? widget.child
+              : PolicyAgreementScreen(onAccept: _acceptPolicies)
+        : WelcomeCarousel(onFinish: _finish),
+  );
 }
