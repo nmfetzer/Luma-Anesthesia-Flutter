@@ -8,6 +8,7 @@ import '../welcome/luma_theme.dart' as brand;
 import '../welcome/welcome_background.dart';
 import '../widgets/luma_home_button.dart';
 import 'ce_paywall_copy.dart';
+import 'web/ce_web_checkout.dart';
 
 /// Each route presents ONE exact course or bundle. The no-ID route is only
 /// an options index; it never displays four separate checkout forms.
@@ -99,7 +100,10 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
       brand.LumaText.body(size: size, color: muted);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) =>
+      CeWebCheckoutScope.maybeOf(context) != null
+      ? CeWebPurchaseScreen(productId: widget.productId)
+      : Scaffold(
     backgroundColor: brand.LumaColors.navyDeep,
     body: Stack(
       children: [
