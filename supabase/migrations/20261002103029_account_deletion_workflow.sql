@@ -1,4 +1,4 @@
--- PREPARED ONLY. Apply after account_deletion_requests; remains disabled.
+-- Applied October 2, 2026 after account_deletion_requests; intake remains disabled.
 -- Intake/notifications only, NOT automatic account erasure.
 begin;
 alter table public.luma_account_deletion_settings

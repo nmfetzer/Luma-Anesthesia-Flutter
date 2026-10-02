@@ -1,9 +1,33 @@
 # Account deletion: implementation and release status
 
 Updated October 2, 2026. Request intake, email queue, dispatcher, retention guards,
-and completion receipts are implemented and locally tested. **Not deployed or
-enabled. Actual account erasure remains an explicit operator action through the
-Supabase Auth admin interface, not an automatic response to an email or app tap.**
+and completion receipts are deployed with explicit approval. **Intake remains
+disabled and the dispatcher is not scheduled.** Actual account erasure remains an
+explicit operator action through the
+Supabase Auth admin interface, not an automatic response to an email or app tap.
+
+## Deployment receipt
+
+The user approved deployment with intake disabled and the tested GitHub push on
+October 2, 2026. Production project: `xuckkusbbcxplpqclbxt`.
+
+- Applied request migration: `20261002103020`.
+- Applied workflow migration: `20261002103029`.
+- Applied retention migration: `20261002103043`.
+- `account-deletion-notify`: ACTIVE version 1, custom one-use-token authentication.
+- Settings verified: `enabled=false`, worker heartbeat unset, private operator
+  recipient configured. No cron dispatcher installed.
+- Verified zero requests, zero queued messages and zero retained archive rows.
+- Unauthenticated deployed worker returned HTTP 401.
+- Verified app clients cannot dispatch notifications, prepare erasure, or read
+  the mail/retention tables; the auth retention guard is enabled.
+- No real account was deleted, no notification sent by this deployment, and no
+  TestFlight build uploaded.
+- User screenshot confirmed actual inbox delivery of the earlier connector-only
+  notification test; that is distinct from testing the deployed automatic worker.
+
+Migration filenames match Supabase's recorded versions to avoid duplicate
+application. The migration SQL is unchanged except deployment comments.
 
 ## Approved operating choices
 
@@ -19,9 +43,10 @@ Supabase Auth admin interface, not an automatic response to an email or app tap.
   60 months, not 60 days and not just certificates:
   [AANA guidance](https://www.aana.com/wp-content/uploads/2026/01/Guidelines-for-Completion-of-an-Application-for-Prior-Approval-Provider-Directed-Independent-Study-January-2026.pdf).
 
-Resend is connected and the domain was previously verified. An accepted connector
-test email is not evidence that the app has a server credential, a running mail
-dispatcher, or actual inbox delivery. Never use the previously pasted secret.
+Resend is connected, the domain was previously verified, and the user confirmed
+the connector test reached their inbox. This does not establish that the app has
+a server credential or a running mail dispatcher. Never use the previously
+pasted secret.
 
 ## Implemented
 
@@ -75,10 +100,10 @@ Provider retry rules follow [Resend's 24-hour idempotency window](https://resend
    `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the Edge Function.
    Set `notification_email` to the approved owner address through a protected
    server operation. The public app cannot read or change this setting.
-3. **Approve exact migrations and deploy disabled.** Apply
-   `20261002090000_account_deletion_requests.sql`, then
-   `20261002110000_account_deletion_workflow.sql`, then
-   `20261002120000_account_deletion_retention.sql`; deploy `account-deletion-notify`
+3. **Completed: approved migrations and disabled deployment.** Applied
+   `20261002103020_account_deletion_requests.sql`, then
+   `20261002103029_account_deletion_workflow.sql`, then
+   `20261002103043_account_deletion_retention.sql`; deployed `account-deletion-notify`
    with gateway `verify_jwt=false` because the dispatcher authenticates a
    short-lived, one-use server token itself. It does not accept user JWTs as worker
    credentials. Tokens are minted only by the protected scheduler function and
@@ -169,12 +194,12 @@ node --test supabase/functions/account-deletion-notify/handler_test.mjs
 npx --yes deno check supabase/functions/account-deletion-notify/index.ts
 pg_virtualenv psql -v ON_ERROR_STOP=1 \
   -f test/deletion_database_setup.sql \
-  -f supabase/migrations/20261002090000_account_deletion_requests.sql \
+  -f supabase/migrations/20261002103020_account_deletion_requests.sql \
   -f test/deletion_database_assertions.sql \
-  -f supabase/migrations/20261002110000_account_deletion_workflow.sql \
+  -f supabase/migrations/20261002103029_account_deletion_workflow.sql \
   -f test/deletion_workflow_assertions.sql \
   -f test/deletion_retention_setup.sql \
-  -f supabase/migrations/20261002120000_account_deletion_retention.sql \
+  -f supabase/migrations/20261002103043_account_deletion_retention.sql \
   -f test/deletion_retention_assertions.sql
 ```
 

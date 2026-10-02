@@ -1,4 +1,4 @@
--- PREPARED ONLY. Separate approval required before changing production FKs.
+-- Applied October 2, 2026 with explicit production approval.
 -- Keeps certificate/payment ledgers intact after login removal. Copies required
 -- learning evidence into a restricted archive in the SAME transaction as auth
 -- deletion. Never deletes an auth user itself; no public erasure endpoint.
