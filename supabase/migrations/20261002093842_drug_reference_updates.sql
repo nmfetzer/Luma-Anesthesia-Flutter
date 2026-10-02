@@ -1,4 +1,5 @@
 -- Additive public-source cache. Does not modify clinical records or access rules.
+-- Applied with approval on 2026-10-02; filename matches Supabase's recorded version.
 begin;
 create table public.drug_reference_cache (
   medication_id text primary key,

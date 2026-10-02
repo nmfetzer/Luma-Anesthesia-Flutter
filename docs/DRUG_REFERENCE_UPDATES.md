@@ -4,7 +4,7 @@
 
 Prepared October 2, 2026. This integration adds a lazy, expandable panel to both Drug Library and Vasopressors medication-detail screens. It supplements reviewed medication content; no dosing, mixing, warning, clinical narrative, subscription rule, account, or CE record is modified.
 
-Production activation requires approval of the new migration and Edge Function. A new native build is required for TestFlight users to see the UI. ASHP content is not imported.
+Production activation was approved and completed October 2, 2026. A new native build is still required for TestFlight users to see the UI. ASHP content is not imported.
 
 ## Data flow
 
@@ -38,7 +38,7 @@ Production activation requires approval of the new migration and Edge Function. 
 
 ## Deployment
 
-1. Apply only `supabase/migrations/20261002100000_drug_reference_updates.sql` after approval. Do not deploy other pending migrations, particularly the unrelated account-deletion draft.
+1. The approved migration is recorded as `20261002093842_drug_reference_updates.sql` in Supabase. Its draft filename was `20261002100000_drug_reference_updates.sql`; the filename was aligned to the recorded version after activation. Do not reapply it or deploy other pending migrations, particularly the unrelated account-deletion draft.
 2. Deploy `supabase/functions/drug-reference-updates/index.ts` and its `providers.mjs` dependency. Set gateway `verify_jwt=false` because the function performs custom project API-key validation and the app uses modern publishable keys, including signed-out users. This does not grant clients cache-table access.
 3. Built-in `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are server-side environment values. An optional `OPENFDA_API_KEY` may be added as an Edge Function secret for higher usage limits; never embed it in Flutter. No DailyMed key is required by this implementation.
 4. Smoke-test signed-out and signed-in lookup, repeated cached lookup, invalid project key, invalid medication ID, offline saved results, direct source links and independent provider failure.
@@ -63,4 +63,15 @@ Rollback: remove/hide the Flutter panel and undeploy the new function. Existing 
 - Release web build succeeded.
 - Browser checks passed at 375 px and 1280 px, including live-provider response rendering via a test-only route interception, 20-result expansion/three-result collapse, failed-refresh saved warnings, and no page errors. Large text at 320 px was checked in Flutter widget tests.
 - Browser testing exposed and fixed a circular in-flight Future cleanup; a real-gateway regression test now verifies deduplication, completion, persistence and subsequent refresh.
-- Production migration, production function deployment, GitHub push and native build upload remain pending authorization/activation.
+- Production migration and function deployment were authorized and completed after these checks. Native build upload remains outstanding.
+
+## Live activation verification
+
+- Supabase migration version: `20261002093842`, name `drug_reference_updates`.
+- Edge Function: `drug-reference-updates`, version 1, active.
+- Live public-key/signed-out calls for propofol and epinephrine returned HTTP 200 with successful FDA and DailyMed responses. A repeated lookup retained source-check timestamps, confirming cache reuse.
+- Invalid medication syntax returned HTTP 400, a nonexistent medication returned HTTP 404, and an invalid project API key returned HTTP 401.
+- The actual Flutter web build loaded results from the deployed function without route interception.
+- A real “View this label” click opened the matching DailyMed propofol page.
+- Switching the browser offline preserved the downloaded metadata, retained the original check times and displayed saved-information warnings for both sources. No browser page errors were observed.
+- No account login credentials were used in these checks. A signed native TestFlight build remains the final platform-specific verification step.
