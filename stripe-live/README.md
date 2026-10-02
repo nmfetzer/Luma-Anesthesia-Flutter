@@ -53,7 +53,7 @@ Upload the contents of `build/web` or the ZIP to the existing Netlify project. N
 - Known owned courses and partially owned bundles cannot be purchased on the portal. Bundle upgrades are not implemented.
 - Refunds, including partial refunds, and disputes revoke this Stripe purchase; unrelated purchases remain. A resolved dispute does not auto-restore access; manual review is required.
 - Disabling `CE_STRIPE_LIVE_ENABLED` stops new checkout but keeps verified webhook processing available.
-- At most one pending web order per account. Returning to the portal reconciles its Stripe session. A stale reserved order without a session remains blocked for operator reconciliation instead of risking a second charge.
+- At most one pending web order per account. Returning to the portal reconciles its Stripe session. Choosing a different course closes the prior open, unpaid Stripe session before releasing its reservation and creating another. If payment completes concurrently, it reconciles the payment and asks the learner to refresh instead of opening another checkout. A stale reserved order without a session remains blocked for operator reconciliation instead of risking a second charge.
 - A purchase on another channel while Stripe Checkout is already open can still overlap; there is no cross-provider atomic purchase lock. Review/refund overlapping payments through support. Never claim cross-provider races are impossible.
 - Existing GoDaddy store purchases and standalone Stripe Payment Links are not imported. They need verified order-to-Luma-account reconciliation before granting ownership.
 

@@ -153,6 +153,37 @@ export function createHandler(config, deps) {
       requireThat(state.products.some(p => p.code === code && p.enabled),
         'This course is not currently available for purchase.', 409);
       validatePrice(await deps.stripe.price(PRODUCTS[code].price), code);
+      // Returning via Stripe's cancel URL does not expire its hosted session.
+      // On an explicit different-product checkout request, close the old session
+      // at Stripe BEFORE releasing its database reservation or creating another.
+      const previous = state.orders.find(o => o.state === 'pending' && o.product_code !== code);
+      if (previous) {
+        requireThat(previous.session_id,
+          'A previous checkout needs support reconciliation. No second payment was started.', 409);
+        const previousOrder = await deps.store.get(previous.id);
+        requireThat(previousOrder?.user_id === user.id && previousOrder.session_id === previous.session_id,
+          'Previous checkout identity could not be verified.', 409);
+        let previousSession = await deps.stripe.session(previous.session_id);
+        verifySession(previousSession, previousOrder);
+        if (previousSession.status === 'open') {
+          requireThat(previousSession.payment_status === 'unpaid',
+            'Previous payment is being checked. Refresh course access before continuing.', 409);
+          // A payment may finish concurrently, or a successful expiration request
+          // may time out. Retrieve authoritative status in either case.
+          try { await deps.stripe.expire(previous.session_id); } catch { /* recheck below */ }
+          previousSession = await deps.stripe.session(previous.session_id);
+          verifySession(previousSession, previousOrder);
+        }
+        if (previousSession.status === 'complete') {
+          await settle({ id: `reconcile_${previousSession.id}_complete`, livemode: true,
+            type: 'checkout.session.completed', data: { object: { id: previousSession.id } } });
+          throw new Fault(409, 'Your previous checkout completed. Refresh course access before starting another purchase.');
+        }
+        requireThat(previousSession.status === 'expired' && previousSession.payment_status === 'unpaid',
+          'Previous checkout is still open. Refresh course access before trying again.', 409);
+        await settle({ id: `reconcile_${previousSession.id}_expired`, livemode: true,
+          type: 'checkout.session.expired', data: { object: { id: previousSession.id } } });
+      }
       const o = await deps.store.reserve(user.id, code);
       requireThat(o.user_id === user.id && o.product_code === code &&
         o.price_id === PRODUCTS[code].price && o.amount === PRODUCTS[code].cents &&
