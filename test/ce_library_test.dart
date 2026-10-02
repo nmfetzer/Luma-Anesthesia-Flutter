@@ -87,7 +87,11 @@ void main() {
     for (final repo in repos) {
       addTearDown(repo.events.close);
     }
-    await t.pumpWidget(MaterialApp(home: CeLibraryScreen(repositories: repos)));
+    await t.pumpWidget(
+      MaterialApp(
+        home: CeLibraryScreen(repositories: repos, showBundlePrompt: false),
+      ),
+    );
     await t.pumpAndSettle();
     return repos;
   }

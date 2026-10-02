@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/luma_home_button.dart';
 
@@ -11,12 +12,22 @@ import 'ce_repository.dart';
 import 'ce_screen.dart';
 import 'ce_purchase_screen.dart';
 import '../billing/ce_billing.dart';
+import '../billing/revenuecat_billing.dart';
+import '../billing/subscription_billing.dart';
+import 'ce_bundle_offer.dart';
 
 /// The production library uses the same repositories and server access checks
 /// as each course. Injected repositories are for isolated previews and tests.
 class CeLibraryScreen extends StatefulWidget {
-  const CeLibraryScreen({super.key, this.repositories});
+  const CeLibraryScreen({
+    super.key,
+    this.repositories,
+    this.billing,
+    this.showBundlePrompt = true,
+  });
   final List<CeRepository>? repositories;
+  final SubscriptionBilling? billing;
+  final bool showBundlePrompt;
 
   @override
   State<CeLibraryScreen> createState() => _CeLibraryScreenState();
@@ -35,6 +46,17 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
   bool loading = true;
   String section = 'courses';
   final scroll = ScrollController();
+  bool bundlePromptConsidered = false;
+  SubscriptionBilling get billing =>
+      widget.billing ?? LumaBilling.instance.controller;
+  bool get purchasePending =>
+      billing.busy ||
+      CeProduct.all.any((p) => billing.ceAwaitingVerification(p.id));
+  bool get showBundleOffer =>
+      !loading &&
+      errors.isEmpty &&
+      !provider &&
+      !repos.every((r) => access[r.courseNumber]?['has_access'] == true);
 
   bool get demo => repos.every((r) => r.isDemo);
   bool get signedIn => repos.first.signedIn;
@@ -88,6 +110,70 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
       errors.addAll(failures);
       loading = false;
     });
+    unawaited(maybeShowBundleOffer());
+  }
+
+  Future<void> maybeShowBundleOffer() async {
+    if (!widget.showBundlePrompt ||
+        bundlePromptConsidered ||
+        demo ||
+        !showBundleOffer ||
+        purchasePending ||
+        section != 'courses' ||
+        access.values.any((s) => s['has_access'] == true)) {
+      return;
+    }
+    bundlePromptConsidered = true;
+    final account = repos.first.accountId;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted ||
+          account != repos.first.accountId ||
+          !showBundleOffer ||
+          purchasePending ||
+          section != 'courses' ||
+          ModalRoute.of(context)?.isCurrent != true ||
+          prefs.getBool(ceBundleOfferSeenKey) == true) {
+        return;
+      }
+      // Persist once per device, not every visit, refresh, or sign-in.
+      await prefs.setBool(ceBundleOfferSeenKey, true);
+      if (!mounted ||
+          account != repos.first.accountId ||
+          purchasePending ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      await showBundleOfferDialog();
+    } catch (_) {
+      // A promotion/storage failure must never block courses or certificates.
+    }
+  }
+
+  Future<void> showBundleOfferDialog() async {
+    if (purchasePending) return;
+    final account = repos.first.accountId;
+    final explore = await showDialog<bool>(
+      context: context,
+      builder: (_) => const CeBundleOfferDialog(),
+    );
+    if (mounted && account == repos.first.accountId && explore == true) {
+      await openBundle();
+    }
+  }
+
+  Future<void> openBundle() async {
+    if (purchasePending) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        settings: const RouteSettings(name: '/ce-purchase'),
+        builder: (_) => CePurchaseScreen(
+          productId: CeProduct.bundle,
+          billing: widget.billing,
+        ),
+      ),
+    );
+    if (mounted) await load();
   }
 
   int completed(CeRepository repo) =>
@@ -478,16 +564,7 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
                     ),
                 TextButton(
                   key: const ValueKey('ce-library-bundle'),
-                  onPressed: () async {
-                    await Navigator.of(context).push<void>(
-                      MaterialPageRoute(
-                        settings: const RouteSettings(name: '/ce-purchase'),
-                        builder: (_) =>
-                            const CePurchaseScreen(productId: CeProduct.bundle),
-                      ),
-                    );
-                    if (mounted) await load();
-                  },
+                  onPressed: purchasePending ? null : openBundle,
                   child: const Text('Three-course bundle'),
                 ),
               ],
@@ -504,6 +581,10 @@ class _CeLibraryScreenState extends State<CeLibraryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (showBundleOffer &&
+                          section != 'provider' &&
+                          !purchasePending)
+                        CeBundleOfferCard(onExplore: showBundleOfferDialog),
                       if (errors.isNotEmpty) ...[
                         const Text(
                           'Some course progress could not be loaded. '
