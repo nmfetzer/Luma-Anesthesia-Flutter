@@ -11,6 +11,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import '../widgets/medication_deep_dive.dart';
 import '../widgets/clinical_source_link.dart';
+import '../widgets/drug_reference_updates_panel.dart';
 
 import '../models/medication.dart';
 import '../theme/luma_theme.dart';
@@ -36,6 +37,7 @@ class DrugDetailScreen extends StatelessWidget {
               _Header(medication: m),
               const SizedBox(height: 20),
               _WarningBanners(medication: m),
+              DrugReferenceUpdatesPanel(key: ValueKey('updates-${m.id}'), medication: m),
               _Section(
                 title: 'Overview',
                 children: [

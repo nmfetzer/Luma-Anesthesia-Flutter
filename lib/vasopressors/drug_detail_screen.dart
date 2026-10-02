@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../widgets/medication_deep_dive.dart';
 import '../widgets/luma_home_button.dart';
 import '../widgets/clinical_source_link.dart';
+import '../widgets/drug_reference_updates_panel.dart';
+import '../models/medication.dart';
 import '../shared/luma_theme_tokens.dart';
 
 /// Rich drug detail screen — clinical-reference aesthetic.
@@ -102,6 +104,10 @@ class DrugDetailScreen extends StatelessWidget {
                 body: lasa,
               ),
             const SizedBox(height: 16),
+            DrugReferenceUpdatesPanel(
+              key: ValueKey('updates-${drug['id']}'),
+              medication: Medication.fromJson(drug),
+            ),
             _bulletSection('Indications', drug['indications']),
             _dosingSection(),
             _mixingSection(),
