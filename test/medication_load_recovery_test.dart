@@ -84,6 +84,22 @@ void main() {
       },
     );
   }
+  test(
+    'warm-up shares a single fetch with browse and retries after failure',
+    () async {
+      await MedicationRepository.instance.warmUp();
+      expect(offsets, isEmpty);
+      fail = false;
+      await Future.wait([
+        MedicationRepository.instance.warmUp(),
+        MedicationRepository.instance.all(),
+        MedicationRepository.instance.all(),
+      ]);
+      expect(offsets, [0, 200]);
+      expect(await MedicationRepository.instance.all(), hasLength(201));
+      expect(offsets, [0, 200]);
+    },
+  );
   testWidgets('drug header menu and account are real navigation controls', (
     t,
   ) async {

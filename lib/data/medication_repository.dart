@@ -27,6 +27,16 @@ class MedicationRepository {
     return _pending ??= _load().whenComplete(() => _pending = null);
   }
 
+  /// Warm only the public library after Home is shown. Shares the same in-flight
+  /// request with search/browse; failures are retried when the library is opened.
+  Future<void> warmUp() async {
+    try {
+      await all();
+    } catch (_) {
+      // Background work must not interrupt navigation or show a blocking error.
+    }
+  }
+
   Future<List<Medication>> _load() async {
     if (LumaConfig.supabaseConfigured) {
       final rows = await OfflineLibrary(Supabase.instance.client).medications();

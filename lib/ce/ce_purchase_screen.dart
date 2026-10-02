@@ -295,6 +295,12 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
           'One-time purchase. No app subscription required.',
           style: body(12),
         ),
+        const SizedBox(height: 4),
+        Text(
+          'A free Luma account is required to purchase, save progress and receive '
+          'your completion certificate.',
+          style: body(12),
+        ),
         const SizedBox(height: 12),
         FilledButton(
           style: FilledButton.styleFrom(

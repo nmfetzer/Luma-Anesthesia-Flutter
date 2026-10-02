@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../data/medication_repository.dart';
+
 import '../launch/launch_scope.dart';
 import 'home_background.dart';
 import 'home_tile.dart';
@@ -74,8 +76,21 @@ const _tiles = [
   ),
 ];
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) MedicationRepository.instance.warmUp();
+    });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

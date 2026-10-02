@@ -124,12 +124,14 @@ class _LumaAppState extends State<LumaApp> {
       theme: buildLumaTheme(),
       navigatorKey: _navKey,
       navigatorObservers: [_quickReferenceObserver],
-      builder: (context, child) => QuickReferenceShortcut(
-        observer: _quickReferenceObserver,
-        navigatorKey: _navKey,
-        child: OfflineStatusFrame(
+      builder: (context, child) => WelcomeGate(
+        child: QuickReferenceShortcut(
+          observer: _quickReferenceObserver,
           navigatorKey: _navKey,
-          child: child ?? const SizedBox.shrink(),
+          child: OfflineStatusFrame(
+            navigatorKey: _navKey,
+            child: child ?? const SizedBox.shrink(),
+          ),
         ),
       ),
       home: kIsWeb && Uri.base.queryParameters['recovery'] == '1'
@@ -138,7 +140,7 @@ class _LumaAppState extends State<LumaApp> {
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : cePortal
           ? const CeLibraryScreen()
-          : const WelcomeGate(child: HomeScreen()),
+          : const HomeScreen(),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
         if (path == OrOnboardingScreen.route) {

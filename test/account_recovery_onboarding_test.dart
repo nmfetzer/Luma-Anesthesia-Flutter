@@ -57,6 +57,9 @@ void main() {
   testWidgets('welcome completion persists across gate recreation', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({
+      WelcomeGate.policyPreferenceKey: WelcomeGate.policyVersion,
+    });
     Widget app() =>
         const MaterialApp(home: WelcomeGate(child: Text('Home fixture')));
     await tester.pumpWidget(app());

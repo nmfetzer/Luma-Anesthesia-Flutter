@@ -11,6 +11,7 @@ import '../auth/account_access.dart';
 import '../billing/revenuecat_billing.dart';
 import '../billing/subscription_billing.dart';
 import '../theme/luma_theme.dart';
+import 'delete_account_screen.dart';
 
 export '../auth/account_access.dart';
 
@@ -399,6 +400,17 @@ class _AccountScreenState extends State<AccountScreen> {
                     OutlinedButton(
                       onPressed: _busy ? null : _signOut,
                       child: const Text('Sign out'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _busy
+                          ? null
+                          : () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const DeleteAccountScreen(),
+                              ),
+                            ),
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Delete account'),
                     ),
                   ] else ...[
                     _socialButton(OAuthProvider.apple),
