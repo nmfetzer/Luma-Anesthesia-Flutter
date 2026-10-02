@@ -31,6 +31,12 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     try {
       _access =
           widget.access ?? SupabaseAccountDeletion(Supabase.instance.client);
+      final pending = await _access!.pendingRequest();
+      if (!mounted) return;
+      if (pending != null) {
+        setState(() => _receipt = pending);
+        return;
+      }
       final available = await _access!.isAvailable();
       if (mounted) setState(() => _available = available);
     } catch (_) {
@@ -42,11 +48,13 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     try {
       final uri = Uri.parse(address);
       if (await (widget.openExternal?.call(uri) ??
-          launchUrl(uri, mode: LaunchMode.externalApplication)))
+          launchUrl(uri, mode: LaunchMode.externalApplication))) {
         return;
+      }
     } catch (_) {}
-    if (mounted)
+    if (mounted) {
       setState(() => _error = 'Could not open this page. Visit $address');
+    }
   }
 
   Future<void> _submit() async {
@@ -82,13 +90,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       final receipt = await _access!.requestDeletion();
       if (mounted) setState(() => _receipt = receipt);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error =
               'Your deletion request could not be confirmed. Your account has not '
               'been deleted. Check your connection and try again. If the problem '
               'continues, contact info@cehalo.com.',
         );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -151,8 +160,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Minimum CE credit records may be retained for accreditor or legal '
-                    'requirements. Limited billing, fraud-prevention or dispute records '
+                    'Required CE program records, including participation, assessments, '
+                    'evaluations and certificates, must be retained for at least '
+                    '60 months (five years) for applicable AANA-approved activities. '
+                    'Limited billing, fraud-prevention or dispute records '
                     'may also need to be retained, as explained in the Privacy Policy.',
                   ),
                 ],

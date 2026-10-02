@@ -9,6 +9,7 @@ class DeletionReceipt {
 
 abstract interface class AccountDeletionAccess {
   Future<bool> isAvailable();
+  Future<DeletionReceipt?> pendingRequest();
   Future<DeletionReceipt> requestDeletion();
 }
 
@@ -30,6 +31,14 @@ class SupabaseAccountDeletion implements AccountDeletionAccess {
   }
 
   @override
+  Future<DeletionReceipt?> pendingRequest() async {
+    _checkOwner();
+    final data = await client.rpc('luma_my_account_deletion_request');
+    _checkOwner();
+    return data == null ? null : _receipt(data);
+  }
+
+  @override
   Future<DeletionReceipt> requestDeletion() async {
     _checkOwner();
     // Never accept a client-supplied target user or email. The RPC derives both.
@@ -37,6 +46,11 @@ class SupabaseAccountDeletion implements AccountDeletionAccess {
       'luma_request_account_deletion',
       params: {'confirmation': 'DELETE MY ACCOUNT'},
     );
+    _checkOwner();
+    return _receipt(data);
+  }
+
+  DeletionReceipt _receipt(dynamic data) {
     if (data is! Map ||
         data['status'] != 'pending' ||
         data['request_id'] is! String ||

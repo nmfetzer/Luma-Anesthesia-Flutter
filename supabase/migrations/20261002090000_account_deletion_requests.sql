@@ -1,4 +1,5 @@
--- PREPARED ONLY. CE HALO approved 7 days and info@cehalo.com notifications.
+-- PREPARED ONLY. CE HALO approved 7 days; public contact info@cehalo.com.
+-- Internal notification routing is configured in protected server settings.
 -- Do not enable until delivery, monitoring, retention and fulfillment are ready.
 -- This records requests; it does NOT erase accounts or declare them deleted.
 begin;

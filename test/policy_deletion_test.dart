@@ -12,6 +12,9 @@ class FakeDeletion implements AccountDeletionAccess {
   bool available = true;
   bool fail = false;
   int calls = 0;
+  DeletionReceipt? pending;
+  @override
+  Future<DeletionReceipt?> pendingRequest() async => pending;
   @override
   Future<bool> isAvailable() async => available;
   @override
@@ -105,34 +108,30 @@ void main() {
     expect(find.byType(PolicyAgreementScreen), findsNothing);
     expect(find.text('App content'), findsOneWidget);
   });
-  testWidgets(
-    'October 2 v1 acceptance requires published v2 acknowledgment',
-    (tester) async {
-      SharedPreferences.setMockInitialValues({
-        WelcomeGate.preferenceKey: true,
-        WelcomeGate.policyPreferenceKey: '2026-10-02-v1',
-      });
-      await tester.pumpWidget(
-        const MaterialApp(home: WelcomeGate(child: Text('Hidden'))),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byType(WelcomeCarousel), findsNothing);
-      expect(find.byType(PolicyAgreementScreen), findsOneWidget);
-      expect(find.text('Hidden'), findsNothing);
-      expect(WelcomeGate.policyVersion, '2026-10-02-v2');
-      await tester.tap(find.byKey(const ValueKey('policy-agree-all')));
-      await tester.pump();
-      await tester.ensureVisible(find.byKey(const ValueKey('policy-continue')));
-      await tester.tap(find.byKey(const ValueKey('policy-continue')));
-      await tester.pumpAndSettle();
-      expect(find.text('Hidden'), findsOneWidget);
-      final prefs = await SharedPreferences.getInstance();
-      expect(
-        prefs.getString(WelcomeGate.policyPreferenceKey),
-        '2026-10-02-v2',
-      );
-    },
-  );
+  testWidgets('October 2 v1 acceptance requires published v2 acknowledgment', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      WelcomeGate.preferenceKey: true,
+      WelcomeGate.policyPreferenceKey: '2026-10-02-v1',
+    });
+    await tester.pumpWidget(
+      const MaterialApp(home: WelcomeGate(child: Text('Hidden'))),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(WelcomeCarousel), findsNothing);
+    expect(find.byType(PolicyAgreementScreen), findsOneWidget);
+    expect(find.text('Hidden'), findsNothing);
+    expect(WelcomeGate.policyVersion, '2026-10-02-v2');
+    await tester.tap(find.byKey(const ValueKey('policy-agree-all')));
+    await tester.pump();
+    await tester.ensureVisible(find.byKey(const ValueKey('policy-continue')));
+    await tester.tap(find.byKey(const ValueKey('policy-continue')));
+    await tester.pumpAndSettle();
+    expect(find.text('Hidden'), findsOneWidget);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(WelcomeGate.policyPreferenceKey), '2026-10-02-v2');
+  });
   testWidgets('save and policy-link failures never accept silently', (
     tester,
   ) async {
@@ -236,6 +235,24 @@ void main() {
       );
     },
   );
+  testWidgets('saved receipt reopens even when new requests are unavailable', (
+    tester,
+  ) async {
+    final access = FakeDeletion()
+      ..available = false
+      ..pending = DeletionReceipt(
+        id: 'existing-receipt',
+        dueAt: DateTime.utc(2026, 10, 9),
+      );
+    await tester.pumpWidget(
+      MaterialApp(home: DeleteAccountScreen(access: access)),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Deletion request received'), findsOneWidget);
+    expect(find.textContaining('existing-receipt'), findsOneWidget);
+    expect(find.text('Request account deletion'), findsNothing);
+    expect(access.calls, 0);
+  });
   testWidgets('unavailable deletion service cannot accept a request', (
     tester,
   ) async {
