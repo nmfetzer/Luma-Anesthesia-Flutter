@@ -15,6 +15,20 @@ export class Fault extends Error {
 export function requireThat(ok, message, status = 400) {
   if (!ok) throw new Fault(status, message);
 }
+function ledgerCredential(env, ledgerOrigin) {
+  if (env.SUPABASE_URL) {
+    requireThat(new URL(env.SUPABASE_URL).origin === ledgerOrigin,
+      'The test ledger must match this function project.', 503);
+    // Use only this isolated function project's built-in server credential.
+    // No need to copy a database secret through a browser or into this repo.
+    const keys = JSON.parse(env.SUPABASE_SECRET_KEYS || '{}');
+    if (typeof keys.default === 'string' && keys.default.startsWith('sb_secret_')) {
+      return keys.default;
+    }
+    return env.SUPABASE_SERVICE_ROLE_KEY || env.CE_TEST_LEDGER_SERVICE_KEY;
+  }
+  return env.CE_TEST_LEDGER_SERVICE_KEY; // Explicit credential for local runtimes.
+}
 export function configFrom(env) {
   requireThat(env.CE_STRIPE_TEST_ENABLED === 'true', 'Test checkout is not configured.', 503);
   requireThat(/^(sk|rk)_test_/.test(env.STRIPE_TEST_SECRET_KEY ?? ''), 'A test-only Stripe key is required.', 503);
@@ -32,8 +46,11 @@ export function configFrom(env) {
     ledgerUrl.hostname !== 'xuckkusbbcxplpqclbxt.supabase.co' &&
     [authUrl, ledgerUrl].every(u => !u.username && !u.password && u.pathname === '/' && !u.search && !u.hash),
     'Test ledger must be in a separate HTTPS project.', 503);
-  requireThat(/^sb_publishable_/.test(env.LUMA_AUTH_PUBLIC_KEY ?? '') && env.CE_TEST_LEDGER_SERVICE_KEY,
+  requireThat(/^sb_publishable_/.test(env.LUMA_AUTH_PUBLIC_KEY ?? ''),
     'Use only the Luma public publishable key for read-only account checks.', 503);
+  const ledgerKey = ledgerCredential(env, ledgerUrl.origin);
+  requireThat(typeof ledgerKey === 'string' && ledgerKey.length > 0,
+    'The test project server credential is unavailable.', 503);
   const testers = new Set((env.CE_TEST_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean));
   requireThat(testers.size > 0 && [...testers].every(x => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)),
     'Explicit test account IDs are required.', 503);
@@ -47,8 +64,32 @@ export function configFrom(env) {
   return {
     stripeKey: env.STRIPE_TEST_SECRET_KEY, webhookSecret: env.STRIPE_TEST_WEBHOOK_SECRET,
     origin: origin.origin, authUrl: authUrl.origin, authKey: env.LUMA_AUTH_PUBLIC_KEY,
-    ledgerUrl: ledgerUrl.origin, ledgerKey: env.CE_TEST_LEDGER_SERVICE_KEY, testers, prices,
+    ledgerUrl: ledgerUrl.origin, ledgerKey, testers, prices,
   };
+}
+
+// Public, local-only configuration check: no credentials/values/account IDs
+// are returned and no Stripe, auth or database requests are made.
+export function setupStatus(env) {
+  const required = [
+    'STRIPE_TEST_SECRET_KEY', 'STRIPE_TEST_WEBHOOK_SECRET',
+    'CE_TEST_PORTAL_ORIGIN', 'LUMA_AUTH_SUPABASE_URL', 'LUMA_AUTH_PUBLIC_KEY',
+    'CE_TEST_LEDGER_URL', 'CE_TEST_USER_IDS',
+    ...Object.keys(PRODUCTS).map(code => `STRIPE_TEST_PRICE_${code.toUpperCase()}`),
+  ];
+  const status = {
+    test_only: true,
+    checkout_enabled: env.CE_STRIPE_TEST_ENABLED === 'true',
+    configuration_ready: false,
+    missing_settings: required.filter(name => !env[name]),
+  };
+  try {
+    // Validate a copy; this never changes the real enable flag or starts a handler.
+    configFrom({ ...env, CE_STRIPE_TEST_ENABLED: 'true' });
+    return { ...status, configuration_ready: true };
+  } catch (error) {
+    return { ...status, issue: error instanceof Fault ? error.message : 'Invalid test configuration.' };
+  }
 }
 
 // Reads the existing RLS-protected purchase ledger, not a client's claim.

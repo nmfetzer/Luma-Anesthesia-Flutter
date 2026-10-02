@@ -2,6 +2,16 @@
 
 Prepared for `ce-web/portal-setup` only. This is disabled-by-default source code, not an activated payment system. Nothing in this folder should be deployed or installed in the shared Luma production project without a separate review and approval.
 
+## Test setup update, October 2, 2026
+
+The owner approved an isolated Supabase project, `mgmvjvzprxyylezheqos` (CE HALO Website Test), schema installation, and disabled backend deployment. The original preparation checklist below describes the initial commit, not the current infrastructure state. The Mac subsequently passed all 36 selected Flutter tests, targeted analysis, and a release web build; local signed-in and signed-out screens were checked.
+
+The hosted backend now obtains its database credential from its own Supabase environment; manually copying `CE_TEST_LEDGER_SERVICE_KEY` is no longer required. The configured ledger URL must match the runtime's own project URL, and the existing production-host prohibition still applies. New `sb_secret_` credentials use only the `apikey` header, with legacy credentials supported as a fallback, following [Supabase's key migration guidance](https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys).
+
+GET `/setup-status` returns only the test-mode flag, whether configuration validates, missing setting names, and fixed error messages. It never returns environment values, keys, account IDs, or tokens; it makes no external requests, writes nothing, and cannot enable checkout. A ready result means configuration is structurally complete, not that key permissions, price amounts or webhook delivery have passed end-to-end testing.
+
+The backend test suite now contains 39 passing local Node/PGlite tests, including automatic project-bound credential resolution, modern/legacy headers, and non-secret readiness checks. Existing production code, mobile files and the Flutter UI were not changed by this follow-up.
+
 ## Current status
 
 - **Prepared:** A website-scoped paywall, same-account checks, Stripe-hosted test Checkout backend, signed-webhook verification, isolated test-order database draft, and automated tests.

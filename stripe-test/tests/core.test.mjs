@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { configFrom, existingOwnership, checkOverlap, validatePrice, checkoutPayload,
-  verifySession, verifyIntent, safeCheckoutUrl, createHandler, PRODUCTS } from '../server/core.mjs';
+  verifySession, verifyIntent, safeCheckoutUrl, createHandler, setupStatus, PRODUCTS } from '../server/core.mjs';
 import { verifyEvent, adapters } from '../server/adapters.mjs';
 
 const uid = '11111111-1111-4111-8111-111111111111';
@@ -287,4 +287,48 @@ test('created and resumed checkouts must have the exact price and account before
     assert.equal(result.status, 409);
     assert.equal(f.calls.filter(x => x[0] === 'attach').length, 0);
   }
+});
+
+test('hosted runtime uses only its own project built-in server key', () => {
+  const hosted = { ...env, CE_TEST_LEDGER_SERVICE_KEY: undefined,
+    SUPABASE_URL: env.CE_TEST_LEDGER_URL,
+    SUPABASE_SECRET_KEYS: JSON.stringify({ default: 'sb_secret_fixture' }) };
+  assert.equal(configFrom(hosted).ledgerKey, 'sb_secret_fixture');
+  assert.throws(() => configFrom({ ...hosted, SUPABASE_URL: 'https://another-project.example' }));
+  assert.throws(() => configFrom({ ...hosted, SUPABASE_URL: env.LUMA_AUTH_SUPABASE_URL }));
+});
+
+test('legacy hosted key remains supported without manually copying it', () => {
+  const hosted = { ...env, CE_TEST_LEDGER_SERVICE_KEY: undefined,
+    SUPABASE_URL: env.CE_TEST_LEDGER_URL, SUPABASE_SERVICE_ROLE_KEY: 'legacy-fixture' };
+  assert.equal(configFrom(hosted).ledgerKey, 'legacy-fixture');
+  assert.throws(() => configFrom({ ...hosted, SUPABASE_SERVICE_ROLE_KEY: undefined }));
+});
+
+test('new database secret goes on apikey only; legacy retains bearer compatibility', async () => {
+  for (const key of ['sb_secret_fixture', 'legacy-fixture']) {
+    const a = adapters({ ...config, ledgerKey: key }, async (_url, options) => {
+      assert.equal(options.headers.apikey, key);
+      assert.equal(options.headers.Authorization, key.startsWith('sb_secret_') ? undefined : `Bearer ${key}`);
+      return new Response('[]');
+    });
+    await a.store.list(uid);
+  }
+});
+
+test('setup status validates without enabling checkout or returning secret values', () => {
+  const disabled = { ...env, CE_STRIPE_TEST_ENABLED: 'false' };
+  assert.deepEqual(setupStatus(disabled), {
+    test_only: true, checkout_enabled: false, configuration_ready: true, missing_settings: [],
+  });
+  assert.equal(disabled.CE_STRIPE_TEST_ENABLED, 'false');
+  assert.throws(() => configFrom(disabled));
+  const absent = setupStatus({ ...disabled, STRIPE_TEST_SECRET_KEY: undefined,
+    STRIPE_TEST_WEBHOOK_SECRET: undefined });
+  assert.deepEqual(absent.missing_settings, ['STRIPE_TEST_SECRET_KEY', 'STRIPE_TEST_WEBHOOK_SECRET']);
+  assert.equal(absent.configuration_ready, false);
+  const serialized = JSON.stringify(setupStatus({ ...disabled, LUMA_AUTH_SUPABASE_URL: env.STRIPE_TEST_SECRET_KEY }));
+  assert.equal(serialized.includes(env.STRIPE_TEST_SECRET_KEY), false);
+  assert.equal(serialized.includes(env.STRIPE_TEST_WEBHOOK_SECRET), false);
+  assert.equal(serialized.includes(env.CE_TEST_LEDGER_SERVICE_KEY), false);
 });

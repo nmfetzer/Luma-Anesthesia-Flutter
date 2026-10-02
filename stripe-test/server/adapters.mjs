@@ -19,7 +19,12 @@ export function adapters(config, fetcher = fetch) {
   });
   const rpc = (name, body) => json(`${config.ledgerUrl}/rest/v1/rpc/ce_stripe_test_${name}`, {
     method: 'POST',
-    headers: { apikey: config.ledgerKey, Authorization: `Bearer ${config.ledgerKey}`, 'Content-Type': 'application/json' },
+    headers: {
+      apikey: config.ledgerKey,
+      // New Supabase secret keys aren't JWTs: never send them as Bearer tokens.
+      ...(config.ledgerKey.startsWith('sb_secret_') ? {} : { Authorization: `Bearer ${config.ledgerKey}` }),
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(body),
   });
   return {
