@@ -9,7 +9,9 @@ class WelcomeGate extends StatefulWidget {
   const WelcomeGate({super.key, required this.child});
   final Widget child;
   static const preferenceKey = 'luma_welcome_completed_v1';
-  static const policyVersion = '2026-10-02-v1';
+  // Published CE HALO privacy policy, verified October 2, 2026.
+  // Bump this whenever a revised policy requires fresh acknowledgment.
+  static const policyVersion = '2026-10-02-v2';
   static const policyPreferenceKey = 'luma_policy_agreement';
   @override
   State<WelcomeGate> createState() => _WelcomeGateState();

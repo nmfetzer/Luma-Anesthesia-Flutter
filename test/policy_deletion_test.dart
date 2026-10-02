@@ -106,11 +106,11 @@ void main() {
     expect(find.text('App content'), findsOneWidget);
   });
   testWidgets(
-    'existing installs and changed policy version require acknowledgment',
+    'October 2 v1 acceptance requires published v2 acknowledgment',
     (tester) async {
       SharedPreferences.setMockInitialValues({
         WelcomeGate.preferenceKey: true,
-        WelcomeGate.policyPreferenceKey: 'old-version',
+        WelcomeGate.policyPreferenceKey: '2026-10-02-v1',
       });
       await tester.pumpWidget(
         const MaterialApp(home: WelcomeGate(child: Text('Hidden'))),
@@ -119,6 +119,18 @@ void main() {
       expect(find.byType(WelcomeCarousel), findsNothing);
       expect(find.byType(PolicyAgreementScreen), findsOneWidget);
       expect(find.text('Hidden'), findsNothing);
+      expect(WelcomeGate.policyVersion, '2026-10-02-v2');
+      await tester.tap(find.byKey(const ValueKey('policy-agree-all')));
+      await tester.pump();
+      await tester.ensureVisible(find.byKey(const ValueKey('policy-continue')));
+      await tester.tap(find.byKey(const ValueKey('policy-continue')));
+      await tester.pumpAndSettle();
+      expect(find.text('Hidden'), findsOneWidget);
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        prefs.getString(WelcomeGate.policyPreferenceKey),
+        '2026-10-02-v2',
+      );
     },
   );
   testWidgets('save and policy-link failures never accept silently', (
