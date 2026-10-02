@@ -27,41 +27,41 @@ const _tiles = [
   HomeTileData(
     titlePlain: 'Drug',
     titleAccent: 'Library',
-    subtitle: 'Dosing, mixing, precautions & sources',
+    subtitle: 'Dosing, mixing & sources',
     style: HomeTileStyle.featured,
     route: '/drug-library',
   ),
   HomeTileData(
     titlePlain: '',
     titleAccent: 'Crisis Hub',
-    subtitle: 'Clinical crisis references · Free provider support',
+    subtitle: 'Clinical crisis references',
     style: HomeTileStyle.crisis,
     route: '/crisis-guidelines',
   ),
   HomeTileData(
-    titlePlain: 'Vasopressors, Infusions, &',
+    titlePlain: 'Vasopressors, Infusions &',
     titleAccent: 'Transfusions',
-    subtitle: 'Medication preparation & clinical references',
+    subtitle: 'Preparation & clinical references',
     route: '/vasopressors-infusions',
   ),
   HomeTileData(
     titlePlain: 'Pathophysiology &',
     titleAccent: 'Anesthesia Considerations',
-    subtitle: 'Conditions, perioperative planning & sources',
+    subtitle: 'Conditions & perioperative planning',
     route: '/special-considerations',
   ),
   HomeTileData(
     eyebrow: 'Continuing Education',
     titlePlain: 'CE',
     titleAccent: 'Halo',
-    subtitle: 'Course information & learning access',
+    subtitle: 'Courses & learning access',
     style: HomeTileStyle.darkHero,
     route: '/ce-halo',
   ),
   HomeTileData(
     titlePlain: 'Quick',
     titleAccent: 'References',
-    subtitle: 'Searchable, source-linked guidance',
+    subtitle: 'Free, source-linked guidance',
     style: HomeTileStyle.parchment,
     route: '/quick-references',
   ),
@@ -87,21 +87,10 @@ class HomeScreen extends StatelessWidget {
         SafeArea(
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
+              constraints: const BoxConstraints(maxWidth: 820),
               child: Column(
                 children: [
                   const _TopBar(),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4, bottom: 14),
-                    child: Text(
-                      'Welcome to Luma',
-                      style: TextStyle(
-                        fontFamily: 'Fraunces',
-                        fontSize: 24,
-                        color: Color(0xFFF7F1E6),
-                      ),
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: HomeSearch(
@@ -130,56 +119,104 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           LayoutBuilder(
                             builder: (context, constraints) {
-                              final columns = constraints.maxWidth < 560
-                                  ? 1
-                                  : 2;
-                              const gap = 12.0;
-                              final width =
-                                  (constraints.maxWidth - gap * (columns - 1)) /
-                                  columns;
-                              final scale =
-                                  MediaQuery.textScalerOf(context).scale(16) /
-                                  16;
-                              return Wrap(
-                                spacing: gap,
-                                runSpacing: gap,
+                              final singleColumn =
+                                  constraints.maxWidth < 280 ||
+                                  MediaQuery.textScalerOf(context).scale(15) >
+                                      20;
+                              Widget pair(int first, int second) => singleColumn
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        HomeTile(
+                                          data: _tiles[first],
+                                          wide: true,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        HomeTile(
+                                          data: _tiles[second],
+                                          wide: true,
+                                        ),
+                                      ],
+                                    )
+                                  : IntrinsicHeight(
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Expanded(
+                                            child: HomeTile(
+                                              data: _tiles[first],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: HomeTile(
+                                              data: _tiles[second],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  for (final tile in _tiles)
-                                    SizedBox(
-                                      width: width,
-                                      height: 152 * scale.clamp(1.0, 2.5),
-                                      child: HomeTile(data: tile),
-                                    ),
+                                  pair(0, 1),
+                                  const SizedBox(height: 8),
+                                  HomeTile(data: _tiles[2], wide: true),
+                                  const SizedBox(height: 8),
+                                  HomeTile(data: _tiles[3], wide: true),
+                                  const SizedBox(height: 8),
+                                  pair(4, 5),
+                                  const SizedBox(height: 8),
+                                  HomeTile(data: _tiles[6], wide: true),
                                 ],
                               );
                             },
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () =>
+                                Navigator.of(context)
+                                    .pushNamed('/provider-support'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFF7F1E6),
+                              side: const BorderSide(color: Color(0xFF627581)),
+                              padding: const EdgeInsets.all(12),
+                              minimumSize: const Size.fromHeight(48),
+                            ),
+                            child: const Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              spacing: 12,
+                              runSpacing: 6,
+                              children: [
+                                Text('Mental Health & Recovery Support'),
+                                Text(
+                                  'Always free',
+                                  style: TextStyle(color: Color(0xFFE6CF9C)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           const _ComingSoonPanel(),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'LUMA · Knowledge Illuminated',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Fraunces',
+                              fontSize: 12,
+                              color: Color(0xFFE6CF9C),
+                            ),
+                          ),
                         ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      12,
-                      20,
-                      MediaQuery.sizeOf(context).width < 900 ? 76 : 18,
-                    ),
-                    child: const Text(
-                      'LUMA · Knowledge Illuminated',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Fraunces',
-                        fontSize: 14,
-                        color: Color(0xFFE6CF9C),
                       ),
                     ),
                   ),
@@ -240,25 +277,19 @@ class _TopBar extends StatelessWidget {
 class _ComingSoonPanel extends StatelessWidget {
   const _ComingSoonPanel();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: const Color(0xFF102A3D),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0xFF596476)),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: ExpansionTile(
+      tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+      childrenPadding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      iconColor: const Color(0xFFE6CF9C),
+      collapsedIconColor: const Color(0xFFE6CF9C),
+      title: const Text(
+        'Coming soon',
+        style: TextStyle(fontSize: 14, color: Color(0xFFCCD3DB)),
+      ),
       children: [
-        const Text(
-          'Coming soon',
-          style: TextStyle(
-            fontFamily: 'Fraunces',
-            fontSize: 24,
-            color: Color(0xFFE6CF9C),
-          ),
-        ),
-        const SizedBox(height: 8),
         const Text(
           'Planned for future updates. These features are not '
           'available or included in the current subscription.',

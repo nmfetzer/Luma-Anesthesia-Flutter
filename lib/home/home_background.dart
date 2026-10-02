@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class HomeBackground extends StatefulWidget {
@@ -8,14 +9,18 @@ class HomeBackground extends StatefulWidget {
   State<HomeBackground> createState() => _HomeBackgroundState();
 }
 
-class _HomeBackgroundState extends State<HomeBackground> with SingleTickerProviderStateMixin {
+class _HomeBackgroundState extends State<HomeBackground>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final List<_Star> _stars;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat();
 
     final rng = math.Random(42);
     _stars = List.generate(60, (_) {
@@ -27,6 +32,16 @@ class _HomeBackgroundState extends State<HomeBackground> with SingleTickerProvid
         phase: rng.nextDouble() * math.pi * 2,
       );
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -51,7 +66,10 @@ class _HomeBackgroundState extends State<HomeBackground> with SingleTickerProvid
           animation: _controller,
           builder: (context, _) {
             return CustomPaint(
-              painter: _StarfieldPainter(stars: _stars, time: _controller.value * 10),
+              painter: _StarfieldPainter(
+                stars: _stars,
+                time: _controller.value * 10,
+              ),
               child: const SizedBox.expand(),
             );
           },
@@ -63,7 +81,13 @@ class _HomeBackgroundState extends State<HomeBackground> with SingleTickerProvid
 
 class _Star {
   final double x, y, size, period, phase;
-  const _Star({required this.x, required this.y, required this.size, required this.period, required this.phase});
+  const _Star({
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.period,
+    required this.phase,
+  });
 }
 
 class _StarfieldPainter extends CustomPainter {
@@ -78,8 +102,13 @@ class _StarfieldPainter extends CustomPainter {
       final t = (math.sin(phaseTime) + 1) / 2;
       final opacity = 0.2 + t * 0.65;
       final scale = 0.9 + t * 0.25;
-      final paint = Paint()..color = const Color(0xFFF7F1E6).withValues(alpha: opacity);
-      canvas.drawCircle(Offset(star.x * size.width, star.y * size.height), star.size * scale, paint);
+      final paint = Paint()
+        ..color = const Color(0xFFF7F1E6).withValues(alpha: opacity);
+      canvas.drawCircle(
+        Offset(star.x * size.width, star.y * size.height),
+        star.size * scale,
+        paint,
+      );
     }
   }
 

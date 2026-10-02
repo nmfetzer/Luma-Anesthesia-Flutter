@@ -91,39 +91,38 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     });
 
-    testWidgets('Quick Ref leaves home footer unobstructed at $size', (
-      tester,
-    ) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      final navigatorKey = GlobalKey<NavigatorState>();
-      final observer = QuickReferenceRouteObserver();
-      await tester.pumpWidget(
-        MaterialApp(
-          navigatorKey: navigatorKey,
-          navigatorObservers: [observer],
-          initialRoute: '/home',
-          routes: {
-            '/': (_) => const SizedBox.shrink(),
-            '/home': (_) => const HomeScreen(),
-          },
-          builder: (context, child) => QuickReferenceShortcut(
-            observer: observer,
+    testWidgets(
+      'home uses its Quick References tile without an overlay at $size',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final navigatorKey = GlobalKey<NavigatorState>();
+        final observer = QuickReferenceRouteObserver();
+        await tester.pumpWidget(
+          MaterialApp(
             navigatorKey: navigatorKey,
-            child: child!,
+            navigatorObservers: [observer],
+            initialRoute: '/home',
+            routes: {
+              '/': (_) => const SizedBox.shrink(),
+              '/home': (_) => const HomeScreen(),
+            },
+            builder: (context, child) => QuickReferenceShortcut(
+              observer: observer,
+              navigatorKey: navigatorKey,
+              child: child!,
+            ),
           ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      final shortcut = tester.getRect(find.byType(ElevatedButton));
-      for (final label in ['LUMA · Knowledge Illuminated']) {
-        expect(shortcut.overlaps(tester.getRect(find.text(label))), isFalse);
-      }
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink());
-    });
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.byType(ElevatedButton), findsNothing);
+        expect(find.text('Quick References'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
   }
 }

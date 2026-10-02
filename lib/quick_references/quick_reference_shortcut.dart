@@ -6,6 +6,7 @@ class QuickReferenceRouteObserver extends NavigatorObserver {
   final List<Route<dynamic>> _routes = [];
   static const _hidden = {
     '/',
+    '/home',
     '/account',
     '/subscribe',
     '/ce-halo',

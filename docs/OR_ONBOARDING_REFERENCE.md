@@ -15,14 +15,16 @@ The user-supplied PDF is included as an unchanged, bundled reference.
 
 ## Release notes
 
-The PDF's second page contains a FREELUMA3 promotion and advertisements for features that are deferred in the current app. These were flagged to the user and left unchanged. Adding this file does not activate the promotion, change Apple offers, enable future features, or establish Android store availability.
+The PDF's second page contains a FREELUMA3 promotion and advertisements for features that are deferred in the current app. The user confirmed on October 1 that the promotion is already loaded; the PDF and store offers were left unchanged. This integration does not independently verify redemption, enable future features, or establish Android store availability.
 
-The selected mixed-grid home layout B is shown separately in the layout-review preview. This addition does not itself implement the pending home/welcome redesign or app-wide text-size/appearance controls.
+The selected mixed-grid home layout B and responsive welcome layout are implemented in Flutter. Phone text-size preferences are respected, with a single-column home fallback for large text. No new app-wide text-size setting or light/dark selector has been added.
 
 ## Verification
 
 - Original and bundled PDF hashes match.
 - Targeted tests: 26 passed across onboarding, existing PDF viewer, home navigation/search and launch device layouts.
+- Layout B follow-up: 95 targeted tests passed, including 320px phone layouts, portrait/landscape welcome screens, enlarged text, navigation, and existing billing safeguards. Web compilation succeeded; analysis reported no errors or warnings (108 informational notices).
+- Rendered Flutter web layouts checked at 320px, 375px and 820px widths. The duplicate floating Quick Ref shortcut is hidden on Home, where the dedicated tile provides access.
 - Actual Flutter web preview opened and displayed the PDF.
 - Native PDFKit pinch/scroll behavior still requires verification on the new signed iPhone/iPad build.
 - A new TestFlight archive is required; this source update is not an App Store upload.

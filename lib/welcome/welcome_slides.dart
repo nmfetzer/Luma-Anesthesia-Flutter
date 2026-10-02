@@ -205,7 +205,9 @@ class _TitleWithItalic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = LumaText.title();
+    final base = LumaText.title(
+      size: MediaQuery.sizeOf(context).width < 400 ? 28 : 32,
+    );
     return Text.rich(
       TextSpan(
         style: base,
@@ -263,7 +265,10 @@ class _AudienceChip extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: Text(label.toUpperCase(), style: LumaText.chip()),
+      child: Text(
+        label,
+        style: LumaText.chip().copyWith(fontSize: 12, letterSpacing: 0),
+      ),
     );
   }
 }

@@ -240,7 +240,7 @@ void main() {
   });
 
   testWidgets(
-    'ivory Quick Ref pill hides on welcome, account, dialogs and references',
+    'ivory Quick Ref pill hides on home, welcome, account, dialogs and references',
     (tester) async {
       final key = GlobalKey<NavigatorState>();
       final observer = QuickReferenceRouteObserver();
@@ -256,6 +256,7 @@ void main() {
           home: const Scaffold(body: Text('Welcome')),
           routes: {
             '/home': (_) => const Scaffold(body: Text('Home')),
+            '/drug-library': (_) => const Scaffold(body: Text('Drugs')),
             '/account': (_) => const Scaffold(body: Text('Account')),
             '/quick-references': (_) =>
                 const Scaffold(body: Text('References')),
@@ -265,6 +266,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byTooltip('Quick References'), findsNothing);
       key.currentState!.pushNamed('/home');
+      await tester.pumpAndSettle();
+      expect(find.text('Quick Ref'), findsNothing);
+      key.currentState!.pushNamed('/drug-library');
       await tester.pumpAndSettle();
       expect(find.text('Quick Ref'), findsOneWidget);
       expect(find.byType(FloatingActionButton), findsNothing);
