@@ -37,11 +37,15 @@ class CeWebState {
     this.existingCourses = const {},
     this.testCourses = const {},
     this.testOrders = const [],
+    this.purchasableCodes,
+    this.checkoutAvailable = true,
   });
   final String userId;
   final Set<int> existingCourses;
   final Set<int> testCourses;
   final List<Map<String, dynamic>> testOrders;
+  final Set<String>? purchasableCodes;
+  final bool checkoutAvailable;
 
   bool owns(String code, {bool test = false}) {
     final owned = test ? testCourses : existingCourses;
@@ -54,6 +58,7 @@ class CeWebState {
 }
 
 abstract class CeWebService {
+  bool get live => false;
   String? get userId;
   Stream<String?> get accounts;
   bool get configured;
@@ -61,7 +66,67 @@ abstract class CeWebService {
   Future<Uri> checkout(String code);
 }
 
+/// Selected only by the CE portal build flag, never by the mobile entry point.
+class SupabaseCeLiveService extends SupabaseCeWebService {
+  static const liveEnabled = bool.fromEnvironment('LUMA_CE_STRIPE_LIVE_ENABLED');
+  static const liveEndpoint =
+      'https://xuckkusbbcxplpqclbxt.supabase.co/functions/v1/ce-stripe-live';
+  @override
+  bool get live => true;
+  @override
+  bool get configured => liveEnabled && !SupabaseCeWebService.enabled;
+
+  @override
+  Future<Map<String, dynamic>> request(
+    String action, Map<String, dynamic> body, String expected,
+  ) async {
+    if (!configured || userId != expected) {
+      throw Exception('Website checkout is not enabled.');
+    }
+    final token = client.auth.currentSession?.accessToken;
+    if (token == null) throw Exception('Sign in with your Luma account.');
+    final response = await http.post(
+      Uri.parse('$liveEndpoint/$action'),
+      headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: 30));
+    if (userId != expected) throw Exception('Your account changed. Please retry.');
+    final data = jsonDecode(response.body);
+    if (data is! Map) throw Exception('Unable to verify website checkout.');
+    if (response.statusCode != 200) {
+      throw Exception(data['error'] is String ? data['error'] : 'Website checkout is unavailable.');
+    }
+    if (data['live'] != true || data['user_id'] != expected) {
+      throw Exception('Checkout identity could not be verified.');
+    }
+    return Map<String, dynamic>.from(data);
+  }
+
+  @override
+  Future<CeWebState> load() async {
+    final expected = userId;
+    if (expected == null) throw Exception('Sign in with your Luma account.');
+    final data = await request('status', {}, expected);
+    final products = data['products'];
+    final orders = data['orders'];
+    if (products is! List || products.any((p) => p is! Map) ||
+        orders is! List || orders.any((o) => o is! Map)) {
+      throw Exception('Course availability could not be verified.');
+    }
+    return CeWebState(
+      userId: expected,
+      existingCourses: SupabaseCeWebService.courses(data['existing_courses']),
+      testOrders: orders.map((o) => Map<String, dynamic>.from(o as Map)).toList(),
+      checkoutAvailable: data['checkout_enabled'] == true,
+      purchasableCodes: products.where((p) => p['enabled'] == true)
+          .map((p) => p['code'] as String).toSet(),
+    );
+  }
+}
+
 class SupabaseCeWebService implements CeWebService {
+  @override
+  bool get live => false;
   static const enabled = bool.fromEnvironment('LUMA_CE_STRIPE_TEST_ENABLED');
   static const endpoint = String.fromEnvironment('LUMA_CE_STRIPE_TEST_ENDPOINT');
   SupabaseClient get client => Supabase.instance.client;
@@ -154,7 +219,7 @@ class SupabaseCeWebService implements CeWebService {
     final owned = <int>{};
     for (final row in rows) {
       if (row['revoked_at'] != null) continue;
-      final code = row['store'] == 'APP_STORE'
+      final code = ['APP_STORE', 'STRIPE'].contains(row['store'])
           ? webProductCodes[row['product_id']]
           : null;
       if (code == null) {
@@ -217,7 +282,9 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
     initialized = true;
     service = widget.service ??
         CeWebCheckoutScope.maybeOf(context)?.service ??
-        SupabaseCeWebService();
+        (SupabaseCeLiveService.liveEnabled
+            ? SupabaseCeLiveService()
+            : SupabaseCeWebService());
     WidgetsBinding.instance.addObserver(this);
     subscription = service.accounts.listen((_) => refresh());
     refresh();
@@ -270,7 +337,7 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
       if (!mounted || request != generation || service.userId != expected) return;
       final opened = await (widget.open?.call(uri) ??
           launchUrl(uri, webOnlyWindowName: '_self'));
-      if (!opened) throw Exception('Unable to open Stripe test checkout.');
+      if (!opened) throw Exception('Unable to open Stripe checkout.');
     } catch (e) {
       if (mounted && request == generation) {
         setState(() => error = e.toString().replaceFirst('Exception: ', ''));
@@ -310,10 +377,13 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              const Text('Website checkout preparation',
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.w600, color: navy)),
+              Text(service.live ? 'CE HALO course checkout' : 'Website checkout preparation',
+                style: const TextStyle(fontSize: 27, fontWeight: FontWeight.w600, color: navy)),
               const SizedBox(height: 12),
-              Text(service.configured
+              Text(service.live
+                  ? 'Purchase securely with Stripe using your existing Luma account. '
+                    'Course access is added only after payment is verified.'
+                  : service.configured
                   ? 'STRIPE TEST MODE · No real payment, CE credit, certificate, '
                     'course unlock, or complimentary access is awarded by this test.'
                   : 'Website purchases are being prepared. No payment is taken here. '
@@ -334,9 +404,12 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
                 productCard(product, selected == null),
               if (service.userId != null)
                 OutlinedButton(onPressed: busy ? null : refresh,
-                  child: const Text('Refresh account and test status')),
+                  child: Text(service.live ? 'Refresh course access' : 'Refresh account and test status')),
               const SizedBox(height: 16),
-              const Text('Test purchases are recorded separately and do not change '
+              Text(service.live
+                ? 'One-time payment. No automatic subscription enrollment. '
+                  'CE credit and certificates require completing the course requirements.'
+                : 'Test purchases are recorded separately and do not change '
                 'Apple/Google purchases or your real complimentary-access balance. '
                 'Existing course access remains subject to the course requirements.'),
               const SizedBox(height: 12),
@@ -361,7 +434,9 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
     final pending = state?.testOrders.any((o) =>
         o['product_code'] == code && o['state'] == 'pending') == true;
     final copy = CePaywallCopy.byProduct[product.id]!;
-    final enabled = !busy && state != null && error == null && service.configured;
+    final available = state?.checkoutAvailable == true &&
+        (state?.purchasableCodes == null || state!.purchasableCodes!.contains(code));
+    final enabled = !busy && state != null && error == null && service.configured && available;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 14),
       child: Padding(
@@ -376,8 +451,8 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
               Padding(padding: const EdgeInsets.only(bottom: 8), child: Text('• $highlight')),
             const SizedBox(height: 8),
           ],
-          Text(code == 'bundle' ? 'Planned website price: \$699.99 USD · one-time'
-              : 'Planned website price: \$249.99 USD · one-time'),
+          Text('${service.live ? '' : 'Planned website price: '}'
+              '${code == 'bundle' ? '\$699.99' : '\$249.99'} USD · one-time'),
           const SizedBox(height: 8),
           Text(code == 'bundle'
               ? 'Complimentary-access rule: three months total per account, '
@@ -388,7 +463,7 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
           const SizedBox(height: 16),
           if (overlap)
             const Text('You already own part of this bundle. Choose an unowned '
-              'individual course; bundle upgrades are not enabled on this test website.'),
+              'individual course; bundle upgrades are not enabled on this website.'),
           if (owned)
             FilledButton(onPressed: busy ? null : () => openOwned(code),
               child: const Text('Open course'))
@@ -400,12 +475,18 @@ class _CeWebPurchaseScreenState extends State<CeWebPurchaseScreen>
             FilledButton(
               onPressed: enabled && !overlap ? () => buy(code) : null,
               child: Text(!service.configured ? 'Website checkout not enabled'
-                  : pending ? 'Resume or check test checkout' : 'Continue to Stripe test checkout'),
+                  : service.live
+                      ? !available ? 'Website checkout unavailable'
+                          : pending ? 'Resume or check checkout' : 'Continue to secure checkout'
+                      : pending ? 'Resume or check test checkout' : 'Continue to Stripe test checkout'),
             ),
           if (service.configured && !owned && !tested)
-            const Padding(padding: EdgeInsets.only(top: 8),
-              child: Text('Use test payment details only. A return from Stripe is '
-                'not proof of payment; the server must verify it.')),
+            Padding(padding: const EdgeInsets.only(top: 8),
+              child: Text(service.live
+                  ? 'If you just paid, select Refresh course access. '
+                    'Do not pay again while verification is pending.'
+                  : 'Use test payment details only. A return from Stripe is '
+                    'not proof of payment; the server must verify it.')),
         ]),
       ),
     );

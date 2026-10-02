@@ -7,6 +7,8 @@ import 'package:luma_anesthesia/ce/web/ce_web_checkout.dart';
 
 class WebFake extends CeWebService {
   @override
+  bool live = false;
+  @override
   String? userId = 'test-user';
   @override
   bool configured = false;
@@ -40,6 +42,7 @@ void main() {
   test('test checkout is disabled in ordinary builds', () {
     expect(SupabaseCeWebService.enabled, isFalse);
     expect(SupabaseCeWebService.endpoint, isEmpty);
+    expect(SupabaseCeLiveService.liveEnabled, isFalse);
   });
   testWidgets('portal replaces iOS-only messaging without enabling checkout', (t) async {
     final service = WebFake();
@@ -86,6 +89,24 @@ void main() {
     await t.tap(find.text('Sign in with your Luma account'));
     await t.pumpAndSettle();
     expect(find.text('Luma login'), findsOneWidget);
+    expect(service.checkouts, 0);
+  });
+  testWidgets('live portal uses secure checkout wording, not iOS or sandbox', (t) async {
+    final service = WebFake()..live = true..configured = true;
+    await t.pumpWidget(app(service));
+    await t.pumpAndSettle();
+    expect(find.text('Continue to secure checkout'), findsOneWidget);
+    expect(find.textContaining('STRIPE TEST MODE'), findsNothing);
+    expect(find.text('Available in the iOS app'), findsNothing);
+  });
+  testWidgets('live server availability gate disables purchase', (t) async {
+    final service = WebFake()..live = true..configured = true
+      ..value = const CeWebState(userId: 'test-user', checkoutAvailable: false);
+    await t.pumpWidget(app(service));
+    await t.pumpAndSettle();
+    final button = t.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Website checkout unavailable'));
+    expect(button.onPressed, isNull);
     expect(service.checkouts, 0);
   });
   testWidgets('account change clears previously displayed ownership', (t) async {
