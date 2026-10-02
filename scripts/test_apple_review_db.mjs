@@ -60,6 +60,38 @@ try {
     sql(read('supabase/tests/'+test));
     console.log(`PASS: production regression ${test}`);
   }
+  sql(read('supabase/migrations/20261002143504_public_purchase_account_routing.sql'));
+  console.log(sql(read('supabase/tests/open_sandbox_testing.sql')));
+  console.log(sql(read('supabase/tests/public_purchase_account_routing.sql')));
+  let blocked=false;
+  try {
+    sql(read('supabase/operations/activate_apple_public_launch.sql'));
+  } catch(error) {
+    if (!String(error).includes('Incomplete course 1')) throw error;
+    blocked=true;
+  }
+  if (!blocked) throw new Error('Incomplete launch was not blocked');
+  sql(`DO $$ BEGIN
+    IF (SELECT customer_subscriptions_enabled FROM public.luma_billing_controls)
+      OR EXISTS(SELECT 1 FROM public.luma_ce_bonus_products WHERE enabled)
+    THEN RAISE EXCEPTION 'Failed activation changed sales flags'; END IF;
+  END $$;`);
+  sql(read('supabase/tests/public_launch_fixtures.sql'));
+  sql(read('supabase/operations/activate_apple_public_launch.sql'));
+  sql(`DO $$ BEGIN
+    IF NOT (SELECT customer_subscriptions_enabled AND sandbox_self_enrollment_enabled
+      FROM public.luma_billing_controls)
+      OR (SELECT count(*) FROM public.luma_ce_bonus_products WHERE enabled)<>4
+      OR NOT (SELECT released FROM public.ce_course1_catalog)
+      OR NOT (SELECT released FROM public.ce_course2_catalog)
+      OR NOT (SELECT released FROM public.ce_course3_catalog)
+      OR NOT (SELECT enabled FROM public.ce_course1_certificate_settings)
+      OR NOT (SELECT enabled FROM public.ce_course2_certificate_settings)
+      OR NOT (SELECT enabled FROM public.ce_course3_certificate_settings)
+    THEN RAISE EXCEPTION 'Public activation failed or disabled sandbox'; END IF;
+  END $$;`);
+  console.log(sql(read('supabase/tests/public_purchase_account_routing.sql')));
+  console.log('PASS: blocked incomplete activation; complete activation preserves sandbox isolation.');
   console.log('Apple review database integration checks passed in a disposable local database.');
 } finally {
   run('dropdb',[db]);

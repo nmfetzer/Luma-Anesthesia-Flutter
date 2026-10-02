@@ -41,6 +41,20 @@ void main() {
     expect(allowed(policy, customers: true), isTrue);
     expect(allowed(const CheckoutPolicy(true, true), customers: true), isFalse);
   });
+  test('release build supports both server-authorized review and customers', () {
+    expect(
+      allowed(const CheckoutPolicy(true, true), customers: true, review: true),
+      isTrue,
+    );
+    expect(
+      allowed(const CheckoutPolicy(false, true), customers: true, review: true),
+      isTrue,
+    );
+    expect(
+      allowed(const CheckoutPolicy(false, false), customers: true, review: true),
+      isFalse,
+    );
+  });
   test('missing, malformed and cross-account responses fail closed', () {
     for (final raw in [
       null,
