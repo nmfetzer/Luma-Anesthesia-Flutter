@@ -152,6 +152,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 'Pathophysiology & Anesthesia Considerations',
                               ),
                               _benefit('Drug Library Deep Dives'),
+                              _benefit('Diagnostics: labs, acid–base & imaging'),
                               const SizedBox(height: 8),
                               if (MediaQuery.textScalerOf(context).scale(14) >
                                   21)

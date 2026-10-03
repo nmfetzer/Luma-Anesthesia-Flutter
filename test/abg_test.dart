@@ -100,7 +100,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(AbgReferenceScreen), findsOneWidget);
     expect(find.text('Perioperative acid–base problems'), findsOneWidget);
-    expect(find.text('12 of 12 reference cards'), findsOneWidget);
+    expect(find.text('12 of 12 reference cards'), findsNothing);
     await tester.tap(find.text('Formulas & compensation'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Expected PaCO₂ ='), findsOneWidget);
@@ -119,7 +119,7 @@ void main() {
     );
     await tester.tap(find.text('Metabolic'));
     await tester.pump();
-    expect(find.text('5 of 12 reference cards'), findsOneWidget);
+    expect(find.text('5 of 12 reference cards'), findsNothing);
     await tester.enterText(find.byType(TextField), 'unexplained');
     await tester.pump();
     await tester
@@ -133,7 +133,7 @@ void main() {
     expect(find.textContaining('No matching ABG references.'), findsOneWidget);
     await tester.tap(find.text('Reset search and filters'));
     await tester.pumpAndSettle();
-    expect(find.text('12 of 12 reference cards'), findsOneWidget);
+    expect(find.text('12 of 12 reference cards'), findsNothing);
     expect(find.byType(TextField), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

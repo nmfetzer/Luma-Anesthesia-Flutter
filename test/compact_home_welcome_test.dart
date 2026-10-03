@@ -90,7 +90,7 @@ void main() {
         sizeFor(tester, size);
         await tester.pumpWidget(app(const HomeScreen(), size, scale));
         await tester.pumpAndSettle();
-        expect(find.byType(HomeTile), findsNWidgets(8));
+        expect(find.byType(HomeTile), findsNWidgets(9));
         final drug = tester.getRect(tile('/drug-library'));
         final crisis = tester.getRect(tile('/crisis-guidelines'));
         final patho = tester.getRect(tile('/special-considerations'));
@@ -111,7 +111,8 @@ void main() {
         expect(find.text('• Diagnostics'), findsNothing);
         await tester.tap(find.text('Coming soon'));
         await tester.pumpAndSettle();
-        expect(find.text('• Diagnostics'), findsOneWidget);
+        expect(find.text('• Diagnostics'), findsNothing);
+        expect(find.text('• Surgical Case Prep'), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.ensureVisible(
           find.text('Mental Health & Recovery Support'),

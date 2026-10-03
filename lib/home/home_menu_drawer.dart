@@ -51,6 +51,7 @@ class HomeMenuDrawer extends StatelessWidget {
                   ),
                   _sectionLabel('CLINICAL'),
                   _link(context, 'Practice Guidelines', '/practice-guidelines'),
+                  _link(context, 'Diagnostics', '/diagnostics'),
                   _link(
                     context,
                     'Pathophysiology & Anesthesia Considerations',

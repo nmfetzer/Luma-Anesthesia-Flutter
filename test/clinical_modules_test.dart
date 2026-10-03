@@ -105,7 +105,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.text('1 of ${module.topics.length} reference cards'),
-        findsOneWidget,
+        findsNothing,
       );
       await tester.ensureVisible(find.text(module.topics.first.title).last);
       await tester.pumpAndSettle();
@@ -168,6 +168,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reset search and filters'));
     await tester.pumpAndSettle();
-    expect(find.text('5 of 5 reference cards'), findsOneWidget);
+    expect(find.text('5 of 5 reference cards'), findsNothing);
   });
 }

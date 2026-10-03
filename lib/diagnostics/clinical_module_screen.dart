@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+
 import '../theme/luma_theme.dart';
 import '../widgets/luma_home_button.dart';
 import 'abg_screen.dart';
 import 'clinical_modules.dart';
+import 'diagnostics_notice.dart';
 
 class ClinicalModuleScreen extends StatefulWidget {
   const ClinicalModuleScreen({
     super.key,
     required this.module,
     this.showClinicalDraft = false,
+    this.clinicalRelease = false,
   });
   final ClinicalModule module;
   final bool showClinicalDraft;
+  final bool clinicalRelease;
 
   @override
   State<ClinicalModuleScreen> createState() => _ClinicalModuleScreenState();
@@ -32,9 +36,11 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
     final module = widget.module;
     final topics = searchClinicalTopics(module, _search.text, group: _group);
     return Scaffold(
-      appBar:
-          AppBar(title: Text(module.title), actions: const [LumaHomeButton()]),
-      body: !widget.showClinicalDraft
+      appBar: AppBar(
+        title: Text(module.title),
+        actions: const [LumaHomeButton()],
+      ),
+      body: !widget.showClinicalDraft && !widget.clinicalRelease
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -50,16 +56,7 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                   key: PageStorageKey('module-${module.id}'),
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: LumaColors.haloGoldLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'REVIEW PREVIEW\nAdult perioperative reference. Draft content is not released for patient care. Follow clinical judgment and institutional protocols.',
-                      ),
-                    ),
+                    DiagnosticsNotice(reviewPreview: widget.showClinicalDraft),
                     const SizedBox(height: 20),
                     Text(module.heading, style: lumaDisplay(size: 28)),
                     const SizedBox(height: 8),
@@ -96,11 +93,6 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      '${topics.length} of ${module.topics.length} reference cards',
-                      style: const TextStyle(color: LumaColors.inkMuted),
-                    ),
-                    const SizedBox(height: 12),
                     if (topics.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -131,8 +123,12 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                             padding: const EdgeInsets.only(top: 6),
                             child: Text('${topic.group} · ${topic.summary}'),
                           ),
-                          childrenPadding:
-                              const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          childrenPadding: const EdgeInsets.fromLTRB(
+                            16,
+                            0,
+                            16,
+                            16,
+                          ),
                           children: [
                             if (topic.differential.isNotEmpty)
                               ClinicalDifferentialTable(
@@ -160,7 +156,7 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                       ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Sources are linked within each section. Source checking is not a substitute for clinician review of this draft.',
+                      'Sources are linked within each section. Verify current guidance and apply clinical judgment and institutional protocols.',
                     ),
                   ],
                 ),

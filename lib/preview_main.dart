@@ -23,7 +23,13 @@ Future<void> main() async {
       await OfflineLibrary.initialize(Supabase.instance.client);
     } catch (_) {}
   }
-  runApp(const LumaApp(allowSocialSignIn: false, showComingSoon: true));
+  runApp(
+    const LumaApp(
+      allowSocialSignIn: false,
+      showComingSoon: true,
+      diagnosticsReviewPreview: true,
+    ),
+  );
 }
 
 class _PreviewMemoryStorage extends GotrueAsyncStorage {

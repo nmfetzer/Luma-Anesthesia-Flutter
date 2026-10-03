@@ -320,12 +320,12 @@ void main() {
     expect(find.textContaining('No matching lab values.'), findsOneWidget);
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump();
-    expect(find.text('35 matching reference cards'), findsOneWidget);
+    expect(find.text('35 matching reference cards'), findsNothing);
     await tester.ensureVisible(find.text('Blood Counts'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Blood Counts'));
     await tester.pump();
-    expect(find.text('5 matching reference cards'), findsOneWidget);
+    expect(find.text('5 matching reference cards'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -340,12 +340,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Coagulation'));
     await tester.pumpAndSettle();
-    expect(find.text('7 matching reference cards'), findsOneWidget);
+    expect(find.text('7 matching reference cards'), findsNothing);
     await tester.ensureVisible(find.text('Urgent findings'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Urgent findings'));
     await tester.pumpAndSettle();
-    expect(find.text('1 matching reference card'), findsOneWidget);
+    expect(find.text('1 matching reference card'), findsNothing);
     await tester.ensureVisible(find.text('Fibrinogen'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Fibrinogen'));
@@ -364,7 +364,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('All'));
     await tester.pumpAndSettle();
-    expect(find.text('1 matching reference card'), findsOneWidget);
+    expect(find.text('1 matching reference card'), findsNothing);
     await tester.ensureVisible(find.text('Cardiac Troponin'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Cardiac Troponin'));

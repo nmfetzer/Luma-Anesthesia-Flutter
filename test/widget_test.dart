@@ -8,6 +8,7 @@ import 'package:luma_anesthesia/launch/deferred_section_screen.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
 import 'package:luma_anesthesia/quick_references/quick_reference_screen.dart';
 import 'package:luma_anesthesia/special_considerations/special_considerations_screen.dart';
+import 'package:luma_anesthesia/diagnostics/diagnostics_access.dart';
 
 void main() {
   test('production defaults preserve clinical review and normal app entry', () {
@@ -53,13 +54,18 @@ void main() {
       }
       expect(screen('/ce-halo'), isA<CeLibraryScreen>());
       expect(screen('/ce-halo/courses'), isA<CeLibraryScreen>());
+      for (final path in ['/diagnostics', '/diagnostics/labs?preview=true',
+        '/diagnostics/abg?reviewPreview=true']) {
+        final diagnostics = screen(path) as DiagnosticsFeature;
+        expect(diagnostics.reviewPreview, isFalse);
+      }
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
 
   testWidgets(
-    'private preview uses inert coming-soon routes, never draft content',
+    'coming-soon display alone never enables Diagnostics review access',
     (tester) async {
       await tester.pumpWidget(const LumaApp(showComingSoon: true));
       await tester.pump(const Duration(milliseconds: 100));
@@ -69,8 +75,8 @@ void main() {
               as MaterialPageRoute<dynamic>;
       final screen = route.builder(
         tester.element(find.byType(MaterialApp)),
-      ) as DeferredSectionScreen;
-      expect(screen.showComingSoon, isTrue);
+      ) as DiagnosticsFeature;
+      expect(screen.reviewPreview, isFalse);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

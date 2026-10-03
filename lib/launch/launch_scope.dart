@@ -4,7 +4,6 @@ abstract final class LaunchScope {
   static const deferred = <String, String>{
     '/luma-ai': 'Luma AI',
     '/surgical-prep': 'Surgical Case Prep',
-    '/diagnostics': 'Diagnostics',
     '/regional-procedures': 'Regional & Procedures',
     '/luma-academy': 'Luma Academy',
     '/ekg': 'EKG',

@@ -164,6 +164,16 @@ class _OfflineDownloadsScreenState extends State<OfflineDownloadsScreen> {
                 'Signing out removes paid downloads.',
               ),
               _bullet(
+                'Diagnostics reference text is included in the installed app; '
+                'no separate content download is needed. Open the app online first '
+                'to verify paid or complimentary access. Offline Diagnostics access '
+                'uses the same maximum 72-hour access check, or ends sooner if your access expires.',
+              ),
+              _bullet(
+                'The Practice Guidelines directory is also included in the app. '
+                'Its linked publisher documents are not stored offline.',
+              ),
+              _bullet(
                 'Internet is still required for account actions, purchases and Restore '
                 'Purchases, external sources and algorithm PDFs, CE progress sync, '
                 'completion and certificates. CE course downloads are not included here.',

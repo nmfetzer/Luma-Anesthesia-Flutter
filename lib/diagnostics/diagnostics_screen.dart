@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../theme/luma_theme.dart';
 import '../widgets/luma_home_button.dart';
 import 'diagnostics_content.dart';
-import 'abg_content.dart';
 import 'abg_screen.dart';
 import 'clinical_modules.dart';
 import 'clinical_module_screen.dart';
+import 'diagnostics_access.dart';
+import 'diagnostics_notice.dart';
 
 class DiagnosticsScreen extends StatefulWidget {
   const DiagnosticsScreen({
     super.key,
     this.showClinicalDraft = false,
+    this.clinicalRelease = false,
   });
   final bool showClinicalDraft;
+  final bool clinicalRelease;
 
   @override
   State<DiagnosticsScreen> createState() => _DiagnosticsScreenState();
@@ -29,23 +33,28 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
   }
 
   void _open(DiagnosticCategory category) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => switch (category.id) {
-          'labs' =>
-            LabValuesScreen(showClinicalDraft: widget.showClinicalDraft),
-          'abg' =>
-            AbgReferenceScreen(showClinicalDraft: widget.showClinicalDraft),
-          _ => widget.showClinicalDraft &&
-                  clinicalModules.any((m) => m.id == category.id)
-              ? ClinicalModuleScreen(
-                  module:
-                      clinicalModules.firstWhere((m) => m.id == category.id),
-                  showClinicalDraft: widget.showClinicalDraft,
-                )
-              : _PreparationScreen(category: category),
-        },
+    final access = DiagnosticsAccessScope.maybeOf(context);
+    final page = switch (category.id) {
+      'labs' => LabValuesScreen(
+        showClinicalDraft: widget.showClinicalDraft,
+        clinicalRelease: widget.clinicalRelease,
       ),
+      'abg' => AbgReferenceScreen(
+        showClinicalDraft: widget.showClinicalDraft,
+        clinicalRelease: widget.clinicalRelease,
+      ),
+      _ =>
+        (widget.showClinicalDraft || widget.clinicalRelease) &&
+                clinicalModules.any((m) => m.id == category.id)
+            ? ClinicalModuleScreen(
+                module: clinicalModules.firstWhere((m) => m.id == category.id),
+                showClinicalDraft: widget.showClinicalDraft,
+                clinicalRelease: widget.clinicalRelease,
+              )
+            : _PreparationScreen(category: category),
+    };
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => access?.protect(page) ?? page),
     );
   }
 
@@ -67,7 +76,7 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
               'Explore laboratory and diagnostic references in one place.',
             ),
             const SizedBox(height: 16),
-            if (widget.showClinicalDraft) const _DraftNotice(),
+            DiagnosticsNotice(reviewPreview: widget.showClinicalDraft),
             const SizedBox(height: 16),
             TextField(
               controller: _search,
@@ -90,8 +99,9 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
             if (categories.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child:
-                    Text('No matching sections. Try labs, ABG, or ultrasound.'),
+                child: Text(
+                  'No matching sections. Try labs, ABG, or ultrasound.',
+                ),
               ),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -131,27 +141,6 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(category.description),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    category.id == 'labs' &&
-                                            widget.showClinicalDraft
-                                        ? '${labReferences.length} reference cards · Review draft'
-                                        : category.id == 'abg' &&
-                                                widget.showClinicalDraft
-                                            ? '${abgTopics.length} reference cards · Review draft'
-                                            : widget.showClinicalDraft &&
-                                                    clinicalModules.any(
-                                                      (m) =>
-                                                          m.id == category.id,
-                                                    )
-                                                ? '${clinicalModules.firstWhere((m) => m.id == category.id).topics.length} reference cards · Review draft'
-                                                : 'In preparation',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: LumaColors.inkMuted,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -170,8 +159,13 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
 }
 
 class LabValuesScreen extends StatefulWidget {
-  const LabValuesScreen({super.key, this.showClinicalDraft = false});
+  const LabValuesScreen({
+    super.key,
+    this.showClinicalDraft = false,
+    this.clinicalRelease = false,
+  });
   final bool showClinicalDraft;
+  final bool clinicalRelease;
 
   @override
   State<LabValuesScreen> createState() => _LabValuesScreenState();
@@ -200,13 +194,14 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
         title: const Text('Lab Values'),
         actions: const [LumaHomeButton()],
       ),
-      body: !widget.showClinicalDraft
+      body: !widget.showClinicalDraft && !widget.clinicalRelease
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child:
-                    Text('Lab Values is in preparation. Clinical draft content '
-                        'is not available in the released app.'),
+                child: Text(
+                  'Lab Values is in preparation. Clinical draft content '
+                  'is not available in the released app.',
+                ),
               ),
             )
           : _ReferenceWidth(
@@ -216,7 +211,9 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                     sliver: SliverList.list(
                       children: [
-                        const _DraftNotice(),
+                        DiagnosticsNotice(
+                          reviewPreview: widget.showClinicalDraft,
+                        ),
                         const SizedBox(height: 16),
                         const Text(
                           'Adult lab interpretation',
@@ -227,9 +224,10 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                         ),
                         const SizedBox(height: 8),
                         const Text(
-                            'Use the interval and units on the patient’s laboratory '
-                            'report. These examples are not critical-value limits, '
-                            'transfusion triggers, or procedural clearance criteria.'),
+                          'Use the interval and units on the patient’s laboratory '
+                          'report. These examples are not critical-value limits, '
+                          'transfusion triggers, or procedural clearance criteria.',
+                        ),
                         const _SourceLink(
                           label: 'How to interpret reference ranges',
                           url: labResultsGuide,
@@ -285,9 +283,6 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text('${entries.length} matching reference '
-                            '${entries.length == 1 ? 'card' : 'cards'}'),
-                        const SizedBox(height: 8),
                         if (entries.isEmpty)
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 24),
@@ -312,15 +307,20 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                             key: PageStorageKey('lab-${entry.id}'),
                             title: Text(
                               entry.title,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 6),
                               child: Text(entry.interval),
                             ),
-                            childrenPadding:
-                                const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            childrenPadding: const EdgeInsets.fromLTRB(
+                              16,
+                              0,
+                              16,
+                              16,
+                            ),
                             expandedCrossAxisAlignment:
                                 CrossAxisAlignment.start,
                             children: [
@@ -370,33 +370,30 @@ class _ActComparisonChart extends StatelessWidget {
     (
       procedure: 'CPB',
       target: '>480 seconds',
-      caveat:
-          'Cardiopulmonary bypass. Certain maximally activated or microcuvette systems: >400 seconds. Use the validated device-specific perfusion protocol.',
+      caveat: 'Cardiopulmonary bypass. Certain maximally activated or microcuvette systems: >400 seconds. Use the validated device-specific perfusion protocol.',
       source: 'STS/SCA/AmSECT · CPB guideline',
       url: actGuidelineSource,
     ),
     (
       procedure: 'PCI (UFH)',
-      target: '250–300 seconds: HemoTec / i-STAT\n'
+      target:
+          '250–300 seconds: HemoTec / i-STAT\n'
           '300–350 seconds: Hemochron',
-      caveat:
-          'With unfractionated heparin. Planned IV GP IIb/IIIa inhibitor: 200–250 seconds. Higher targets may be considered for CTO or ACS; confirm the procedural protocol.',
+      caveat: 'With unfractionated heparin. Planned IV GP IIb/IIIa inhibitor: 200–250 seconds. Higher targets may be considered for CTO or ACS; confirm the procedural protocol.',
       source: 'ACC/AHA/SCAI · PCI guideline',
       url: pciActSource,
     ),
     (
       procedure: 'AF ablation',
       target: '≥300 seconds',
-      caveat:
-          'Left atrial ablation. Maintain with unfractionated heparin and regular ACT checks. Some centers use higher targets; follow the electrophysiology protocol.',
+      caveat: 'Left atrial ablation. Maintain with unfractionated heparin and regular ACT checks. Some centers use higher targets; follow the electrophysiology protocol.',
       source: 'EHRA/HRS · AF ablation consensus',
       url: ablationActSource,
     ),
     (
       procedure: 'Arterial surgery',
       target: 'No universal numeric target',
-      caveat:
-          'Open or endovascular procedures. ESVS: ACT-guided additional UFH or reversal may be considered (IIb, C). Follow an agreed procedure- and device-specific institutional protocol.',
+      caveat: 'Open or endovascular procedures. ESVS: ACT-guided additional UFH or reversal may be considered (IIb, C). Follow an agreed procedure- and device-specific institutional protocol.',
       source: 'ESVS · Arterial surgery guidance',
       url: vascularActSource,
     ),
@@ -404,87 +401,84 @@ class _ActComparisonChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        key: const ValueKey('act-comparison-chart'),
-        padding: const EdgeInsets.only(top: 12, bottom: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    key: const ValueKey('act-comparison-chart'),
+    padding: const EdgeInsets.only(top: 12, bottom: 16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'ACT targets by procedure',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Procedural anticoagulation targets, not normal ranges. '
+          'Confirm the procedure, analyzer, medications, and local protocol.',
+        ),
+        const SizedBox(height: 12),
+        Table(
+          key: const ValueKey('act-procedure-table'),
+          columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(2.3)},
+          defaultVerticalAlignment: TableCellVerticalAlignment.top,
+          border: TableBorder.all(
+            color: LumaColors.inkMuted.withValues(alpha: 0.25),
+          ),
           children: [
-            const Text(
-              'ACT targets by procedure',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Procedural anticoagulation targets, not normal ranges. '
-              'Confirm the procedure, analyzer, medications, and local protocol.',
-            ),
-            const SizedBox(height: 12),
-            Table(
-              key: const ValueKey('act-procedure-table'),
-              columnWidths: const {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(2.3),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.top,
-              border: TableBorder.all(
-                color: LumaColors.inkMuted.withValues(alpha: 0.25),
-              ),
+            const TableRow(
+              decoration: BoxDecoration(color: LumaColors.haloGoldLight),
               children: [
-                const TableRow(
-                  decoration: BoxDecoration(color: LumaColors.haloGoldLight),
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'Procedure',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'ACT target & key qualifications',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-                for (final row in _rows)
-                  TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          row.procedure,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              row.target,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: LumaColors.inkNavy,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(row.caveat),
-                            const SizedBox(height: 6),
-                            _SourceLink(label: row.source, url: row.url),
-                          ],
-                        ),
-                      ),
-                    ],
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Procedure',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'ACT target & key qualifications',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
               ],
             ),
+            for (final row in _rows)
+              TableRow(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      row.procedure,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          row.target,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: LumaColors.inkNavy,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(row.caveat),
+                        const SizedBox(height: 6),
+                        _SourceLink(label: row.source, url: row.url),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _LabBullet extends StatelessWidget {
@@ -493,15 +487,15 @@ class _LabBullet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('•  '),
-            Expanded(child: SelectionArea(child: Text(text))),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('•  '),
+        Expanded(child: SelectionArea(child: Text(text))),
+      ],
+    ),
+  );
 }
 
 class _ClinicalSection extends StatelessWidget {
@@ -510,35 +504,35 @@ class _ClinicalSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: 16),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: section.urgent ? LumaColors.haloGoldLight : null,
-          border: Border.all(color: LumaColors.inkMuted.withValues(alpha: 0.2)),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (section.urgent)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 6),
-                child: Text(
-                  'IMPORTANT CLINICAL CONTEXT',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              ),
-            Text(
-              section.title,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+    width: double.infinity,
+    margin: const EdgeInsets.only(top: 16),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: section.urgent ? LumaColors.haloGoldLight : null,
+      border: Border.all(color: LumaColors.inkMuted.withValues(alpha: 0.2)),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (section.urgent)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 6),
+            child: Text(
+              'IMPORTANT CLINICAL CONTEXT',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 12),
-            for (final bullet in section.bullets) _LabBullet(bullet),
-            _SourceLink(label: section.sourceLabel, url: section.url),
-          ],
+          ),
+        Text(
+          section.title,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
         ),
-      );
+        const SizedBox(height: 12),
+        for (final bullet in section.bullets) _LabBullet(bullet),
+        _SourceLink(label: section.sourceLabel, url: section.url),
+      ],
+    ),
+  );
 }
 
 class _PreparationScreen extends StatelessWidget {
@@ -546,42 +540,43 @@ class _PreparationScreen extends StatelessWidget {
   final DiagnosticCategory category;
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(category.title),
-          actions: const [LumaHomeButton()],
-        ),
-        body: _ReferenceWidth(
-          child: ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              Text(
-                category.title,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 16),
-              Text(category.description),
-              const SizedBox(height: 24),
-              const Text(
-                'In preparation',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                  'The Base44 material for this section has been identified. '
-                  'Its expanded Flutter reference and source review are not complete yet.'),
-              const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back to Diagnostics'),
-                ),
-              ),
-            ],
+    appBar: AppBar(
+      title: Text(category.title),
+      actions: const [LumaHomeButton()],
+    ),
+    body: _ReferenceWidth(
+      child: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(
+            category.title,
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
-        ),
-      );
+          const SizedBox(height: 16),
+          Text(category.description),
+          const SizedBox(height: 24),
+          const Text(
+            'In preparation',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'The Base44 material for this section has been identified. '
+            'Its expanded Flutter reference and source review are not complete yet.',
+          ),
+          const SizedBox(height: 24),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.arrow_back),
+              label: const Text('Back to Diagnostics'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _ReferenceWidth extends StatelessWidget {
@@ -589,28 +584,11 @@ class _ReferenceWidth extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) => Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 960),
-          child: child,
-        ),
-      );
-}
-
-class _DraftNotice extends StatelessWidget {
-  const _DraftNotice();
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: LumaColors.haloGoldLight,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'REVIEW PREVIEW\n'
-          'Diagnostics is being built. Draft content is not released for patient care.',
-          style: TextStyle(color: LumaColors.inkNavy, height: 1.5),
-        ),
-      );
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 960),
+      child: child,
+    ),
+  );
 }
 
 class _SourceLink extends StatelessWidget {
@@ -619,28 +597,28 @@ class _SourceLink extends StatelessWidget {
   final String url;
   @override
   Widget build(BuildContext context) => TextButton(
-        onPressed: () async {
-          try {
-            final opened = await launchUrl(
-              Uri.parse(url),
-              mode: LaunchMode.externalApplication,
-            );
-            if (!opened) throw StateError('Could not open reference');
-          } catch (_) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Unable to open source. $url')),
-              );
-            }
-          }
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.open_in_new, size: 16),
-            const SizedBox(width: 8),
-            Flexible(child: Text(label)),
-          ],
-        ),
-      );
+    onPressed: () async {
+      try {
+        final opened = await launchUrl(
+          Uri.parse(url),
+          mode: LaunchMode.externalApplication,
+        );
+        if (!opened) throw StateError('Could not open reference');
+      } catch (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Unable to open source. $url')),
+          );
+        }
+      }
+    },
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.open_in_new, size: 16),
+        const SizedBox(width: 8),
+        Flexible(child: Text(label)),
+      ],
+    ),
+  );
 }

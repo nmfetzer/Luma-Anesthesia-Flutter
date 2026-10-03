@@ -29,6 +29,7 @@ import 'ce/ce_purchase_screen.dart';
 import 'references/or_onboarding_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'practice_guidelines/practice_guidelines_screen.dart';
+import 'diagnostics/diagnostics_access.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
 import 'offline/offline_status_frame.dart';
@@ -66,10 +67,12 @@ class LumaApp extends StatefulWidget {
     this.allowSocialSignIn = true,
     this.showComingSoon = false,
     this.cePortal = false,
+    this.diagnosticsReviewPreview = false,
   });
   final bool allowSocialSignIn;
   final bool showComingSoon;
   final bool cePortal;
+  final bool diagnosticsReviewPreview;
 
   @override
   State<LumaApp> createState() => _LumaAppState();
@@ -189,6 +192,17 @@ class _LumaAppState extends State<LumaApp> {
               initialQuery: settings.arguments is String
                   ? settings.arguments as String
                   : '',
+            ),
+          );
+        }
+        if (path == '/diagnostics' || path.startsWith('/diagnostics/')) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => DiagnosticsFeature(
+              reviewPreview: widget.diagnosticsReviewPreview,
+              initialSection: Uri.tryParse(path)?.pathSegments
+                  .skip(1)
+                  .firstOrNull,
             ),
           );
         }

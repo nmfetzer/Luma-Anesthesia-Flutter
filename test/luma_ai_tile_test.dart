@@ -27,7 +27,7 @@ void main() {
         await tester.tap(find.text('Coming soon'));
         await tester.pump(const Duration(milliseconds: 300));
         expect(find.text('• Luma AI'), findsOneWidget);
-        expect(find.text('• Diagnostics'), findsOneWidget);
+        expect(find.text('• Diagnostics'), findsNothing);
         expect(
           find.text(
             'You’ll be notified in the app when new features and updates are available.',

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../theme/luma_theme.dart';
 import '../widgets/luma_home_button.dart';
 import 'abg_content.dart';
+import 'diagnostics_notice.dart';
 
 class AbgReferenceScreen extends StatefulWidget {
-  const AbgReferenceScreen({super.key, this.showClinicalDraft = false});
+  const AbgReferenceScreen({
+    super.key,
+    this.showClinicalDraft = false,
+    this.clinicalRelease = false,
+  });
   final bool showClinicalDraft;
+  final bool clinicalRelease;
 
   @override
   State<AbgReferenceScreen> createState() => _AbgReferenceScreenState();
@@ -30,12 +37,14 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
         title: const Text('ABG & Acid–Base'),
         actions: const [LumaHomeButton()],
       ),
-      body: !widget.showClinicalDraft
+      body: !widget.showClinicalDraft && !widget.clinicalRelease
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('ABG & Acid–Base is in preparation. Clinical draft '
-                    'content is not available in the released app.'),
+                child: Text(
+                  'ABG & Acid–Base is in preparation. Clinical draft '
+                  'content is not available in the released app.',
+                ),
               ),
             )
           : Center(
@@ -44,17 +53,7 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: LumaColors.haloGoldLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text('REVIEW PREVIEW\n'
-                          'Adult perioperative reference. Draft content is not '
-                          'released for patient care. Follow clinical judgment '
-                          'and institutional protocols.'),
-                    ),
+                    DiagnosticsNotice(reviewPreview: widget.showClinicalDraft),
                     const SizedBox(height: 20),
                     Text(
                       'Perioperative acid–base problems',
@@ -62,8 +61,9 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                        'Differentials, management considerations and anesthesia '
-                        'pitfalls. Select a clinical problem, or search a finding.'),
+                      'Differentials, management considerations and anesthesia '
+                      'pitfalls. Select a clinical problem, or search a finding.',
+                    ),
                     const SizedBox(height: 20),
                     const Card(
                       margin: EdgeInsets.zero,
@@ -76,9 +76,11 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                         children: [
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 8),
-                            child: Text('Approximate responses, not treatment '
-                                'targets. Compare with baseline, time course '
-                                'and clinical context.'),
+                            child: Text(
+                              'Approximate responses, not treatment '
+                              'targets. Compare with baseline, time course '
+                              'and clinical context.',
+                            ),
                           ),
                           _CompensationTable(),
                           ClinicalReferenceSection(section: gapReference),
@@ -117,19 +119,16 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      '${topics.length} of ${abgTopics.length} reference cards',
-                      style: const TextStyle(color: LumaColors.inkMuted),
-                    ),
-                    const SizedBox(height: 12),
                     if (topics.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('No matching ABG references. Try a '
-                                'different term or reset the filters.'),
+                            const Text(
+                              'No matching ABG references. Try a '
+                              'different term or reset the filters.',
+                            ),
                             TextButton(
                               onPressed: () => setState(() {
                                 _search.clear();
@@ -151,8 +150,12 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                             padding: const EdgeInsets.only(top: 6),
                             child: Text('${topic.group} · ${topic.summary}'),
                           ),
-                          childrenPadding:
-                              const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          childrenPadding: const EdgeInsets.fromLTRB(
+                            16,
+                            0,
+                            16,
+                            16,
+                          ),
                           children: [
                             if (topic.differential.isNotEmpty)
                               ClinicalDifferentialTable(
@@ -164,9 +167,10 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                         ),
                       ),
                     const SizedBox(height: 16),
-                    const Text('Sources are linked within each section. '
-                        'Source checking is not a substitute for clinician '
-                        'review of this draft.'),
+                    const Text(
+                      'Sources are linked within each section. '
+                      'Verify current guidance and apply clinical judgment and institutional protocols.',
+                    ),
                   ],
                 ),
               ),
@@ -191,20 +195,17 @@ class _AbgSourceButton extends StatelessWidget {
       // Preserve a visible destination when the browser cannot open it.
     }
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unable to open source: $url'),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Unable to open source: $url')));
     }
   }
 
   @override
   Widget build(BuildContext context) => TextButton.icon(
-        onPressed: () => _openSource(context),
-        icon: const Icon(Icons.open_in_new, size: 16),
-        label: Text(label),
-      );
+    onPressed: () => _openSource(context),
+    icon: const Icon(Icons.open_in_new, size: 16),
+    label: Text(label),
+  );
 }
 
 class _CompensationTable extends StatelessWidget {
@@ -212,41 +213,41 @@ class _CompensationTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final section in compensationReference)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: LumaColors.inkNavy.withValues(alpha: .14),
-                  ),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    section.title,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 6),
-                  for (final line in section.bullets)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: SelectionArea(child: Text(line)),
-                    ),
-                ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      for (final section in compensationReference)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: LumaColors.inkNavy.withValues(alpha: .14),
               ),
             ),
-          const _AbgSourceButton(
-            label: 'Merck Manual · Compensation table',
-            url: compensationSource,
           ),
-        ],
-      );
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                section.title,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 6),
+              for (final line in section.bullets)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: SelectionArea(child: Text(line)),
+                ),
+            ],
+          ),
+        ),
+      const _AbgSourceButton(
+        label: 'Merck Manual · Compensation table',
+        url: compensationSource,
+      ),
+    ],
+  );
 }
 
 class ClinicalDifferentialTable extends StatelessWidget {
@@ -267,112 +268,112 @@ class ClinicalDifferentialTable extends StatelessWidget {
   final String? introduction;
 
   Widget _cell(String text, {bool heading = false}) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: SelectionArea(
-          child: Text(
-            text,
-            style:
-                heading ? const TextStyle(fontWeight: FontWeight.w600) : null,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.all(12),
+    child: SelectionArea(
+      child: Text(
+        text,
+        style: heading ? const TextStyle(fontWeight: FontWeight.w600) : null,
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+    builder: (context, constraints) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        if (introduction != null) ...[
+          Text(introduction!),
+          const SizedBox(height: 12),
+        ],
+        if (constraints.maxWidth >= 640)
+          Table(
+            columnWidths: const {
+              0: FlexColumnWidth(.8),
+              1: FlexColumnWidth(1.3),
+              2: FlexColumnWidth(1.5),
+            },
+            border: TableBorder.all(
+              color: LumaColors.inkNavy.withValues(alpha: .14),
             ),
-            const SizedBox(height: 12),
-            if (introduction != null) ...[
-              Text(introduction!),
-              const SizedBox(height: 12),
+            defaultVerticalAlignment: TableCellVerticalAlignment.top,
+            children: [
+              TableRow(
+                decoration: const BoxDecoration(
+                  color: LumaColors.haloGoldLight,
+                ),
+                children: [
+                  _cell(processLabel, heading: true),
+                  _cell(cluesLabel, heading: true),
+                  _cell(focusLabel, heading: true),
+                ],
+              ),
+              for (final row in rows)
+                TableRow(
+                  children: [
+                    _cell(row.process, heading: true),
+                    _cell(row.clues),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SelectionArea(child: Text(row.focus)),
+                          _AbgSourceButton(
+                            label: row.sourceLabel,
+                            url: row.url,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
-            if (constraints.maxWidth >= 640)
-              Table(
-                columnWidths: const {
-                  0: FlexColumnWidth(.8),
-                  1: FlexColumnWidth(1.3),
-                  2: FlexColumnWidth(1.5),
-                },
-                border: TableBorder.all(
+          )
+        else
+          for (final row in rows)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(
                   color: LumaColors.inkNavy.withValues(alpha: .14),
                 ),
-                defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TableRow(
-                    decoration:
-                        const BoxDecoration(color: LumaColors.haloGoldLight),
-                    children: [
-                      _cell(processLabel, heading: true),
-                      _cell(cluesLabel, heading: true),
-                      _cell(focusLabel, heading: true),
-                    ],
+                  Text(
+                    row.process,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  for (final row in rows)
-                    TableRow(
-                      children: [
-                        _cell(row.process, heading: true),
-                        _cell(row.clues),
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SelectionArea(child: Text(row.focus)),
-                              _AbgSourceButton(
-                                label: row.sourceLabel,
-                                url: row.url,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    cluesLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  SelectionArea(child: Text(row.clues)),
+                  const SizedBox(height: 8),
+                  Text(
+                    focusLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  SelectionArea(child: Text(row.focus)),
+                  _AbgSourceButton(label: row.sourceLabel, url: row.url),
                 ],
-              )
-            else
-              for (final row in rows)
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: LumaColors.inkNavy.withValues(alpha: .14),
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        row.process,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        cluesLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SelectionArea(child: Text(row.clues)),
-                      const SizedBox(height: 8),
-                      Text(
-                        focusLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SelectionArea(child: Text(row.focus)),
-                      _AbgSourceButton(label: row.sourceLabel, url: row.url),
-                    ],
-                  ),
-                ),
-          ],
-        ),
-      );
+              ),
+            ),
+      ],
+    ),
+  );
 }
 
 class ClinicalReferenceSection extends StatelessWidget {
@@ -381,35 +382,35 @@ class ClinicalReferenceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: section.caution ? LumaColors.haloGoldLight : null,
-          border: Border.all(color: LumaColors.inkNavy.withValues(alpha: .14)),
-          borderRadius: BorderRadius.circular(12),
+    width: double.infinity,
+    margin: const EdgeInsets.only(top: 12),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: section.caution ? LumaColors.haloGoldLight : null,
+      border: Border.all(color: LumaColors.inkNavy.withValues(alpha: .14)),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          section.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              section.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        const SizedBox(height: 12),
+        for (final bullet in section.bullets)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('•  '),
+                Expanded(child: SelectionArea(child: Text(bullet))),
+              ],
             ),
-            const SizedBox(height: 12),
-            for (final bullet in section.bullets)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('•  '),
-                    Expanded(child: SelectionArea(child: Text(bullet))),
-                  ],
-                ),
-              ),
-            _AbgSourceButton(label: section.sourceLabel, url: section.url),
-          ],
-        ),
-      );
+          ),
+        _AbgSourceButton(label: section.sourceLabel, url: section.url),
+      ],
+    ),
+  );
 }

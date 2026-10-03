@@ -20,6 +20,11 @@ const sections = [
     keywords: 'ASA AANA CAA AAAA NCCAA ARC-AA standards policies advisories',
   ),
   HomeSearchSection('Luma Academy', '/luma-academy'),
+  HomeSearchSection(
+    'Diagnostics',
+    '/diagnostics',
+    keywords: 'ABG ACT labs troponin BNP POCUS ultrasound carotid',
+  ),
 ];
 final data = HomeSearchData(
   medications: [
@@ -186,7 +191,7 @@ void main() {
         Finder tile(String route) => find.byWidgetPredicate(
           (w) => w is HomeTile && w.data.route == route,
         );
-        expect(find.byType(HomeTile), findsNWidgets(8));
+        expect(find.byType(HomeTile), findsNWidgets(9));
         for (final path in [
           '/drug-library',
           '/crisis-guidelines',
@@ -196,10 +201,10 @@ void main() {
           '/special-considerations',
           '/first-days-in-or',
           '/practice-guidelines',
+          '/diagnostics',
         ]) {
           expect(tile(path), findsOneWidget);
         }
-        expect(tile('/diagnostics'), findsNothing);
         expect(find.text('Coming soon'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },

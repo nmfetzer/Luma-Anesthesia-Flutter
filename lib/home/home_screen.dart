@@ -81,6 +81,13 @@ const _tiles = [
     style: HomeTileStyle.parchment,
     route: '/practice-guidelines',
   ),
+  HomeTileData(
+    titlePlain: '',
+    titleAccent: 'Diagnostics',
+    subtitle: 'Labs, acid–base & imaging',
+    style: HomeTileStyle.parchment,
+    route: '/diagnostics',
+  ),
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -126,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia ACLS PALS BLS emergency' : ''} '
                                 '${tile.route == '/special-considerations' ? 'special considerations patho comorbidities conditions perioperative' : ''} '
                                 '${tile.route == '/quick-references' ? 'preop pre-op clearance GLP1 GLP-1 guidelines' : ''} '
-                                '${tile.route == '/practice-guidelines' ? 'ASA AANA CAA AAAA NCCAA ARC-AA standards policies advisories ethics' : ''}',
+                                '${tile.route == '/practice-guidelines' ? 'ASA AANA CAA AAAA NCCAA ARC-AA standards policies advisories ethics' : ''} '
+                                '${tile.route == '/diagnostics' ? 'ABG ACT coagulation lab values troponin BNP NT-proBNP CK CKMB CPK lactate lactic acid PFT pulmonary function echo TEE imaging POCUS ultrasound carotid' : ''}',
                           ),
                         const HomeSearchSection(
                           'Mental Health & Recovery Support',
@@ -198,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 8),
                                   pair(4, 5),
                                   const SizedBox(height: 8),
-                                  HomeTile(data: _tiles[7], wide: true),
+                                  pair(7, 8),
                                   const SizedBox(height: 8),
                                   HomeTile(data: _tiles[6], wide: true),
                                 ],
