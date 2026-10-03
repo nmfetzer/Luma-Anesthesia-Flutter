@@ -26,6 +26,7 @@ import 'welcome/welcome_gate.dart';
 import 'screens/password_recovery_screen.dart';
 import 'ce/ce_library_screen.dart';
 import 'ce/ce_purchase_screen.dart';
+import 'ce/web/ce_portal_frame.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
@@ -128,7 +129,9 @@ class _LumaAppState extends State<LumaApp> {
         navigatorKey: _navKey,
         child: OfflineStatusFrame(
           navigatorKey: _navKey,
-          child: child ?? const SizedBox.shrink(),
+          child: cePortal && kIsWeb
+              ? CePortalFrame(child: child ?? const SizedBox.shrink())
+              : child ?? const SizedBox.shrink(),
         ),
       ),
       home: kIsWeb && Uri.base.queryParameters['recovery'] == '1'
