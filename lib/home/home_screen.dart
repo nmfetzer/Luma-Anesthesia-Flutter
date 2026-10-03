@@ -74,6 +74,13 @@ const _tiles = [
     style: HomeTileStyle.parchment,
     route: '/first-days-in-or',
   ),
+  HomeTileData(
+    titlePlain: 'Practice',
+    titleAccent: 'Guidelines',
+    subtitle: 'ASA, AANA & CAA resources',
+    style: HomeTileStyle.parchment,
+    route: '/practice-guidelines',
+  ),
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -118,7 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 '${tile.subtitle ?? ''} '
                                 '${tile.route == '/crisis-guidelines' ? 'malignant hyperthermia ACLS PALS BLS emergency' : ''} '
                                 '${tile.route == '/special-considerations' ? 'special considerations patho comorbidities conditions perioperative' : ''} '
-                                '${tile.route == '/quick-references' ? 'preop pre-op clearance GLP1 GLP-1 guidelines' : ''}',
+                                '${tile.route == '/quick-references' ? 'preop pre-op clearance GLP1 GLP-1 guidelines' : ''} '
+                                '${tile.route == '/practice-guidelines' ? 'ASA AANA CAA AAAA NCCAA ARC-AA standards policies advisories ethics' : ''}',
                           ),
                         const HomeSearchSection(
                           'Mental Health & Recovery Support',
@@ -189,6 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   HomeTile(data: _tiles[3], wide: true),
                                   const SizedBox(height: 8),
                                   pair(4, 5),
+                                  const SizedBox(height: 8),
+                                  HomeTile(data: _tiles[7], wide: true),
                                   const SizedBox(height: 8),
                                   HomeTile(data: _tiles[6], wide: true),
                                 ],

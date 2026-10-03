@@ -41,6 +41,7 @@ flutter:
   assets:
     - assets/data/medications.json
     - assets/data/provider_support.json
+    - assets/data/practice_guidelines.json
     - assets/references/first_days_in_the_or.pdf
     - assets/branding/luma_icon.png
     - assets/branding/luma_symbol_halo.png

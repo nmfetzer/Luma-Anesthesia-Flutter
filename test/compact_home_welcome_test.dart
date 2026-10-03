@@ -90,7 +90,7 @@ void main() {
         sizeFor(tester, size);
         await tester.pumpWidget(app(const HomeScreen(), size, scale));
         await tester.pumpAndSettle();
-        expect(find.byType(HomeTile), findsNWidgets(7));
+        expect(find.byType(HomeTile), findsNWidgets(8));
         final drug = tester.getRect(tile('/drug-library'));
         final crisis = tester.getRect(tile('/crisis-guidelines'));
         final patho = tester.getRect(tile('/special-considerations'));

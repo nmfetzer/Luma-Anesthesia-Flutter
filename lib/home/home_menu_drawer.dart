@@ -50,6 +50,7 @@ class HomeMenuDrawer extends StatelessWidget {
                     '/vasopressors-infusions',
                   ),
                   _sectionLabel('CLINICAL'),
+                  _link(context, 'Practice Guidelines', '/practice-guidelines'),
                   _link(
                     context,
                     'Pathophysiology & Anesthesia Considerations',

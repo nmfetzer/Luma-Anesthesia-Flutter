@@ -6,7 +6,6 @@ abstract final class LaunchScope {
     '/surgical-prep': 'Surgical Case Prep',
     '/diagnostics': 'Diagnostics',
     '/regional-procedures': 'Regional & Procedures',
-    '/practice-guidelines': 'Practice Guidelines',
     '/luma-academy': 'Luma Academy',
     '/ekg': 'EKG',
   };

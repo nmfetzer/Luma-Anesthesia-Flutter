@@ -14,6 +14,11 @@ const sections = [
     keywords: 'special considerations',
   ),
   HomeSearchSection('Crisis Hub', '/crisis-guidelines'),
+  HomeSearchSection(
+    'Practice Guidelines',
+    '/practice-guidelines',
+    keywords: 'ASA AANA CAA AAAA NCCAA ARC-AA standards policies advisories',
+  ),
   HomeSearchSection('Luma Academy', '/luma-academy'),
 ];
 final data = HomeSearchData(
@@ -64,6 +69,16 @@ Future<void> openSearch(
 }
 
 void main() {
+  testWidgets('publisher searches find the launch guideline tile', (
+    tester,
+  ) async {
+    await openSearch(tester);
+    for (final query in ['ASA', 'AANA', 'CAA', 'NCCAA']) {
+      await tester.enterText(find.byType(TextField).last, query);
+      await tester.pumpAndSettle();
+      expect(find.text('Practice Guidelines'), findsOneWidget);
+    }
+  });
   testWidgets('home search hides deferred pediatric topics but retains PALS', (
     tester,
   ) async {
@@ -171,7 +186,7 @@ void main() {
         Finder tile(String route) => find.byWidgetPredicate(
           (w) => w is HomeTile && w.data.route == route,
         );
-        expect(find.byType(HomeTile), findsNWidgets(7));
+        expect(find.byType(HomeTile), findsNWidgets(8));
         for (final path in [
           '/drug-library',
           '/crisis-guidelines',
@@ -180,6 +195,7 @@ void main() {
           '/quick-references',
           '/special-considerations',
           '/first-days-in-or',
+          '/practice-guidelines',
         ]) {
           expect(tile(path), findsOneWidget);
         }

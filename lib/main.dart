@@ -28,6 +28,7 @@ import 'ce/ce_library_screen.dart';
 import 'ce/ce_purchase_screen.dart';
 import 'references/or_onboarding_screen.dart';
 import 'quick_references/quick_reference_screen.dart';
+import 'practice_guidelines/practice_guidelines_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
 import 'offline/offline_status_frame.dart';
@@ -179,6 +180,16 @@ class _LumaAppState extends State<LumaApp> {
           return MaterialPageRoute(
             settings: settings,
             builder: (_) => const ProviderSupportScreen(),
+          );
+        }
+        if (path == '/practice-guidelines') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => PracticeGuidelinesScreen(
+              initialQuery: settings.arguments is String
+                  ? settings.arguments as String
+                  : '',
+            ),
           );
         }
         if (settings.name == '/quick-references') {
