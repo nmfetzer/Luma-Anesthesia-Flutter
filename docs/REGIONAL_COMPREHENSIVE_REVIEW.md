@@ -1,6 +1,6 @@
 # Regional & Procedures: Comprehensive Review
 
-Prepared October 4, 2026. This proposal expands the existing block references using the Interscalene format selected by the owner. Clinical-content approval and permission to push to GitHub are still pending; this is not an installed TestFlight update.
+Prepared October 4, 2026. This update expands the existing block references using the Interscalene format selected by the owner. The owner approved the consolidated clinical-content update and authorized pushing it to GitHub on October 4, 2026. This is not an installed TestFlight update.
 
 ## Scope
 
@@ -39,7 +39,7 @@ The thirteen newly expanded topics each include an always-visible clinical summa
 
 ## Shared safety and evidence boundaries
 
-These are references for trained clinicians, not procedural checklists, automated dosing tools, or substitutes for supervised training. All clinical content still requires the owner's review before publication.
+These are references for trained clinicians, not procedural checklists, automated dosing tools, or substitutes for supervised training. Owner approval for this consolidated update is recorded below; future substantive clinical changes require a new review.
 
 - **Dose context:** Published atlas volumes are labeled as context, not default orders or safe maximums. Bilateral and combined-block exposure must be considered together, and liposomal-bupivacaine indications are not extrapolated to other sites ([EXPAREL prescribing information](https://www.exparel.com/prescribing-information.pdf)).
 - **Bleeding and infection:** Drug/dose, renal function, needle placement, catheter removal, and restart decisions remain linked to the complete guidance; no new generic hold-time shortcut was introduced ([ASRA fifth-edition antithrombotic guideline](https://rapm.bmj.com/content/early/2025/01/21/rapm-2024-105766), [ASRA infection-control guideline](https://doi.org/10.1136/rapm-2024-105651)).
@@ -56,4 +56,14 @@ These are references for trained clinicians, not procedural checklists, automate
 - These checks validate software behavior, not independent clinical certification.
 - No Supabase schema, production clinical records, billing, CE, account, or AI configuration is changed.
 - Preview-only access remains confined to a separate preview checkout. It is not included in the production proposal.
-- A later approved GitHub push prepares source for the next native build; it does not update installed TestFlight apps or publish an App Store release.
+- The authorized GitHub push prepares source for the next native build; it does not update installed TestFlight apps or publish an App Store release.
+
+## Owner approval
+
+On October 4, 2026, after receiving the consolidated preview and review summary, the owner instructed: “Approve the Regional update and push it to GitHub.”
+
+- **Approved scope:** All fourteen comprehensive block references, their shared reader, navigation/search behavior, source links, and associated tests.
+- **Reviewed source commits:** `32a99fa` and `57c20f8`, based on GitHub main `1a14e74`.
+- **Destination:** `nmfetzer/Luma-Anesthesia-Flutter`, branch `main`.
+- **Excluded:** Preview-only access changes, production database or billing changes, native build upload, and App Store release.
+- **Governance:** This records the owner's approval, not independent clinical certification by automated testing.
