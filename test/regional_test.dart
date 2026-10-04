@@ -159,7 +159,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(RegionalDetailScreen), findsOneWidget);
       expect(find.text('Nonzero motor risk'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Femoral nerve block'), 400);
+      await tester.scrollUntilVisible(
+        find.text('Femoral nerve block'),
+        400,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Femoral nerve block'));
       await tester.pumpAndSettle();
       expect(

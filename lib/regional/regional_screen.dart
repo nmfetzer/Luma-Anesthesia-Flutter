@@ -178,7 +178,8 @@ class RegionalDetailScreen extends StatelessWidget {
   const RegionalDetailScreen({super.key, required this.topic});
   final RegionalTopic topic;
   @override
-  Widget build(BuildContext context) => topic.id == 'interscalene'
+  Widget build(BuildContext context) =>
+      topic.sections.first.title == 'At a glance'
       ? _ComprehensiveRegionalDetail(topic: topic)
       : Scaffold(
           appBar: AppBar(
@@ -265,7 +266,7 @@ class RegionalDetailScreen extends StatelessWidget {
         );
 }
 
-/// The first comprehensive reference is intentionally scoped to Interscalene.
+/// Expanded block references share a searchable, progressive-disclosure reader.
 /// All entry points still pass through RegionalFeature's subscription gate.
 class _ComprehensiveRegionalDetail extends StatefulWidget {
   const _ComprehensiveRegionalDetail({required this.topic});
@@ -285,15 +286,34 @@ class _ComprehensiveRegionalDetailState
       section.title: GlobalKey(),
   };
 
-  static const _shortcuts = {
-    'Anatomy': 'Anatomy & ultrasound orientation',
-    'Technique': 'Technique & injection safeguards',
-    'Medications': 'Local anesthetics & dose context',
-    'Troubleshooting': 'Block assessment & incomplete coverage',
-    'Urgent concerns': 'Complications & urgent escalation',
-    'Catheters': 'Continuous catheter management',
-    'Evidence': 'Evidence & current controversies',
-  };
+  Map<String, String> get _shortcuts {
+    final result = <String, String>{};
+    for (final section in widget.topic.sections.skip(1)) {
+      final title = section.title;
+      if (title.startsWith('Anatomy')) {
+        result['Anatomy'] = title;
+      } else if (title.startsWith('Technique')) {
+        result['Technique'] = title;
+      } else if (title.startsWith('Local anesthetics') ||
+          title.startsWith('Medications')) {
+        result['Medications'] = title;
+      } else if (title.startsWith('Block assessment')) {
+        result['Troubleshooting'] = title;
+      } else if (title.startsWith('Complications') ||
+          title == 'Nonzero motor risk') {
+        result['Urgent concerns'] = title;
+      } else if (title.startsWith('Continuous catheter') ||
+          title.startsWith('Catheter')) {
+        result['Catheters'] = title;
+      } else if (title.startsWith('Recovery') ||
+          title.startsWith('Ongoing care')) {
+        result['Recovery'] = title;
+      } else if (title.startsWith('Evidence')) {
+        result['Evidence'] = title;
+      }
+    }
+    return result;
+  }
 
   @override
   void dispose() {
@@ -347,16 +367,22 @@ class _ComprehensiveRegionalDetailState
     }).toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Interscalene', maxLines: 1),
+        title: Text(
+          widget.topic.id == 'interscalene'
+              ? 'Interscalene'
+              : widget.topic.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: const [LumaHomeButton()],
       ),
       body: _ReferenceBody(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'UPPER EXTREMITY · ADULT REFERENCE',
-              style: TextStyle(
+            Text(
+              '${widget.topic.category.toUpperCase()} · ADULT REFERENCE',
+              style: const TextStyle(
                 color: LumaColors.inkMuted,
                 fontSize: 12,
                 letterSpacing: 0.8,
@@ -364,7 +390,9 @@ class _ComprehensiveRegionalDetailState
             ),
             const SizedBox(height: 10),
             Text(
-              'Interscalene\nbrachial plexus block',
+              widget.topic.id == 'interscalene'
+                  ? 'Interscalene\nbrachial plexus block'
+                  : widget.topic.title,
               style: lumaDisplay(size: 28),
             ),
             const SizedBox(height: 10),
@@ -410,7 +438,7 @@ class _ComprehensiveRegionalDetailState
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
                 labelText: 'Search detailed sections',
-                hintText: 'Phrenic, catheter, rebound pain…',
+                hintText: 'Coverage, anatomy, medication…',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: query.isEmpty
                     ? null

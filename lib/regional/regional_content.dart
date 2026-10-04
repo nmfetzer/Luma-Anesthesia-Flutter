@@ -1,3 +1,5 @@
+part 'regional_expanded_blocks.dart';
+
 /// Adult regional references adapted from the Base44 topic inventory.
 /// Clinical publication requires owner review. No patient-specific calculator.
 class RegionalSource {
@@ -61,6 +63,10 @@ const regionalSources = <String, RegionalSource>{
   'esp': RegionalSource(
     'NYSORA · Erector spinae plane',
     'https://www.nysora.com/regional-anesthesia/techniques/erector-spinae-plane-block/',
+  ),
+  'thoracic-review': RegionalSource(
+    'J Anesth Analg Crit Care · Thoracic wall blocks review, 2025',
+    'https://pmc.ncbi.nlm.nih.gov/articles/PMC12822337/',
   ),
   'peng': RegionalSource(
     'Healthcare · PENG anatomy and quadriceps weakness',
@@ -652,34 +658,7 @@ const regionalTopics = <RegionalTopic>[
     'Upper extremity',
     'Dense upper-limb coverage; pleural and diaphragmatic risks remain.',
     'elbow forearm wrist hand first rib subclavian pneumothorax',
-    [
-      RegionalSection(
-        'Coverage and gaps',
-        [
-          'Useful for arm, elbow, forearm, and hand surgery. Confirm distribution before incision; block location does not guarantee every terminal territory is anesthetized.',
-          'The intercostobrachial nerve supplies proximal medial-arm skin and is not reliably covered by a brachial plexus block. Tourniquet/incision requirements may require supplementation.',
-        ],
-        ['sc'],
-      ),
-      RegionalSection(
-        'Key ultrasound relationships',
-        [
-          'Identify the plexus posterior/superficial to the subclavian artery, with the first rib and pleura deep to the target region.',
-          'Distinguish first rib from pleura and use Doppler for intervening vessels. Keep the needle tip continuously identifiable; a visible shaft alone is not adequate.',
-          'Seek appropriate spread around the plexus without forceful injection or unnecessary needle passes.',
-        ],
-        ['sc'],
-      ),
-      RegionalSection(
-        'Risk and postoperative assessment',
-        [
-          'Pneumothorax is uncommon with experienced ultrasound-guided practice but remains possible and may present later. New chest pain, dyspnea, or hypoxemia warrants assessment.',
-          'Phrenic involvement is less common than with interscalene block but cannot reliably be avoided. Consider a more distal approach when loss of diaphragmatic function would be poorly tolerated.',
-          'Vascular puncture, LAST, incomplete block, and neurologic injury remain relevant despite ultrasound guidance.',
-        ],
-        ['sc', 'nerve'],
-      ),
-    ],
+    supraclavicularExpandedSections,
     related: ['infraclavicular', 'axillary', 'last'],
   ),
   RegionalTopic(
@@ -688,34 +667,7 @@ const regionalTopics = <RegionalTopic>[
     'Upper extremity',
     'Cord-level anesthesia below the shoulder and a stable catheter site.',
     'elbow wrist hand cords axillary artery continuous catheter',
-    [
-      RegionalSection(
-        'Clinical role',
-        [
-          'Useful for arm, elbow, forearm, and hand surgery below the shoulder. The proximal medial-arm skin supplied by the intercostobrachial nerve may require supplementation.',
-          'The chest-wall location can support catheter stability when prolonged analgesia is desired.',
-        ],
-        ['ic'],
-      ),
-      RegionalSection(
-        'Anatomy and imaging',
-        [
-          'Image the axillary artery deep to pectoralis major and minor. The cords lie around the artery; individual positions vary and should not be treated as fixed clock-face coordinates.',
-          'Identify the axillary vein and pleura as well as the artery. Appropriate spread posterior, cephalad, and caudad to the artery can reach the cords even when each cord is not distinct.',
-          'Depth increases the importance of needle-tip visualization and a controlled injection. Reassess poor spread rather than forcing injection across a fascial barrier.',
-        ],
-        ['ic'],
-      ),
-      RegionalSection(
-        'Limits and ongoing care',
-        [
-          'A more distal approach may be preferable when respiratory reserve is limited, but do not label any technique categorically “zero risk.” Pleural, vascular, neurologic, and toxicity risks still require assessment.',
-          'Motor block is expected and can persist. Protect the limb and align catheter duration with benefit and infection risk.',
-          'For a catheter, verify spread and function and reassess the insertion site and ongoing need.',
-        ],
-        ['sc', 'ic', 'infection'],
-      ),
-    ],
+    infraclavicularExpandedSections,
     related: ['axillary', 'selection-recovery', 'anticoagulation'],
   ),
   RegionalTopic(
@@ -724,34 +676,7 @@ const regionalTopics = <RegionalTopic>[
     'Upper extremity',
     'Distal upper-limb coverage without approaching the neck or pleura.',
     'median ulnar radial musculocutaneous hand wrist forearm',
-    [
-      RegionalSection(
-        'Coverage and exclusions',
-        [
-          'Useful for elbow, forearm, and hand surgery when the relevant terminal branches, including musculocutaneous, are covered.',
-          'The axillary nerve has already left the plexus; shoulder/deltoid skin is not covered. Proximal medial-arm skin and tourniquet discomfort may require separate assessment.',
-        ],
-        ['ax'],
-      ),
-      RegionalSection(
-        'Anatomy and practical limitations',
-        [
-          'Identify the axillary artery, surrounding veins, and median, ulnar, and radial nerves. Nerve positions are variable, not a universal diagram.',
-          'The musculocutaneous nerve is commonly separate from the perivascular cluster, within or between coracobrachialis and biceps; identify it rather than assuming a perivascular injection covers it.',
-          'Avoid excessive arm abduction. Light transducer pressure and Doppler help reveal compressible veins that could otherwise be obscured.',
-        ],
-        ['ax'],
-      ),
-      RegionalSection(
-        'Injection and recovery',
-        [
-          'Observe spread; absent visible spread during injection should prompt stopping and reassessment for intravascular or incorrect placement.',
-          'The approach avoids the characteristic pleural and phrenic concerns of more proximal blocks, but still carries risks of LAST, vessel injury, nerve injury, and incomplete anesthesia.',
-          'Protect the blocked limb and verify recovery expectations and follow-up before discharge.',
-        ],
-        ['ax', 'nerve'],
-      ),
-    ],
+    axillaryExpandedSections,
     related: ['safety', 'last', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -760,34 +685,7 @@ const regionalTopics = <RegionalTopic>[
     'Lower extremity',
     'Anterior thigh and knee analgesia with quadriceps motor block.',
     'hip fracture patella quadriceps fascia iliaca falls',
-    [
-      RegionalSection(
-        'Coverage and use',
-        [
-          'Useful for femoral, patellar, quadriceps-tendon, and knee procedures and hip-fracture analgesia.',
-          'Coverage includes anterior/medial thigh and a variable medial leg/foot territory. Do not assume it supplies complete hip, posterior knee, or whole-leg surgical anesthesia.',
-        ],
-        ['fn', 'ipack'],
-      ),
-      RegionalSection(
-        'Ultrasound relationships',
-        [
-          'At the femoral crease, identify the femoral artery, vein, fascia iliaca, and iliopsoas. The nerve lies lateral to the artery and deep to fascia iliaca.',
-          'Confirm the correct fascial plane and local anesthetic spread. The vein may be concealed by probe pressure; use Doppler and release pressure when necessary.',
-          'Injection in the wrong fascial plane can fail despite an apparently nearby needle. Do not overcome resistance with force.',
-        ],
-        ['fn'],
-      ),
-      RegionalSection(
-        'Motor and catheter implications',
-        [
-          'Femoral motor blockade can impair quadriceps function. Assess strength and provide assisted mobilization/fall precautions rather than equating pain relief with safe weight-bearing.',
-          'An adductor canal technique may better support motor-sparing goals for selected knee procedures, but its coverage and residual motor risk also require assessment.',
-          'The mobile groin and shallow nerve location can make catheter dislodgement a problem; secure, assess function, and monitor the site.',
-        ],
-        ['fn', 'ac'],
-      ),
-    ],
+    femoralExpandedSections,
     related: ['adductor-canal', 'peng', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -796,33 +694,7 @@ const regionalTopics = <RegionalTopic>[
     'Lower extremity',
     'Medial leg coverage and knee analgesia; motor sparing is not absolute.',
     'saphenous subsartorius knee TKA femoral triangle quadriceps',
-    [
-      RegionalSection(
-        'Clinical role and coverage',
-        [
-          'Useful for knee analgesia within a multimodal plan and for medial foot/ankle coverage when supplementing a sciatic block.',
-          'The saphenous nerve is a sensory branch of the femoral nerve supplying the medial leg/foot and infrapatellar territory. It does not cover the entire knee or replace a sciatic block for other foot territories.',
-        ],
-        ['ac', 'ps'],
-      ),
-      RegionalSection(
-        'Anatomy and motor limitations',
-        [
-          'At mid-thigh, identify sartorius over the femoral vessels, vastus medialis laterally, and adductor muscle medially. The saphenous nerve is typically close to the femoral artery.',
-          'A proximal subsartorial/femoral-triangle injection is not identical to a distal canal or below-knee saphenous block. Location and spread affect coverage and motor involvement.',
-          'Larger or more proximal injections may affect the branch to vastus medialis or femoral motor territory. Assess quadriceps function and assist ambulation even when the goal is motor sparing.',
-        ],
-        ['ac'],
-      ),
-      RegionalSection(
-        'Completing the analgesic plan',
-        [
-          'Posterior knee pain may require a complementary modality such as periarticular infiltration or iPACK, selected according to the surgical plan and cumulative local anesthetic exposure.',
-          'For continuous techniques, reassess benefit, catheter function, mobility, and infection risk. A label-supported liposomal regimen exists, but it has specific dose and compatibility requirements.',
-        ],
-        ['ipack', 'infection', 'exparel'],
-      ),
-    ],
+    adductorCanalExpandedSections,
     related: ['ipack', 'liposomal-bupivacaine', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -831,32 +703,7 @@ const regionalTopics = <RegionalTopic>[
     'Lower extremity',
     'A posterior capsular supplement, not a stand-alone surgical block.',
     'TKA total knee arthroplasty posterior capsule popliteal foot drop',
-    [
-      RegionalSection(
-        'Target and role',
-        [
-          'iPACK means infiltration between the popliteal artery and posterior capsule of the knee. It targets articular sensory branches while aiming to avoid the tibial and common peroneal motor trunks.',
-          'It is commonly considered as a posterior-pain supplement to adductor canal or femoral techniques; select the combination within a multimodal surgical plan.',
-        ],
-        ['ipack'],
-      ),
-      RegionalSection(
-        'Imaging and limitations',
-        [
-          'Identify the popliteal artery, distal femur, and posterior capsular plane. The intended plane is not the popliteal sciatic nerve sheath.',
-          'Do not assume posterior analgesia covers anterior incision pain or provides full surgical anesthesia. Reconcile all local anesthetics used for companion blocks and surgeon infiltration.',
-        ],
-        ['ipack', 'ipack-risk', 'exparel'],
-      ),
-      RegionalSection(
-        'Motor function still needs assessment',
-        [
-          'The motor-sparing goal is not a guarantee. Temporary foot drop has been reported, plausibly from spread to the common peroneal nerve.',
-          'Document baseline and postoperative dorsiflexion/other relevant motor findings. New or persistent deficits require assessment for block spread, surgical injury, or another cause rather than automatic reassurance.',
-        ],
-        ['ipack-risk', 'nerve'],
-      ),
-    ],
+    ipackExpandedSections,
     related: ['adductor-canal', 'neurologic-injury', 'local-anesthetics'],
   ),
   RegionalTopic(
@@ -865,34 +712,7 @@ const regionalTopics = <RegionalTopic>[
     'Lower extremity',
     'Foot and ankle coverage with a medial saphenous gap.',
     'Achilles tibial common peroneal ankle foot sciatic',
-    [
-      RegionalSection(
-        'Coverage',
-        [
-          'Useful for foot, ankle, and Achilles procedures. It blocks motor and sensory function below the knee, except the medial leg/foot supplied by the saphenous nerve.',
-          'Supplement medial territory when the incision requires it. Hamstring function is spared, but foot/calf motor function and safe ambulation can be affected.',
-        ],
-        ['ps'],
-      ),
-      RegionalSection(
-        'Anatomy and ultrasound orientation',
-        [
-          'Identify the popliteal artery and vein, tibial nerve, and common peroneal nerve. Trace proximally to their convergence; bifurcation height varies.',
-          'The branches share a connective-tissue sheath near their separation. The objective is spread around the relevant components, not fascicular injection.',
-          'High resistance or poor visualization warrants stopping/reassessment. Confirm distribution around both branches rather than relying on one motor response.',
-        ],
-        ['ps', 'nerve'],
-      ),
-      RegionalSection(
-        'Recovery and catheter plan',
-        [
-          'Protect the insensate foot and plan safe assisted mobilization. A longer analgesic block may also prolong motor impairment.',
-          'For a catheter, verify spread and secure the system; assess ongoing benefit, site condition, and block distribution.',
-          'A label-supported liposomal-bupivacaine regimen exists for adult popliteal sciatic block; its dose and compatibility restrictions differ from conventional local anesthetics.',
-        ],
-        ['ps', 'infection', 'exparel'],
-      ),
-    ],
+    poplitealExpandedSections,
     related: ['adductor-canal', 'liposomal-bupivacaine', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -901,34 +721,7 @@ const regionalTopics = <RegionalTopic>[
     'Truncal',
     'Abdominal-wall analgesia, not reliable visceral analgesia.',
     'abdominal cesarean hernia subcostal lateral TAP',
-    [
-      RegionalSection(
-        'Coverage follows the approach',
-        [
-          'TAP blocks target somatic abdominal-wall afferents; visceral surgical pain still requires other analgesic modalities.',
-          'Subcostal, lateral, and posterior approaches are not interchangeable. Match the injection location to the incision and expected distribution; do not assign one universal dermatomal range to all TAP techniques.',
-        ],
-        ['tap'],
-      ),
-      RegionalSection(
-        'Anatomy and imaging',
-        [
-          'For a lateral approach, identify external oblique, internal oblique, transversus abdominis, and the peritoneal boundary. The target is the plane between internal oblique and transversus abdominis.',
-          'Subcostal anatomy and targets differ. Maintain visualization of the needle tip and deeper abdominal structures rather than following a fixed depth.',
-          'Spread in the correct plane matters more than a visible volume alone; intramuscular or deeper-than-intended injection changes both efficacy and risk.',
-        ],
-        ['tap'],
-      ),
-      RegionalSection(
-        'Bilateral dosing and limitations',
-        [
-          'Account for the combined dose from both sides and all other local anesthetics. Large-volume fascial-plane techniques can still produce systemic toxicity.',
-          'TAP and QL should be presented as separate techniques with different targets and risks. Do not use the old “266 mg liposomal bupivacaine per side” recipe.',
-          'EXPAREL has no established label indication for regional analgesia by TAP block in the cited US prescribing information.',
-        ],
-        ['tap', 'exparel'],
-      ),
-    ],
+    tapExpandedSections,
     related: ['quadratus-lumborum', 'local-anesthetics', 'last'],
   ),
   RegionalTopic(
@@ -937,33 +730,7 @@ const regionalTopics = <RegionalTopic>[
     'Truncal',
     'Approach-dependent abdominal analgesia with deeper anatomical risks.',
     'QL QLB transmuscular abdominal psoas lumbar plexus',
-    [
-      RegionalSection(
-        'Distinct from TAP',
-        [
-          'Lateral, posterior, and transmuscular QL approaches use different fascial targets and can produce different distributions. Treat “QL block” as a family of techniques.',
-          'Somatic and possible visceral effects depend on spread and approach; do not promise a fixed dermatomal range or guaranteed visceral analgesia.',
-        ],
-        ['tap'],
-      ),
-      RegionalSection(
-        'Anatomical orientation',
-        [
-          'Identify quadratus lumborum, psoas, the relevant fascial layers, and adjacent retroperitoneal structures. For the transmuscular approach, the target is between QL and psoas.',
-          'Identify the kidney and use Doppler for regional vessels. A deeper approach has different consequences for inadvertent vascular or organ injury than a superficial TAP injection.',
-        ],
-        ['tap'],
-      ),
-      RegionalSection(
-        'Safety and recovery',
-        [
-          'Spread to the lumbar plexus can cause lower-extremity weakness. Assess strength and assisted-mobility needs rather than assuming a purely sensory abdominal block.',
-          'Large volumes and bilateral treatment require careful total-dose accounting. Vascularity and depth increase the importance of toxicity and bleeding-risk planning.',
-          'Use technique-specific anticoagulation assessment, including whether the target is deep/noncompressible, rather than assuming every fascial-plane block is low risk.',
-        ],
-        ['tap', 'asra'],
-      ),
-    ],
+    quadratusLumborumExpandedSections,
     related: ['tap', 'anticoagulation', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -972,34 +739,7 @@ const regionalTopics = <RegionalTopic>[
     'Truncal',
     'A paraspinal fascial-plane technique with variable spread.',
     'rib thoracic erector spinae transverse process ESPB',
-    [
-      RegionalSection(
-        'Target and proposed mechanism',
-        [
-          'The target plane is deep to erector spinae and superficial to the transverse process. Cranio-caudal spread and diffusion toward adjacent spaces may contribute to analgesia.',
-          'The mechanism and optimal indications remain incompletely defined. Do not promise epidural-equivalent coverage or a fixed sensory extent based on the injection level alone.',
-        ],
-        ['esp'],
-      ),
-      RegionalSection(
-        'Ultrasound landmarks',
-        [
-          'Identify the transverse process in a paramedian sagittal view. At upper thoracic levels, trapezius and rhomboid may overlie erector spinae.',
-          'Lamina indicates a more medial view; ribs with intervening pleura indicate a more lateral view. Confirm the bony target before interpreting the needle endpoint.',
-          'Observe separation deep to the muscle and above the transverse process; an uncertain tip or unintended spread warrants reassessment.',
-        ],
-        ['esp'],
-      ),
-      RegionalSection(
-        'Limits and risk planning',
-        [
-          'Assess actual analgesic distribution and maintain a rescue/multimodal analgesic plan. A successful-looking fascial injection is not confirmation of complete surgical anesthesia.',
-          'Total local anesthetic exposure, infection prevention, and the bleeding consequences of the selected depth/site still apply.',
-          'The cited EXPAREL label does not establish ESP as an approved regional nerve-block indication.',
-        ],
-        ['esp', 'asra', 'infection', 'exparel'],
-      ),
-    ],
+    espExpandedSections,
     related: ['local-anesthetics', 'anticoagulation', 'infection'],
   ),
   RegionalTopic(
@@ -1008,33 +748,7 @@ const regionalTopics = <RegionalTopic>[
     'Lower extremity',
     'Anterior hip-capsule analgesia; quadriceps sparing is not assured.',
     'hip fracture arthroplasty femoral obturator iliopsoas motor sparing',
-    [
-      RegionalSection(
-        'Anatomy and intended coverage',
-        [
-          'PENG targets articular branches supplying the anterior hip capsule, including femoral, obturator, and accessory obturator contributions.',
-          'The described target lies deep to the iliopsoas tendon near the iliopubic/iliopectineal bony region. Correct fascial relationships matter; anatomy and spread are more complex than a single target dot.',
-        ],
-        ['peng'],
-      ),
-      RegionalSection(
-        'Analgesia is not complete operative anesthesia',
-        [
-          'The intent is hip-capsule analgesia. Do not assume complete skin-incision coverage, posterior hip coverage, or dependable stand-alone surgical anesthesia.',
-          'Reports of wider anesthesia may involve additional blocks, infiltration, sedation, or extra-plane spread. Plan the primary anesthetic separately.',
-        ],
-        ['peng'],
-      ),
-      RegionalSection(
-        'Nonzero motor risk',
-        [
-          'Quadriceps weakness has been reported in clinical studies and can result from spread to the femoral nerve proper. The label “motor-sparing” describes an aim, not a guarantee.',
-          'Needle location and injectate volume can affect spread. Assess postoperative motor function and provide fall precautions.',
-          'Do not describe PENG as categorically superior to femoral block for every hip-fracture patient; select within the operation, patient risks, and local expertise.',
-        ],
-        ['peng'],
-      ),
-    ],
+    pengExpandedSections,
     related: ['femoral', 'neurologic-injury', 'selection-recovery'],
   ),
   RegionalTopic(
@@ -1043,44 +757,7 @@ const regionalTopics = <RegionalTopic>[
     'Neuraxial',
     'Segmental blockade with catheter-dependent dosing and follow-up.',
     'labor thoracic lumbar catheter test dose top up hypotension',
-    [
-      RegionalSection(
-        'Clinical role and anatomy',
-        [
-          'Epidural local anesthetic acts on spinal nerve roots outside the dura. Catheter level, concentration, volume, and total dose influence distribution and density.',
-          'Uses include labor analgesia and selected thoracic, abdominal, pelvic, and lower-extremity procedures, alone or with general anesthesia.',
-          'Choose the catheter level to match the surgical target rather than using a universal volume or a fixed “milliliters per segment” order.',
-        ],
-        ['epidural'],
-      ),
-      RegionalSection(
-        'Selection and placement',
-        [
-          'Assess consent, infection at the intended site, hemostasis, antithrombotic exposure, neurologic baseline, and hemodynamic reserve.',
-          'Severe coagulation abnormality and obstructed CSF flow/mass-effect intracranial pathology are major concerns. Fixed-output states and systemic infection require individualized specialist-level risk–benefit assessment.',
-          'An adult who can report atypical pain or paresthesia provides useful information; deep sedation or general anesthesia for placement needs a specific rationale.',
-        ],
-        ['epidural', 'asra', 'nerve'],
-      ),
-      RegionalSection(
-        'Catheter dosing and failed block',
-        [
-          'Reassess catheter location/function before boluses, use repeated aspiration and incremental dosing, and monitor for intravascular or intrathecal effects.',
-          'A traditional test dose has limitations in labor, under anesthesia, and with beta-blockade. A negative test does not guarantee that later doses are safe.',
-          'Patchy, unilateral, or inadequate anesthesia requires reassessment or replacement; repeated large top-ups of an uncertain catheter can increase risk.',
-        ],
-        ['epidural'],
-      ),
-      RegionalSection(
-        'High block, removal, and recovery',
-        [
-          'Progressive hypotension/bradycardia, ascending weakness, difficulty speaking, respiratory compromise, or altered consciousness require prompt evaluation and support of airway, ventilation, and circulation.',
-          'Plan catheter removal around the current antithrombotic regimen. Removal itself is a bleeding-risk event, not merely a nursing convenience.',
-          'New, recurrent, prolonged, or progressive deficits need urgent assessment; do not assume all weakness is the infusion. Monitor for infection and communicate a clear recovery/follow-up plan.',
-        ],
-        ['epidural', 'asra', 'nerve', 'infection'],
-      ),
-    ],
+    epiduralExpandedSections,
     related: ['anticoagulation', 'spinal', 'neurologic-injury'],
   ),
   RegionalTopic(
@@ -1089,44 +766,7 @@ const regionalTopics = <RegionalTopic>[
     'Neuraxial',
     'Intrathecal anesthesia shaped by dose, baricity, position, and physiology.',
     'intrathecal cesarean hip knee TURP bupivacaine high spinal hypotension',
-    [
-      RegionalSection(
-        'Clinical role and anatomy',
-        [
-          'Local anesthetic is delivered into CSF in the subarachnoid space. Common uses include selected lower abdominal, pelvic, perineal, obstetric, and lower-extremity operations.',
-          'Lumbar puncture is generally performed at L3–4 or L4–5, recognizing anatomical variability and the limitations of surface landmarks.',
-          'Dose, solution baricity, and patient position are major determinants of spread. Volume alone cannot define the expected block height or duration.',
-        ],
-        ['spinal'],
-      ),
-      RegionalSection(
-        'Selection and physiological risk',
-        [
-          'Assess refusal, injection-site infection, severe uncorrected hypovolemia, drug allergy, hemostasis, and intracranial pathology with a risk of herniation from altered CSF pressure.',
-          'Not all elevated intracranial-pressure states are equivalent; mass effect/obstructed flow differs from idiopathic intracranial hypertension. Seek appropriate specialist input.',
-          'Systemic infection, fixed-output cardiac disease, and preexisting neurologic disease require individualized assessment. A single label should not replace evaluation of severity, treatment, and physiologic reserve.',
-        ],
-        ['spinal', 'epidural', 'asra', 'nerve'],
-      ),
-      RegionalSection(
-        'Assess the block before surgery',
-        [
-          'Confirm an appropriate sensory distribution and clinical conditions before incision. Maintain monitoring, IV access, and immediate resuscitation capability.',
-          'Avoid oversedation; it can obscure symptoms and compromise ventilation. Treat hypotension and bradycardia promptly rather than relying on spontaneous regression.',
-          'An inadequate block requires reassessment of mechanism and the remaining drug effect. Do not reflexively repeat a full intrathecal dose; excessive dosing or maldistribution may cause high block or neurologic injury.',
-        ],
-        ['spinal', 'nerve'],
-      ),
-      RegionalSection(
-        'Recognize excessive spread and delayed problems',
-        [
-          'Unexpected ascending weakness, dyspnea, cardiovascular compromise, or altered consciousness should trigger immediate evaluation and airway/circulatory support as needed.',
-          'Protect insensate limbs and monitor recovery. New or progressive neurologic symptoms are not routine postoperative findings and require urgent assessment.',
-          'Maintain a plan for post-dural-puncture symptoms, urinary retention, and safe mobilization rather than ending follow-up once surgery is complete.',
-        ],
-        ['spinal', 'nerve'],
-      ),
-    ],
+    spinalExpandedSections,
     related: ['epidural', 'anticoagulation', 'neurologic-injury'],
   ),
   RegionalTopic(
