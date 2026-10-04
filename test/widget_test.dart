@@ -9,6 +9,7 @@ import 'package:luma_anesthesia/launch/launch_scope.dart';
 import 'package:luma_anesthesia/quick_references/quick_reference_screen.dart';
 import 'package:luma_anesthesia/special_considerations/special_considerations_screen.dart';
 import 'package:luma_anesthesia/diagnostics/diagnostics_access.dart';
+import 'package:luma_anesthesia/regional/regional_screen.dart';
 
 void main() {
   test('production defaults preserve clinical review and normal app entry', () {
@@ -37,8 +38,8 @@ void main() {
 
       expect(screen('/provider-support'), isA<ProviderSupportScreen>());
       expect(LaunchScope.isDeferred('/special-considerations'), isFalse);
-      final considerations = screen('/special-considerations')
-          as SpecialConsiderationsScreen;
+      final considerations =
+          screen('/special-considerations') as SpecialConsiderationsScreen;
       expect(considerations.onSubscribe, isNotNull);
       expect(considerations.onSignIn, isNotNull);
       final quick =
@@ -54,8 +55,20 @@ void main() {
       }
       expect(screen('/ce-halo'), isA<CeLibraryScreen>());
       expect(screen('/ce-halo/courses'), isA<CeLibraryScreen>());
-      for (final path in ['/diagnostics', '/diagnostics/labs?preview=true',
-        '/diagnostics/abg?reviewPreview=true']) {
+      expect(LaunchScope.isDeferred('/regional-procedures'), isFalse);
+      for (final path in [
+        '/regional-procedures',
+        '/regional-procedures/anticoagulation?preview=true',
+      ]) {
+        final regional = screen(path) as RegionalFeature;
+        expect(regional.checkAccess, isNull);
+        expect(regional.accessChanges, isNull);
+      }
+      for (final path in [
+        '/diagnostics',
+        '/diagnostics/labs?preview=true',
+        '/diagnostics/abg?reviewPreview=true',
+      ]) {
         final diagnostics = screen(path) as DiagnosticsFeature;
         expect(diagnostics.reviewPreview, isFalse);
       }

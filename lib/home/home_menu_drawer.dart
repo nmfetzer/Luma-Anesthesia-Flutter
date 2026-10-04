@@ -54,6 +54,11 @@ class HomeMenuDrawer extends StatelessWidget {
                   _link(context, 'Diagnostics', '/diagnostics'),
                   _link(
                     context,
+                    'Regional & Procedures',
+                    '/regional-procedures',
+                  ),
+                  _link(
+                    context,
                     'Pathophysiology & Anesthesia Considerations',
                     '/special-considerations',
                   ),

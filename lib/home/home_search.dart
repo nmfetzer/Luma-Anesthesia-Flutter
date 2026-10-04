@@ -6,6 +6,7 @@ import '../crisis/crisis_repository.dart';
 import '../crisis/crisis_screen.dart';
 import '../data/medication_repository.dart';
 import '../diagnostics/diagnostics_search.dart';
+import '../regional/regional_content.dart';
 import '../models/medication.dart';
 import '../screens/drug_detail_screen.dart';
 import '../launch/launch_scope.dart';
@@ -170,6 +171,11 @@ class _HomeSearchState extends State<HomeSearch> {
     final diagnostics = !LaunchScope.isDeferred('/diagnostics')
         ? searchDiagnosticsTopics(query)
         : <DiagnosticsSearchResult>[];
+    final regional =
+        RegExp(r'[a-z0-9]', caseSensitive: false).hasMatch(query) &&
+            !LaunchScope.isDeferred('/regional-procedures')
+        ? searchRegionalTopics(query)
+        : <RegionalTopic>[];
     final medications = searching
         ? (data?.medications ?? [])
               .where(
@@ -209,6 +215,15 @@ class _HomeSearchState extends State<HomeSearch> {
             title: Text(topic.title),
             subtitle: Text('Diagnostics · ${topic.category}'),
             leading: const Icon(Icons.biotech_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _open(null, route: topic.route),
+          ),
+        if (regional.isNotEmpty) heading('Regional & Procedures references'),
+        for (final topic in regional)
+          ListTile(
+            title: Text(topic.title),
+            subtitle: Text('Regional · ${topic.category}'),
+            leading: const Icon(Icons.layers_outlined),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _open(null, route: topic.route),
           ),
@@ -303,6 +318,7 @@ class _HomeSearchState extends State<HomeSearch> {
             searching &&
             sections.isEmpty &&
             diagnostics.isEmpty &&
+            regional.isEmpty &&
             medications.isEmpty &&
             conditions.isEmpty &&
             crises.isEmpty &&

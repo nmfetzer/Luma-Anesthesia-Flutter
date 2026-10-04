@@ -12,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config.dart';
 import 'billing/revenuecat_billing.dart';
 import 'home/home_screen.dart';
+import 'regional/regional_screen.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
@@ -205,6 +206,15 @@ class _LumaAppState extends State<LumaApp> {
               initialSection: Uri.tryParse(path)?.pathSegments
                   .skip(1)
                   .firstOrNull,
+            ),
+          );
+        }
+        if (path == '/regional-procedures' ||
+            path.startsWith('/regional-procedures/')) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => RegionalFeature(
+              topicId: Uri.tryParse(path)?.pathSegments.skip(1).firstOrNull,
             ),
           );
         }

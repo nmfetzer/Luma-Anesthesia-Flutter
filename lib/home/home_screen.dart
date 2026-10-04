@@ -88,6 +88,13 @@ const _tiles = [
     style: HomeTileStyle.parchment,
     route: '/diagnostics',
   ),
+  HomeTileData(
+    titlePlain: 'Regional &',
+    titleAccent: 'Procedures',
+    subtitle: 'Blocks, safety & recovery',
+    style: HomeTileStyle.parchment,
+    route: '/regional-procedures',
+  ),
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -207,6 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   pair(4, 5),
                                   const SizedBox(height: 8),
                                   pair(7, 8),
+                                  const SizedBox(height: 8),
+                                  HomeTile(data: _tiles[9], wide: true),
                                   const SizedBox(height: 8),
                                   HomeTile(data: _tiles[6], wide: true),
                                 ],

@@ -164,9 +164,9 @@ class _OfflineDownloadsScreenState extends State<OfflineDownloadsScreen> {
                 'Signing out removes paid downloads.',
               ),
               _bullet(
-                'Diagnostics reference text is included in the installed app; '
+                'Diagnostics and Regional & Procedures reference text is included in the installed app; '
                 'no separate content download is needed. Open the app online first '
-                'to verify paid or complimentary access. Offline Diagnostics access '
+                'to verify paid or complimentary access. Offline access to these references '
                 'uses the same maximum 72-hour access check, or ends sooner if your access expires.',
               ),
               _bullet(
