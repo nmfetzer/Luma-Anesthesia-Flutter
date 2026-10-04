@@ -163,9 +163,11 @@ class LabValuesScreen extends StatefulWidget {
     super.key,
     this.showClinicalDraft = false,
     this.clinicalRelease = false,
+    this.initialTopic,
   });
   final bool showClinicalDraft;
   final bool clinicalRelease;
+  final String? initialTopic;
 
   @override
   State<LabValuesScreen> createState() => _LabValuesScreenState();
@@ -177,6 +179,15 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
   bool _urgentOnly = false;
 
   @override
+  void initState() {
+    super.initState();
+    final selected = labReferences
+        .where((entry) => entry.id == widget.initialTopic)
+        .firstOrNull;
+    _search.text = selected?.title ?? '';
+  }
+
+  @override
   void dispose() {
     _search.dispose();
     super.dispose();
@@ -184,11 +195,19 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final entries = searchLabReferences(
-      _search.text,
-      group: _group,
-      urgentOnly: _urgentOnly,
-    );
+    final entries =
+        searchLabReferences(
+          _search.text,
+          group: _group,
+          urgentOnly: _urgentOnly,
+        ).where((entry) {
+          final selected = labReferences
+              .where((item) => item.id == widget.initialTopic)
+              .firstOrNull;
+          return selected == null ||
+              _search.text != selected.title ||
+              entry.id == selected.id;
+        }).toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lab Values'),
@@ -305,6 +324,7 @@ class _LabValuesScreenState extends State<LabValuesScreen> {
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           child: ExpansionTile(
                             key: PageStorageKey('lab-${entry.id}'),
+                            initiallyExpanded: entry.id == widget.initialTopic,
                             title: Text(
                               entry.title,
                               style: const TextStyle(

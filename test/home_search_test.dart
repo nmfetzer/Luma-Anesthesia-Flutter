@@ -172,6 +172,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Crisis Hub'), findsOneWidget);
     expect(find.text('Some library results could not load.'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).last, 'troponin');
+    await tester.pumpAndSettle();
+    expect(find.text('Diagnostics references'), findsOneWidget);
+    expect(find.text('Cardiac Troponin'), findsOneWidget);
+    expect(find.textContaining('No matches yet'), findsNothing);
   });
 
   for (final size in [

@@ -13,11 +13,13 @@ class DiagnosticsFeature extends StatelessWidget {
     super.key,
     this.reviewPreview = false,
     this.initialSection,
+    this.initialTopic,
     this.checkAccess,
     this.accessChanges,
   });
   final bool reviewPreview;
   final String? initialSection;
+  final String? initialTopic;
   final Future<bool> Function()? checkAccess;
   final Stream<void>? accessChanges;
 
@@ -29,15 +31,18 @@ class DiagnosticsFeature extends StatelessWidget {
       accessChanges: accessChanges,
       child: switch (initialSection) {
         'labs' => LabValuesScreen(
+          initialTopic: initialTopic,
           showClinicalDraft: reviewPreview,
           clinicalRelease: !reviewPreview,
         ),
         'abg' => AbgReferenceScreen(
+          initialTopic: initialTopic,
           showClinicalDraft: reviewPreview,
           clinicalRelease: !reviewPreview,
         ),
         final id? when clinicalModules.any((m) => m.id == id) =>
           ClinicalModuleScreen(
+            initialTopic: initialTopic,
             module: clinicalModules.firstWhere((m) => m.id == id),
             showClinicalDraft: reviewPreview,
             clinicalRelease: !reviewPreview,

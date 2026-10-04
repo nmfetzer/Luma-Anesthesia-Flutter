@@ -200,6 +200,8 @@ class _LumaAppState extends State<LumaApp> {
             settings: settings,
             builder: (_) => DiagnosticsFeature(
               reviewPreview: widget.diagnosticsReviewPreview,
+              initialTopic: Uri.tryParse(settings.name ?? '')
+                  ?.queryParameters['topic'],
               initialSection: Uri.tryParse(path)?.pathSegments
                   .skip(1)
                   .firstOrNull,

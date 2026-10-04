@@ -12,10 +12,12 @@ class ClinicalModuleScreen extends StatefulWidget {
     required this.module,
     this.showClinicalDraft = false,
     this.clinicalRelease = false,
+    this.initialTopic,
   });
   final ClinicalModule module;
   final bool showClinicalDraft;
   final bool clinicalRelease;
+  final String? initialTopic;
 
   @override
   State<ClinicalModuleScreen> createState() => _ClinicalModuleScreenState();
@@ -26,6 +28,17 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
   String _group = 'All';
 
   @override
+  void initState() {
+    super.initState();
+    _search.text =
+        widget.module.topics
+            .where((topic) => topic.id == widget.initialTopic)
+            .firstOrNull
+            ?.title ??
+        '';
+  }
+
+  @override
   void dispose() {
     _search.dispose();
     super.dispose();
@@ -34,7 +47,17 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
   @override
   Widget build(BuildContext context) {
     final module = widget.module;
-    final topics = searchClinicalTopics(module, _search.text, group: _group);
+    final selected = module.topics
+        .where((topic) => topic.id == widget.initialTopic)
+        .firstOrNull;
+    final topics = searchClinicalTopics(module, _search.text, group: _group)
+        .where(
+          (topic) =>
+              selected == null ||
+              _search.text != selected.title ||
+              topic.id == selected.id,
+        )
+        .toList();
     return Scaffold(
       appBar: AppBar(
         title: Text(module.title),
@@ -117,6 +140,7 @@ class _ClinicalModuleScreenState extends State<ClinicalModuleScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         color: LumaColors.creamElevated,
                         child: ExpansionTile(
+                          initiallyExpanded: topic.id == widget.initialTopic,
                           key: PageStorageKey(topic.id),
                           title: Text(topic.title),
                           subtitle: Padding(

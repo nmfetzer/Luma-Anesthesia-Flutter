@@ -11,9 +11,11 @@ class AbgReferenceScreen extends StatefulWidget {
     super.key,
     this.showClinicalDraft = false,
     this.clinicalRelease = false,
+    this.initialTopic,
   });
   final bool showClinicalDraft;
   final bool clinicalRelease;
+  final String? initialTopic;
 
   @override
   State<AbgReferenceScreen> createState() => _AbgReferenceScreenState();
@@ -24,6 +26,17 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
   String _group = 'All';
 
   @override
+  void initState() {
+    super.initState();
+    _search.text =
+        abgTopics
+            .where((topic) => topic.id == widget.initialTopic)
+            .firstOrNull
+            ?.title ??
+        '';
+  }
+
+  @override
   void dispose() {
     _search.dispose();
     super.dispose();
@@ -31,7 +44,17 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final topics = searchAbgTopics(_search.text, group: _group);
+    final selected = abgTopics
+        .where((topic) => topic.id == widget.initialTopic)
+        .firstOrNull;
+    final topics = searchAbgTopics(_search.text, group: _group)
+        .where(
+          (topic) =>
+              selected == null ||
+              _search.text != selected.title ||
+              topic.id == selected.id,
+        )
+        .toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('ABG & Acid–Base'),
@@ -65,15 +88,23 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                       'pitfalls. Select a clinical problem, or search a finding.',
                     ),
                     const SizedBox(height: 20),
-                    const Card(
+                    Card(
                       margin: EdgeInsets.zero,
                       color: LumaColors.creamElevated,
                       child: ExpansionTile(
-                        key: PageStorageKey('abg-compensation'),
-                        title: Text('Formulas & compensation'),
-                        subtitle: Text('Compensation · Anion gap · Delta gap'),
-                        childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        children: [
+                        initiallyExpanded: widget.initialTopic == 'formulas',
+                        key: const PageStorageKey('abg-compensation'),
+                        title: const Text('Formulas & compensation'),
+                        subtitle: const Text(
+                          'Compensation · Anion gap · Delta gap',
+                        ),
+                        childrenPadding: const EdgeInsets.fromLTRB(
+                          16,
+                          0,
+                          16,
+                          16,
+                        ),
+                        children: const [
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 8),
                             child: Text(
@@ -144,6 +175,7 @@ class _AbgReferenceScreenState extends State<AbgReferenceScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         color: LumaColors.creamElevated,
                         child: ExpansionTile(
+                          initiallyExpanded: topic.id == widget.initialTopic,
                           key: PageStorageKey('abg-${topic.id}'),
                           title: Text(topic.title),
                           subtitle: Padding(

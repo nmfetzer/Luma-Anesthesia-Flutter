@@ -5,6 +5,7 @@ import '../config.dart';
 import '../crisis/crisis_repository.dart';
 import '../crisis/crisis_screen.dart';
 import '../data/medication_repository.dart';
+import '../diagnostics/diagnostics_search.dart';
 import '../models/medication.dart';
 import '../screens/drug_detail_screen.dart';
 import '../launch/launch_scope.dart';
@@ -122,7 +123,7 @@ class _HomeSearchState extends State<HomeSearch> {
     constraints: const BoxConstraints(maxWidth: 560),
     child: SearchAnchor(
       searchController: _controller,
-      viewHintText: 'Search drugs, conditions, crises, or sections',
+      viewHintText: 'Search drugs, conditions, crises, labs & diagnostics',
       viewBackgroundColor: const Color(0xFFF7F1E6),
       viewConstraints: const BoxConstraints(maxWidth: 640, maxHeight: 620),
       builder: (context, controller) => SearchBar(
@@ -166,6 +167,9 @@ class _HomeSearchState extends State<HomeSearch> {
         .where((s) => !LaunchScope.isDeferred(s.route))
         .where((s) => matches('${s.title} ${s.keywords}'))
         .toList();
+    final diagnostics = !LaunchScope.isDeferred('/diagnostics')
+        ? searchDiagnosticsTopics(query)
+        : <DiagnosticsSearchResult>[];
     final medications = searching
         ? (data?.medications ?? [])
               .where(
@@ -199,6 +203,15 @@ class _HomeSearchState extends State<HomeSearch> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (diagnostics.isNotEmpty) heading('Diagnostics references'),
+        for (final topic in diagnostics.take(30))
+          ListTile(
+            title: Text(topic.title),
+            subtitle: Text('Diagnostics · ${topic.category}'),
+            leading: const Icon(Icons.biotech_outlined),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _open(null, route: topic.route),
+          ),
         if (sections.isNotEmpty) heading('App sections'),
         for (final section in sections)
           ListTile(
@@ -247,7 +260,8 @@ class _HomeSearchState extends State<HomeSearch> {
               ),
             ),
           ),
-        if (medications.length > 30 ||
+        if (diagnostics.length > 30 ||
+            medications.length > 30 ||
             crises.length > 30 ||
             conditions.length > 30)
           const Padding(
@@ -288,6 +302,7 @@ class _HomeSearchState extends State<HomeSearch> {
             !failed &&
             searching &&
             sections.isEmpty &&
+            diagnostics.isEmpty &&
             medications.isEmpty &&
             conditions.isEmpty &&
             crises.isEmpty &&
@@ -295,7 +310,7 @@ class _HomeSearchState extends State<HomeSearch> {
           const Padding(
             padding: EdgeInsets.all(24),
             child: Text(
-              'No matches yet. Try a drug, condition, crisis, or section.',
+              'No matches yet. Try a drug, condition, crisis, lab, or diagnostic topic.',
             ),
           ),
       ],
