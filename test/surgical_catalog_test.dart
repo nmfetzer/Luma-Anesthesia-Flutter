@@ -36,7 +36,9 @@ Widget app({
     final uri = Uri.parse(settings.name!);
     return MaterialPageRoute(
       builder: (_) => SurgicalPrepFeature(
-        caseId: uri.pathSegments.length > 1 ? uri.pathSegments[1] : null,
+        caseId: uri.pathSegments.length > 1
+            ? uri.pathSegments.skip(1).join('/')
+            : null,
         checkAccess: () async => allowed,
         accessChanges: const Stream<void>.empty(),
       ),
@@ -50,15 +52,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('243 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('251 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 242);
-    expect(cases.length, 243);
+    expect(raw.length, 250);
+    expect(cases.length, 251);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 243);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 251);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -143,12 +145,19 @@ void main() {
   testWidgets(
     'unsubscribed hub and direct detail show paywall, never case content',
     (tester) async {
-      for (final id in [null, 'laparoscopic-cholecystectomy']) {
+      for (final id in [
+        null,
+        'specialty/bariatric',
+        'specialty/burns',
+        'escharotomy-fasciotomy-for-burns',
+        'laparoscopic-cholecystectomy',
+      ]) {
         await tester.pumpWidget(app(id: id, allowed: false));
         await tester.pumpAndSettle();
         expect(find.byType(SubscriptionScreen), findsOneWidget);
         expect(find.text('Quick clinical overview'), findsNothing);
-        expect(find.text('Adult & OB cases'), findsNothing);
+        expect(find.text('Choose a specialty'), findsNothing);
+        expect(find.text('Bariatric cases'), findsNothing);
         await tester.pumpWidget(const SizedBox());
       }
     },
@@ -196,15 +205,15 @@ void main() {
         find.text('This surgical case could not be found.'),
         findsOneWidget,
       );
-      await tester.tap(find.text('Browse surgical cases'));
+      await tester.tap(find.text('Browse specialties'));
       await tester.pumpAndSettle();
-      expect(find.text('Adult & OB cases'), findsOneWidget);
+      expect(find.text('Choose a specialty'), findsOneWidget);
     },
   );
 
   for (final width in [320.0, 820.0]) {
     testWidgets(
-      'library fits width $width with double text, filters reset correctly',
+      'specialty tiles fit width $width with double text and searches reset',
       (tester) async {
         tester.view.physicalSize = Size(width, 1200);
         tester.view.devicePixelRatio = 1;
@@ -212,21 +221,121 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
         await tester.pumpWidget(app(scale: 2));
         await tester.pumpAndSettle();
-        await tester.ensureVisible(
-          find.byType(DropdownButtonFormField<String>),
-        );
-        await tester.tap(find.byType(DropdownButtonFormField<String>));
+        await tester.ensureVisible(find.text('Bariatric'));
+        await tester.tap(find.text('Bariatric'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Bariatric').last);
-        await tester.pumpAndSettle();
+        expect(find.text('Bariatric cases'), findsOneWidget);
+        expect(find.text('Cesarean Delivery'), findsNothing);
         await tester.enterText(find.byType(TextField), 'zzzzunknownterm');
         await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Reset search and filters'));
-        await tester.tap(find.text('Reset search and filters'));
+        await tester.ensureVisible(find.text('Reset search'));
+        await tester.tap(find.text('Reset search'));
         await tester.pumpAndSettle();
-        expect(find.text('All'), findsOneWidget);
+        expect(find.text('No matching cases. Try another term.'), findsNothing);
+        await tester.ensureVisible(find.text('All specialties'));
+        await tester.tap(find.text('All specialties'));
+        await tester.pumpAndSettle();
+        expect(find.text('Choose a specialty'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );
   }
+
+  test(
+    'Bariatric content includes five cases and preserves clinical qualifiers',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final bariatric = searchSurgicalCases('', category: 'Bariatric');
+      expect(bariatric.length, 5);
+      expect(
+        searchSurgicalCases('lap band').first.id,
+        'adjustable-gastric-band-lap-band',
+      );
+      expect(searchSurgicalCases('SADI').first.id, 'sadi-s');
+      final sleeve = cases['sleeve-gastrectomy']!;
+      final text = [
+        ...sleeve.overview.bullets,
+        ...sleeve.sections.expand((s) => s.bullets),
+      ].join(' ');
+      for (final phrase in [
+        '58.35%',
+        '80% refers to stomach',
+        'calibration bougie',
+        'ACTUAL body weight',
+        'Most patients can continue GLP-1',
+        'historical',
+        'CPAP is not automatically prohibited',
+        'Propofol maintenance/TIVA',
+      ]) {
+        expect(text, contains(phrase));
+      }
+      expect(
+        surgicalCategories
+            .where((c) => c != 'All')
+            .map(surgicalSpecialtySlug)
+            .toSet()
+            .length,
+        22,
+      );
+    },
+  );
+
+  test(
+    'Burns has seven cases and clinically important searchable warnings',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      expect(searchSurgicalCases('', category: 'Burns').length, 7);
+      expect(cases.containsKey('burn-fasciotomy'), true);
+      expect(cases.containsKey('burn-escharotomy'), true);
+      final text = cases['burn-wound-debridement-excision']!.sections
+          .expand((s) => s.bullets)
+          .join(' ');
+      for (final term in [
+        'after the first 24 hours',
+        'months or longer',
+        'first-24-hour volume estimate',
+        'co-oximetry',
+        'CYANOKIT',
+        'donor',
+        'quantitative neuromuscular',
+        'Hypothermia',
+      ]) {
+        expect(text, contains(term));
+      }
+      expect(
+        cases['burn-related-amputation']!.overview.bullets.join(' '),
+        contains('phantom limb'),
+      );
+    },
+  );
+
+  testWidgets('old combined burn URL opens Burns specialty and Home works', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(id: 'escharotomy-fasciotomy-for-burns'));
+    await tester.pumpAndSettle();
+    expect(find.text('Burns cases'), findsOneWidget);
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dashboard'), findsOneWidget);
+  });
+
+  testWidgets('specialty opens case and unknown specialty can recover', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(id: 'specialty/bariatric'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'sleeve gastrectomy');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sleeve Gastrectomy'));
+    await tester.pumpAndSettle();
+    expect(find.text('Quick clinical overview'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(app(id: 'specialty/not-real'));
+    await tester.pumpAndSettle();
+    expect(find.text('This specialty could not be found.'), findsOneWidget);
+    await tester.tap(find.text('Browse specialties'));
+    await tester.pumpAndSettle();
+    expect(find.text('Choose a specialty'), findsOneWidget);
+  });
 }
