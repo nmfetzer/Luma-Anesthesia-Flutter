@@ -274,6 +274,7 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'parotidectomy-superficial-total',
         'neck-dissection-radical-modified-selective',
         'laryngectomy-total-partial',
+        'tracheostomy-placement',
         'microlaryngoscopy-vocal-cord-surgery',
         'airway-foreign-body-removal',
         'awake-fiber-optic-intubation-afoi',

@@ -23,6 +23,7 @@ class SurgicalCaseIndex {
 
 // Cross-list canonical records without copying their clinical content.
 const surgicalSpecialtyCrossListings = <String, Set<String>>{
+  'ENT & shared airway': {'tracheostomy-placement'},
   'Endocrine': {
     'thyroidectomy',
     'transsphenoidal-pituitary-surgery-tsps-endoscopic',

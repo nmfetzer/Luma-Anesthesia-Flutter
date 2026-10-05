@@ -362,6 +362,52 @@ void main() {
     },
   );
 
+  test(
+    'ENT cross-lists tracheostomy without moving or duplicating its route',
+    () async {
+      const id = 'tracheostomy-placement';
+      final cases = await SurgicalCatalog.load();
+      expect(cases[id]!.category, 'General & abdominal · Clinical draft');
+      expect(
+        surgicalIndex.singleWhere((c) => c.id == id).category,
+        'General & abdominal',
+      );
+      expect(surgicalIndex.where((c) => c.id == id).length, 1);
+      expect(
+        searchSurgicalCases('', category: 'ENT & shared airway').length,
+        15,
+      );
+      for (final category in [
+        'ENT & shared airway',
+        'General & abdominal',
+        'All',
+      ]) {
+        final matches = searchSurgicalCases(
+          'tracheostomy',
+          category: category,
+        ).where((c) => c.id == id).toList();
+        expect(matches.length, 1);
+        expect(matches.single.route, '/surgical-prep/tracheostomy-placement');
+      }
+    },
+  );
+
+  testWidgets('ENT tracheostomy shortcut opens the existing reference', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(id: 'specialty/ent-shared-airway'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'tracheostomy');
+    await tester.pumpAndSettle();
+    expect(find.text('Tracheostomy Placement'), findsOneWidget);
+    expect(find.text('Related case · General & abdominal'), findsOneWidget);
+    await tester.ensureVisible(find.text('Tracheostomy Placement'));
+    await tester.tap(find.text('Tracheostomy Placement'));
+    await tester.pumpAndSettle();
+    expect(find.text('Quick clinical overview'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('ENT expansion preserves adult airway safety distinctions', () async {
     final cases = await SurgicalCatalog.load();
     final ent = cases.values.where(
