@@ -52,15 +52,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('254 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('263 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 253);
-    expect(cases.length, 254);
+    expect(raw.length, 262);
+    expect(cases.length, 263);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 254);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 263);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -102,6 +102,106 @@ void main() {
         category: 'Obstetric',
       ).every((c) => c.category == 'Obstetric'),
       true,
+    );
+  });
+
+  test(
+    'Endocrine cross-listing preserves canonical routes without duplicates',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final endocrine = searchSurgicalCases('', category: 'Endocrine');
+      expect(endocrine.length, 14);
+      expect(endocrine.map((c) => c.id).toSet().length, 14);
+      for (final c in endocrine) {
+        expect(cases[c.id]!.overview.bullets.length, 4);
+        expect(cases[c.id]!.sections.length, inInclusiveRange(12, 14));
+      }
+      final whipple = searchSurgicalCases(
+        'Whipple',
+        category: 'Endocrine',
+      ).first;
+      expect(whipple.category, 'Hepatobiliary & transplant');
+      expect(
+        whipple.route,
+        '/surgical-prep/whipple-procedure-pancreaticoduodenectomy',
+      );
+      expect(surgicalIndex.where((c) => c.id == whipple.id).length, 1);
+      expect(
+        searchSurgicalCases(
+          'thyroidectomy',
+          category: 'General & abdominal',
+        ).any((c) => c.id == 'thyroidectomy'),
+        true,
+      );
+      expect(
+        searchSurgicalCases(
+          'adipsic',
+          category: 'Endocrine',
+        ).any((c) => c.id == 'craniopharyngioma-resection-adult'),
+        true,
+      );
+    },
+  );
+
+  test('Endocrine clinical qualifiers survive catalog generation', () async {
+    final cases = await SurgicalCatalog.load();
+    String body(String id) => [
+      cases[id]!.overview,
+      ...cases[id]!.sections,
+    ].expand((s) => s.bullets).join(' ');
+    expect(body('thyroidectomy'), contains('including the strap layer'));
+    expect(
+      body('thyroidectomy'),
+      contains('do not delay decompression for imaging'),
+    );
+    expect(body('parathyroidectomy'), contains('Hungry bone syndrome'));
+    expect(
+      body('pheochromocytoma-resection'),
+      contains('only after adequate alpha blockade'),
+    );
+    expect(
+      body('cortisol-producing-adrenal-tumor'),
+      contains('empirical postoperative glucocorticoid replacement'),
+    );
+    expect(
+      body('aldosterone-producing-adrenal-tumor'),
+      contains('hyperkalemia'),
+    );
+    expect(
+      body('transsphenoidal-pituitary-surgery-tsps-endoscopic'),
+      contains('Do not apply a blanket postoperative fluid restriction'),
+    );
+    expect(
+      body('acromegaly-pituitary-surgery'),
+      contains('Do not give repeated DDAVP solely'),
+    );
+    expect(
+      body('cushing-disease-transsphenoidal-surgery'),
+      contains('not routine withholding'),
+    );
+    expect(
+      body('craniopharyngioma-resection-adult'),
+      contains('Do not rely on drink-to-thirst instructions alone'),
+    );
+    expect(
+      body('insulinoma-resection'),
+      contains('unreliable stand-alone marker'),
+    );
+    expect(
+      body('insulinoma-resection'),
+      contains('paradoxically worsen hypoglycemia'),
+    );
+    expect(
+      body('pancreatic-neuroendocrine-tumor-resection'),
+      contains('bicarbonate-loss metabolic acidosis'),
+    );
+    expect(
+      body('men-syndromes-surgical-planning'),
+      contains('not increased as it is in MEN2A'),
+    );
+    expect(
+      body('whipple-procedure-pancreaticoduodenectomy'),
+      contains('not mandatory'),
     );
   });
 
@@ -533,6 +633,28 @@ void main() {
   );
 
   for (final width in [320.0, 820.0]) {
+    testWidgets('Endocrine related case fits width $width at double text', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(app(id: 'specialty/endocrine', scale: 2));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Whipple');
+      await tester.pumpAndSettle();
+      expect(find.text('Adjacent HPB case'), findsOneWidget);
+      await tester.ensureVisible(
+        find.text('Whipple Procedure (Pancreaticoduodenectomy)'),
+      );
+      await tester.tap(
+        find.text('Whipple Procedure (Pancreaticoduodenectomy)'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Quick clinical overview'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
     testWidgets(
       'ENT specialty and awake airway reference fit width $width at double text',
       (tester) async {

@@ -63,8 +63,8 @@ for (const change of changes) {
 const oldCases = JSON.parse(before);
 const changedIds = cases.filter((c, i) => JSON.stringify(c) !== JSON.stringify(oldCases[i])).map(c => c.id);
 assert(changedIds.every(id => changes.some(c => c.id === id)));
-assert.equal(cases.length, 253);
-assert.equal(new Set(cases.map(c => c.id)).size, 253);
+assert.equal(cases.length, oldCases.length);
+assert.equal(new Set(cases.map(c => c.id)).size, cases.length);
 fs.writeFileSync(file, JSON.stringify(cases));
 
 // Match the existing index generator, preserving the manual-case entry verbatim.

@@ -21,6 +21,16 @@ class SurgicalCaseIndex {
   String get route => '/surgical-prep/$id';
 }
 
+// Cross-list canonical records without copying their clinical content.
+const surgicalSpecialtyCrossListings = <String, Set<String>>{
+  'Endocrine': {
+    'thyroidectomy',
+    'transsphenoidal-pituitary-surgery-tsps-endoscopic',
+    'craniopharyngioma-resection-adult',
+    'whipple-procedure-pancreaticoduodenectomy',
+  },
+};
+
 String _normalize(String s) =>
     s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
 
@@ -41,7 +51,10 @@ List<SurgicalCaseIndex> searchSurgicalCases(
   final results = surgicalIndex
       .where(
         (item) =>
-            (category == 'All' || item.category == category) &&
+            (category == 'All' ||
+                item.category == category ||
+                (surgicalSpecialtyCrossListings[category]?.contains(item.id) ??
+                    false)) &&
             (q.isEmpty ||
                 words.every(
                   (w) => _tokens[item.id]!.any((t) => t.startsWith(w)),

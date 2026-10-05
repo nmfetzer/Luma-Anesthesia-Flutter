@@ -167,6 +167,12 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
       title: Text(c.title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: widget.category == null
           ? Text(c.category)
+          : widget.category != c.category
+          ? Text(
+              c.id == 'whipple-procedure-pancreaticoduodenectomy'
+                  ? 'Adjacent HPB case'
+                  : 'Related case · ${c.category}',
+            )
           : [
               'biliopancreatic-diversion-duodenal-switch',
               'sadi-s',
@@ -241,6 +247,22 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
       category: widget.category ?? 'All',
     );
     const preferredOrder = {
+      'Endocrine': [
+        'thyroidectomy',
+        'parathyroidectomy',
+        'adrenalectomy-laparoscopic-robotic',
+        'pheochromocytoma-resection',
+        'cortisol-producing-adrenal-tumor',
+        'aldosterone-producing-adrenal-tumor',
+        'transsphenoidal-pituitary-surgery-tsps-endoscopic',
+        'acromegaly-pituitary-surgery',
+        'cushing-disease-transsphenoidal-surgery',
+        'craniopharyngioma-resection-adult',
+        'insulinoma-resection',
+        'pancreatic-neuroendocrine-tumor-resection',
+        'whipple-procedure-pancreaticoduodenectomy',
+        'men-syndromes-surgical-planning',
+      ],
       'ENT & shared airway': [
         'functional-endoscopic-sinus-surgery-fess',
         'septoplasty-turbinate-reduction',
