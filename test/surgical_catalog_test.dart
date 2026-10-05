@@ -247,6 +247,61 @@ void main() {
     },
   );
 
+  test(
+    'dental references preserve adult scope and procedure-specific safeguards',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final dental = cases.values.where(
+        (c) => c.category.startsWith('Dental & maxillofacial'),
+      );
+      expect(dental.length, 2);
+      for (final c in dental) {
+        expect(c.overview.bullets.length, 4);
+        expect(c.sections.length, inInclusiveRange(16, 17));
+      }
+      String body(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      final rehab = body(
+        'dental-rehabilitation-under-general-anesthesia-adult',
+      );
+      final jaw = body('orthognathic-surgery-bimaxillary-osteotomy');
+      expect(rehab, contains('Do not infer incapacity'));
+      expect(rehab, contains('no longer recommend routine'));
+      expect(rehab, contains('NSAID alone or with acetaminophen'));
+      expect(
+        rehab,
+        contains('smaller preformed nasal RAE tube is also shorter'),
+      );
+      expect(jaw, contains('no universal minimum MAP'));
+      expect(jaw, contains('Immediately ask the surgeon to stop'));
+      expect(jaw, contains('elastics require a release plan'));
+      expect(
+        jaw,
+        contains(
+          'cuff leak can add information but does not guarantee success',
+        ),
+      );
+      expect(jaw, contains('does not establish a universal regimen'));
+      expect(
+        searchSurgicalCases('BSSO').first.id,
+        'orthognathic-surgery-bimaxillary-osteotomy',
+      );
+      expect(
+        searchSurgicalCases(
+          'trigeminocardiac',
+          category: 'Dental & maxillofacial',
+        ).single.id,
+        'orthognathic-surgery-bimaxillary-osteotomy',
+      );
+      expect(
+        searchSurgicalCases('nasal RAE').any(
+          (c) => c.id == 'dental-rehabilitation-under-general-anesthesia-adult',
+        ),
+        true,
+      );
+    },
+  );
+
   test('manual safety corrections survive catalog generation', () async {
     final cases = await SurgicalCatalog.load();
     final tbi = cases['craniotomy-for-traumatic-brain-injury-tbi']!;
@@ -292,6 +347,8 @@ void main() {
         'specialty/bariatric',
         'specialty/burns',
         'specialty/colorectal',
+        'specialty/dental-maxillofacial',
+        'orthognathic-surgery-bimaxillary-osteotomy',
         'colectomy-open-laparoscopic-robotic',
         'escharotomy-fasciotomy-for-burns',
         'laparoscopic-cholecystectomy',
@@ -356,6 +413,31 @@ void main() {
   );
 
   for (final width in [320.0, 820.0]) {
+    testWidgets(
+      'dental specialty and jaw reference fit width $width at double text',
+      (tester) async {
+        tester.view.physicalSize = Size(width, 1400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          app(id: 'specialty/dental-maxillofacial', scale: 2),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Dental & maxillofacial cases'), findsOneWidget);
+        await tester.enterText(find.byType(TextField), 'BSSO');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Orthognathic Surgery (Bimaxillary Osteotomy)'),
+        );
+        await tester.tap(
+          find.text('Orthognathic Surgery (Bimaxillary Osteotomy)'),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Quick clinical overview'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
     testWidgets(
       'colorectal specialty and detail fit width $width at double text',
       (tester) async {

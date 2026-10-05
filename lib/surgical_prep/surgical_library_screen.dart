@@ -257,6 +257,10 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'burn-related-amputation',
         'burn-contracture-release-reconstruction',
       ],
+      'Dental & maxillofacial': [
+        'dental-rehabilitation-under-general-anesthesia-adult',
+        'orthognathic-surgery-bimaxillary-osteotomy',
+      ],
       'Colorectal': [
         'colectomy-open-laparoscopic-robotic',
         'low-anterior-resection-lar',
