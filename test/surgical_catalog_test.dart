@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
+import 'package:luma_anesthesia/surgical_prep/ep_groups.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/theme/luma_theme.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -52,15 +53,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('263 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('271 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 262);
-    expect(cases.length, 263);
+    expect(raw.length, 270);
+    expect(cases.length, 271);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 263);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 271);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -104,6 +105,97 @@ void main() {
       true,
     );
   });
+
+  test(
+    'EP groups cover every reference exactly once and retain clinical depth',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final ep = searchSurgicalCases('', category: 'EP & structural heart');
+      final grouped = surgicalEpGroups.values.expand((ids) => ids).toList();
+      expect(ep.length, 26);
+      expect(grouped.length, 26);
+      expect(grouped.toSet().length, 26);
+      expect(grouped.toSet(), ep.map((c) => c.id).toSet());
+      expect(surgicalEpGroups.keys.toList(), [
+        'EP ablation & cardioversion',
+        'Cardiac devices',
+        'Structural heart interventions',
+        'Special & high-risk cath-lab cases',
+      ]);
+      for (final id in grouped) {
+        final c = cases[id]!;
+        expect(c.overview.bullets.length, 4);
+        expect(c.sections.length, greaterThanOrEqualTo(10));
+        expect(c.sections.map((s) => s.id).toSet().length, c.sections.length);
+      }
+    },
+  );
+
+  test('EP safety distinctions are searchable and source-linked', () async {
+    final cases = await SurgicalCatalog.load();
+    String body(String id) => [
+      ...cases[id]!.overview.bullets,
+      ...cases[id]!.sections.expand((s) => s.bullets),
+    ].join(' ');
+    expect(
+      body('ventricular-tachycardia-vt-ablation'),
+      contains('not mandatory for every VT'),
+    );
+    expect(
+      body('atrial-fibrillation-ablation-pulmonary-vein-isolation'),
+      contains('Hemolysis'),
+    );
+    expect(
+      body('elective-cardioversion-dccv'),
+      contains('under 48 hours is always safe'),
+    );
+    expect(
+      body('elective-cardioversion-dccv'),
+      contains('negative TEE does not eliminate'),
+    );
+    expect(
+      body('lead-extraction-transvenous'),
+      contains('Absence of a large pericardial effusion'),
+    );
+    expect(
+      body('transcatheter-tricuspid-interventions'),
+      contains('effective RV afterload'),
+    );
+    expect(body('adult-vsd-device-closure'), contains('not post-infarction'));
+    expect(
+      body('ice-guided-structural-planning'),
+      contains('not a separate intervention'),
+    );
+    for (final term in ['hemolysis', 'BASILICA', 'neo-LVOT', 'CRT', 'LINQ']) {
+      expect(
+        searchSurgicalCases(term, category: 'EP & structural heart'),
+        isNotEmpty,
+        reason: term,
+      );
+    }
+  });
+
+  for (final width in [320.0, 820.0]) {
+    testWidgets('EP groups and search work at width $width with large text', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(Size(width, 1100));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        app(id: 'specialty/ep-structural-heart', scale: 2),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('EP ablation & cardioversion'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), 'BASILICA');
+      await tester.pumpAndSettle();
+      expect(find.text('Aortic Valve-in-Valve TAVR'), findsOneWidget);
+      expect(find.text('EP ablation & cardioversion'), findsNothing);
+      await tester.tap(find.text('Aortic Valve-in-Valve TAVR'));
+      await tester.pumpAndSettle();
+      expect(find.text('Quick clinical overview'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   test(
     'Endocrine cross-listing preserves canonical routes without duplicates',

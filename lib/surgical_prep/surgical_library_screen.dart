@@ -6,6 +6,7 @@ import '../widgets/premium_access_gate.dart';
 import 'surgical_catalog.dart';
 import 'surgical_case.dart';
 import 'surgical_case_screen.dart';
+import 'ep_groups.dart';
 
 String surgicalSpecialtySlug(String category) => category
     .toLowerCase()
@@ -336,7 +337,9 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'bronchoscopy-flexible-rigid',
       ],
     };
-    final order = preferredOrder[widget.category];
+    final order = widget.category == 'EP & structural heart'
+        ? surgicalEpGroups.values.expand((ids) => ids).toList()
+        : preferredOrder[widget.category];
     if (!isSearching && order != null) {
       matches.sort((a, b) {
         final ai = order.indexOf(a.id);
@@ -451,7 +454,38 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                     sliver: SliverList.builder(
                       itemCount: matches.length,
-                      itemBuilder: (_, i) => _caseTile(matches[i]),
+                      itemBuilder: (_, i) {
+                        String? group;
+                        if (widget.category == 'EP & structural heart' &&
+                            !isSearching) {
+                          for (final entry in surgicalEpGroups.entries) {
+                            if (entry.value.first == matches[i].id) {
+                              group = entry.key;
+                              break;
+                            }
+                          }
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (group != null)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 16,
+                                  bottom: 12,
+                                ),
+                                child: Semantics(
+                                  header: true,
+                                  child: Text(
+                                    group,
+                                    style: lumaDisplay(size: 24),
+                                  ),
+                                ),
+                              ),
+                            _caseTile(matches[i]),
+                          ],
+                        );
+                      },
                     ),
                   ),
               ],
