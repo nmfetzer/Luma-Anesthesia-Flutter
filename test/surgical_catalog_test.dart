@@ -52,15 +52,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('251 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('254 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 250);
-    expect(cases.length, 251);
+    expect(raw.length, 253);
+    expect(cases.length, 254);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 251);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 254);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -104,6 +104,76 @@ void main() {
       true,
     );
   });
+
+  test(
+    'cardiothoracic expansion preserves scope and safety distinctions',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final ct = cases.values.where(
+        (c) => c.category.startsWith('Cardiac & thoracic'),
+      );
+      expect(ct.length, 25);
+      for (final c in ct) {
+        expect(c.sections.length, greaterThanOrEqualTo(11));
+        expect(c.overview.bullets.length, 4);
+      }
+      String body(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      expect(
+        body('cabg-coronary-artery-bypass-grafting'),
+        contains('ACT >480 seconds'),
+      );
+      expect(
+        body('cabg-coronary-artery-bypass-grafting'),
+        contains('system-specific target'),
+      );
+      expect(
+        body('mitral-valve-repair-replacement'),
+        contains('afterload mismatch'),
+      );
+      expect(
+        body('mitral-valve-repair-replacement'),
+        contains('reducing inotropic'),
+      );
+      expect(body('tricuspid-valve-repair-replacement'), contains('CVP'));
+      expect(
+        body('mediastinal-mass-resection'),
+        contains('does not prove routine induction safe'),
+      );
+      expect(
+        body('ecmo-cannulation-decannulation'),
+        contains('no direct hemodynamic support'),
+      );
+      expect(body('ecmo-cannulation-decannulation'), contains('Right-radial'));
+      expect(
+        body('lvad-placement-left-ventricular-assist-device'),
+        contains('Console flow is an estimate'),
+      );
+      expect(
+        body('esophagectomy-ivor-lewis-mckeown-minimally-invasive'),
+        contains('Do not insert an NG/OG tube blindly'),
+      );
+      expect(body('thymectomy-vats-open-robotic'), contains('quantitative'));
+      expect(
+        cases['mediastinoscopy']!.sections.any((s) => s.id == 'hypoxemia'),
+        false,
+      );
+      expect(
+        searchSurgicalCases('SAM')
+            .any((c) => c.id == 'mitral-valve-repair-replacement'),
+        true,
+      );
+      expect(
+        searchSurgicalCases('Harlequin').single.id,
+        'ecmo-cannulation-decannulation',
+      );
+      expect(
+        searchSurgicalCases('mediastinal mass')
+            .any((c) => c.id == 'mediastinal-mass-resection'),
+        true,
+      );
+    },
+  );
 
   test('manual safety corrections survive catalog generation', () async {
     final cases = await SurgicalCatalog.load();
@@ -212,6 +282,29 @@ void main() {
   );
 
   for (final width in [320.0, 820.0]) {
+    testWidgets(
+      'cardiothoracic tiles and new detail fit width $width at double text',
+      (tester) async {
+        tester.view.physicalSize = Size(width, 1400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          app(id: 'specialty/cardiac-thoracic', scale: 2),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Cardiac & thoracic cases'), findsOneWidget);
+        await tester.enterText(find.byType(TextField), 'mitral');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Mitral Valve Repair / Replacement'),
+        );
+        await tester.tap(find.text('Mitral Valve Repair / Replacement'));
+        await tester.pumpAndSettle();
+        expect(find.text('Quick clinical overview'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
     testWidgets(
       'specialty tiles fit width $width with double text and searches reset',
       (tester) async {

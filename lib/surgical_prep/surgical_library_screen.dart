@@ -257,12 +257,43 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'burn-related-amputation',
         'burn-contracture-release-reconstruction',
       ],
+      'Cardiac & thoracic': [
+        'cabg-coronary-artery-bypass-grafting',
+        'aortic-valve-replacement-avr',
+        'mitral-valve-repair-replacement',
+        'tricuspid-valve-repair-replacement',
+        'cardiac-valve-repair-replacement-open',
+        'aortic-root-ascending-aorta-repair',
+        'thoracic-aortic-aneurysm-repair-tevar-open-descending',
+        'lvad-placement-left-ventricular-assist-device',
+        'heart-transplant',
+        'ecmo-cannulation-decannulation',
+        'cardiac-catheterization-pci',
+        'pericardial-window',
+        'lobectomy-vats-open',
+        'pneumonectomy',
+        'vats-wedge-resection',
+        'thoracotomy-open-exploratory-thoracotomy',
+        'esophagectomy-ivor-lewis-mckeown-minimally-invasive',
+        'lung-transplant-single-double',
+        'mediastinal-mass-resection',
+        'thymectomy-vats-open-robotic',
+        'mediastinoscopy',
+        'decortication-pleural',
+        'pleurodesis-chemical-surgical-vats',
+        'chest-wall-resection-and-reconstruction',
+        'bronchoscopy-flexible-rigid',
+      ],
     };
     final order = preferredOrder[widget.category];
     if (!isSearching && order != null) {
-      matches.sort(
-        (a, b) => order.indexOf(a.id).compareTo(order.indexOf(b.id)),
-      );
+      matches.sort((a, b) {
+        final ai = order.indexOf(a.id);
+        final bi = order.indexOf(b.id);
+        return (ai < 0 ? order.length : ai).compareTo(
+          bi < 0 ? order.length : bi,
+        );
+      });
     }
     return Scaffold(
       appBar: AppBar(
