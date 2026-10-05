@@ -10,6 +10,7 @@ Updated October 5, 2026. This is a staged clinical-review milestone, not release
 - **Reader**: each new case has a quick clinical overview plus 15 expandable, bulleted detail sections with source buttons. These remain clinical reference materials, not task checklists.
 - **Counts**: 251 total adult/OB cases, comprising 250 bundled JSON records and the separate manual cholecystectomy reference. Categories outside Bariatric and Burns were preserved, not re-reviewed in this milestone.
 - **Compatibility**: the old combined escharotomy/fasciotomy URL now opens the Burns specialty so readers can choose the correct procedure.
+- **Shortcut clearance**: the surgical library and reader reserve a text-scale-aware footer so the app-wide Quick Ref button cannot cover the scrolling content.
 
 ## Clinically important qualifications
 
@@ -27,6 +28,7 @@ Updated October 5, 2026. This is a staged clinical-review milestone, not release
 
 - Targeted Flutter analysis: no issues.
 - 175 targeted tests passed across the surgical catalog/reader, Diagnostics, Regional and premium-access gate.
+- After the footer-clearance fix, all 23 surgical tests passed again and targeted analysis remained clean.
 - Tests cover the 251-record catalog, unique IDs, source URLs, specialty and legacy-route gating, case search, unknown-route recovery, Home navigation, small-width/double-text layout, expansion, source failures and access revocation.
 - Private Flutter web build succeeded. Browser screenshots are preview evidence, not native iPhone/iPad acceptance or independent clinical signoff.
 - Surgical Case Prep remains release-deferred. Production home/drawer activation and global homepage search are not enabled by this staged change.

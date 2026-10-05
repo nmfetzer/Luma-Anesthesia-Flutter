@@ -320,6 +320,17 @@ void main() {
     expect(find.text('Dashboard'), findsOneWidget);
   });
 
+  testWidgets('library reserves footer clearance for the floating shortcut', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    final bottom = tester.getRect(find.byType(CustomScrollView)).bottom;
+    final screen =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(screen - bottom, greaterThanOrEqualTo(84));
+  });
+
   testWidgets('specialty opens case and unknown specialty can recover', (
     tester,
   ) async {

@@ -275,6 +275,11 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
       ),
       body: SafeArea(
         top: false,
+        // The app-wide Quick Ref shortcut floats outside this Scaffold.
+        // Keep the scroll viewport above it, including at larger text sizes.
+        minimum: EdgeInsets.only(
+          bottom: MediaQuery.textScalerOf(context).scale(48) + 36,
+        ),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),

@@ -134,6 +134,10 @@ class _CaseReaderState extends State<_CaseReader> {
       ),
       body: SafeArea(
         top: false,
+        // Reserve a footer for the app-wide floating Quick Ref shortcut.
+        minimum: EdgeInsets.only(
+          bottom: MediaQuery.textScalerOf(context).scale(48) + 36,
+        ),
         child: SingleChildScrollView(
           child: Align(
             alignment: Alignment.topCenter,
