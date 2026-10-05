@@ -105,6 +105,71 @@ void main() {
     );
   });
 
+  test(
+    'generator change uses asynchronous pacing and ICD magnet qualification',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final section = cases['pacemaker-icd-generator-change']!.sections
+          .firstWhere((s) => s.id == 'intraop');
+      final body = section.bullets.join(' ');
+      expect(body, contains('asynchronous-pacing'));
+      expect(body, isNot(contains('to a synchronous mode')));
+      expect(body, contains('without changing its pacing mode'));
+      expect(body, contains('possible interruption of pacing support'));
+      expect(
+        section.sources.any((s) => s.url.contains('j.jacc.2024.06.013')),
+        true,
+      );
+      expect(
+        searchSurgicalCases(
+          'asynchronous',
+          category: 'EP & structural heart',
+        ).any((c) => c.id == 'pacemaker-icd-generator-change'),
+        true,
+      );
+    },
+  );
+
+  test('plastic skin graft harmonizes burn succinylcholine cautions', () async {
+    final cases = await SurgicalCatalog.load();
+    final body = cases['split-thickness-full-thickness-skin-graft']!.sections
+        .expand((s) => s.bullets)
+        .join(' ');
+    expect(body, contains('after the first 24 hours'));
+    expect(
+      body,
+      contains('rather than treating 24–48 hours as an assured safe window'),
+    );
+    expect(body, contains('cannot be cleared by the calendar alone'));
+    expect(body, contains('electrical/crush muscle injury'));
+    expect(body, isNot(contains('avoid succinylcholine from 48 hours')));
+  });
+
+  test(
+    'loop recorder does not prescribe universal magnet activation',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final section = cases['implantable-loop-recorder-ilr-placement']!.sections
+          .firstWhere((s) => s.id == 'procedure');
+      final body = section.bullets.join(' ');
+      expect(body, contains('workflows are device-specific'));
+      expect(body, contains('rather than assuming magnet activation'));
+      expect(body, contains('when prescribed'));
+      expect(
+        body,
+        isNot(contains('The device is activated by passing a magnet')),
+      );
+      expect(section.sources.any((s) => s.url.contains('medtronic.com')), true);
+      expect(
+        searchSurgicalCases(
+          'LINQ',
+          category: 'EP & structural heart',
+        ).any((c) => c.id == 'implantable-loop-recorder-ilr-placement'),
+        true,
+      );
+    },
+  );
+
   test('ENT expansion preserves adult airway safety distinctions', () async {
     final cases = await SurgicalCatalog.load();
     final ent = cases.values.where(
