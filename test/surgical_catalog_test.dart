@@ -1,0 +1,232 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
+import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
+import 'package:luma_anesthesia/screens/subscription_screen.dart';
+import 'package:luma_anesthesia/theme/luma_theme.dart';
+import 'package:luma_anesthesia/launch/launch_scope.dart';
+
+Widget app({
+  String? id,
+  bool allowed = true,
+  double scale = 1,
+  Future<bool> Function()? checker,
+}) => MaterialApp(
+  theme: buildLumaTheme(),
+  builder: (context, child) => MediaQuery(
+    data: MediaQuery.of(
+      context,
+    ).copyWith(disableAnimations: true, textScaler: TextScaler.linear(scale)),
+    child: child!,
+  ),
+  home: SurgicalPrepFeature(
+    caseId: id,
+    checkAccess: checker ?? () async => allowed,
+    accessChanges: const Stream<void>.empty(),
+  ),
+  onGenerateRoute: (settings) {
+    if (settings.name == '/home') {
+      return MaterialPageRoute(
+        builder: (_) => const Scaffold(body: Text('Dashboard')),
+      );
+    }
+    final uri = Uri.parse(settings.name!);
+    return MaterialPageRoute(
+      builder: (_) => SurgicalPrepFeature(
+        caseId: uri.pathSegments.length > 1 ? uri.pathSegments[1] : null,
+        checkAccess: () async => allowed,
+        accessChanges: const Stream<void>.empty(),
+      ),
+    );
+  },
+);
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  // Prime real asset I/O outside any individual widget test's fake-async zone.
+  setUpAll(() async {
+    await SurgicalCatalog.load();
+  });
+  test('243 unique adult/OB references are bundled and all remain release-deferred', () async {
+    final raw = jsonDecode(
+      await rootBundle.loadString('assets/data/surgical_cases.json'),
+    ) as List;
+    final cases = await SurgicalCatalog.load();
+    expect(raw.length, 242);
+    expect(cases.length, 243);
+    expect(surgicalIndex.length, cases.length);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 243);
+    expect(surgicalCategories.length, 23); // 22 categories and All.
+    for (final item in surgicalIndex) {
+      expect(cases.containsKey(item.id), true, reason: item.title);
+      expect(LaunchScope.isDeferred(item.route), true);
+      expect(item.title.toLowerCase(), isNot(contains('pediatric')));
+      expect(item.aliases.toLowerCase(), isNot(contains('pediatric')));
+      final c = cases[item.id]!;
+      expect(
+        c.overview.bullets.length,
+        inInclusiveRange(3, 5),
+        reason: c.title,
+      );
+      expect(c.sections.length, greaterThanOrEqualTo(10));
+      for (final section in [c.overview, ...c.sections]) {
+        expect(section.bullets, isNotEmpty);
+        expect(section.sources, isNotEmpty);
+        for (final source in section.sources) {
+          final uri = Uri.parse(source.url);
+          expect(uri.scheme, 'https');
+          expect(uri.host, isNotEmpty);
+        }
+      }
+    }
+    expect(identical(cases, await SurgicalCatalog.load()), true);
+  });
+
+  test('case search matches titles, prefixes, aliases and clinical text', () {
+    expect(
+      searchSurgicalCases('LAP CHOLE').first.id,
+      'laparoscopic-cholecystectomy',
+    );
+    expect(searchSurgicalCases('cesar'), isNotEmpty);
+    expect(searchSurgicalCases('zzzzunknownterm'), isEmpty);
+    expect(searchSurgicalCases('pneumoperitoneum'), isNotEmpty);
+    expect(searchSurgicalCases('', category: 'Obstetric'), isNotEmpty);
+    expect(
+      searchSurgicalCases(
+        '',
+        category: 'Obstetric',
+      ).every((c) => c.category == 'Obstetric'),
+      true,
+    );
+  });
+
+  test('manual safety corrections survive catalog generation', () async {
+    final cases = await SurgicalCatalog.load();
+    final tbi = cases['craniotomy-for-traumatic-brain-injury-tbi']!;
+    final airway = tbi.sections.firstWhere((s) => s.id == 'airway');
+    expect(airway.bullets.join(' '), contains('35–45 mmHg'));
+    expect(
+      airway.bullets.join(' '),
+      contains('when intracranial hypertension is absent'),
+    );
+    expect(
+      airway.bullets.join(' '),
+      isNot(contains('should be maintained at 30–35')),
+    );
+    expect(
+      tbi.sections
+          .expand((s) => s.sources)
+          .any(
+            (s) =>
+                s.url == 'https://braintrauma.org/coma/guidelines/severe-tbi',
+          ),
+      true,
+    );
+    final pyelo = cases['pyeloplasty-open-robotic']!;
+    expect(
+      pyelo.sections.expand((s) => s.bullets).join(' '),
+      isNot(contains('dexketoprofen 50 mg')),
+    );
+    for (final c in cases.values) {
+      for (final source in [
+        c.overview,
+        ...c.sections,
+      ].expand((s) => s.sources)) {
+        expect(source.label, isNot(contains('*')));
+      }
+    }
+  });
+
+  testWidgets(
+    'unsubscribed hub and direct detail show paywall, never case content',
+    (tester) async {
+      for (final id in [null, 'laparoscopic-cholecystectomy']) {
+        await tester.pumpWidget(app(id: id, allowed: false));
+        await tester.pumpAndSettle();
+        expect(find.byType(SubscriptionScreen), findsOneWidget);
+        expect(find.text('Quick clinical overview'), findsNothing);
+        expect(find.text('Adult & OB cases'), findsNothing);
+        await tester.pumpWidget(const SizedBox());
+      }
+    },
+  );
+
+  testWidgets('detail checks entitlement once, then shows bundled content', (
+    tester,
+  ) async {
+    var checks = 0;
+    await tester.pumpWidget(
+      app(
+        id: 'laparoscopic-cholecystectomy',
+        checker: () async {
+          checks++;
+          return true;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(checks, 1);
+    expect(find.text('Quick clinical overview'), findsOneWidget);
+  });
+
+  testWidgets('hub search opens case and Home returns to dashboard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'lap chole');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Laparoscopic cholecystectomy'));
+    await tester.pumpAndSettle();
+    expect(find.text('Quick clinical overview'), findsOneWidget);
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dashboard'), findsOneWidget);
+  });
+
+  testWidgets(
+    'unknown route gives useful recovery instead of empty reference',
+    (tester) async {
+      await tester.pumpWidget(app(id: 'missing-case'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('This surgical case could not be found.'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Browse surgical cases'));
+      await tester.pumpAndSettle();
+      expect(find.text('Adult & OB cases'), findsOneWidget);
+    },
+  );
+
+  for (final width in [320.0, 820.0]) {
+    testWidgets(
+      'library fits width $width with double text, filters reset correctly',
+      (tester) async {
+        tester.view.physicalSize = Size(width, 1200);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(app(scale: 2));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byType(DropdownButtonFormField<String>),
+        );
+        await tester.tap(find.byType(DropdownButtonFormField<String>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Bariatric').last);
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField), 'zzzzunknownterm');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Reset search and filters'));
+        await tester.tap(find.text('Reset search and filters'));
+        await tester.pumpAndSettle();
+        expect(find.text('All'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+}
