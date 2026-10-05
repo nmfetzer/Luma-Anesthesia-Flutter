@@ -241,6 +241,22 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
       category: widget.category ?? 'All',
     );
     const preferredOrder = {
+      'ENT & shared airway': [
+        'functional-endoscopic-sinus-surgery-fess',
+        'septoplasty-turbinate-reduction',
+        'tonsillectomy-and-adenoidectomy-t-a-adult',
+        'tympanoplasty',
+        'mastoidectomy',
+        'myringotomy-with-tube-placement-adult',
+        'parotidectomy-superficial-total',
+        'neck-dissection-radical-modified-selective',
+        'laryngectomy-total-partial',
+        'microlaryngoscopy-vocal-cord-surgery',
+        'airway-foreign-body-removal',
+        'awake-fiber-optic-intubation-afoi',
+        'tracheal-intubation-for-epiglottitis',
+        'maxillofacial-trauma-surgery-panfacial-fractures',
+      ],
       'Bariatric': [
         'sleeve-gastrectomy',
         'roux-en-y-gastric-bypass-rygb',

@@ -105,6 +105,61 @@ void main() {
     );
   });
 
+  test('ENT expansion preserves adult airway safety distinctions', () async {
+    final cases = await SurgicalCatalog.load();
+    final ent = cases.values.where(
+      (c) => c.category.startsWith('ENT & shared airway'),
+    );
+    expect(ent.length, 14);
+    for (final c in ent) {
+      expect(c.overview.bullets.length, 4);
+      expect(c.sections.length, inInclusiveRange(11, 14));
+    }
+    String body(String id) =>
+        cases[id]!.sections.expand((s) => s.bullets).join(' ');
+    expect(
+      body('laryngectomy-total-partial'),
+      contains(
+        'Oral/nasal intubation or face-mask ventilation cannot ventilate the lungs.',
+      ),
+    );
+    final awake = body('awake-fiber-optic-intubation-afoi');
+    expect(awake, contains('9 mg/kg LEAN body weight'));
+    expect(awake, contains('not actual body weight and not a target'));
+    expect(awake, contains('Postponement is the default'));
+    expect(
+      body('microlaryngoscopy-vocal-cord-surgery'),
+      contains('patent expiratory path'),
+    );
+    expect(
+      body('tympanoplasty'),
+      contains('Nitrous oxide is generally avoided'),
+    );
+    expect(
+      body('tonsillectomy-and-adenoidectomy-t-a-adult'),
+      contains('pediatric-specific'),
+    );
+    expect(body('airway-foreign-body-removal'), contains('en bloc'));
+  });
+
+  test('ENT clinical terms resolve to their existing procedure routes', () {
+    for (final entry in {
+      'AFOI': 'awake-fiber-optic-intubation-afoi',
+      'jet ventilation': 'microlaryngoscopy-vocal-cord-surgery',
+      'epiglottitis': 'tracheal-intubation-for-epiglottitis',
+      'cholesteatoma': 'mastoidectomy',
+    }.entries) {
+      expect(
+        searchSurgicalCases(
+          entry.key,
+          category: 'ENT & shared airway',
+        ).any((c) => c.id == entry.value),
+        true,
+        reason: entry.key,
+      );
+    }
+  });
+
   test(
     'cardiothoracic expansion preserves scope and safety distinctions',
     () async {
@@ -413,6 +468,29 @@ void main() {
   );
 
   for (final width in [320.0, 820.0]) {
+    testWidgets(
+      'ENT specialty and awake airway reference fit width $width at double text',
+      (tester) async {
+        tester.view.physicalSize = Size(width, 1400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          app(id: 'specialty/ent-shared-airway', scale: 2),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('ENT & shared airway cases'), findsOneWidget);
+        await tester.enterText(find.byType(TextField), 'AFOI');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Awake Fiber-Optic Intubation (AFOI)'),
+        );
+        await tester.tap(find.text('Awake Fiber-Optic Intubation (AFOI)'));
+        await tester.pumpAndSettle();
+        expect(find.text('Quick clinical overview'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
     testWidgets(
       'dental specialty and jaw reference fit width $width at double text',
       (tester) async {
