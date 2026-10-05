@@ -175,6 +175,78 @@ void main() {
     },
   );
 
+  test(
+    'colorectal expansion preserves distinct pathways and searchable details',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final colorectal = cases.values.where(
+        (c) => c.category.startsWith('Colorectal'),
+      );
+      expect(colorectal.length, 7);
+      for (final c in colorectal) {
+        expect(c.overview.bullets.length, 4);
+        expect(c.sections.length, inInclusiveRange(12, 13));
+      }
+      String body(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      expect(
+        body('colectomy-open-laparoscopic-robotic'),
+        contains('combined with oral antibiotics'),
+      );
+      expect(
+        body('colectomy-open-laparoscopic-robotic'),
+        contains('not routinely recommended for laparoscopic'),
+      );
+      expect(
+        body('low-anterior-resection-lar'),
+        contains('Preserved pulses do not exclude'),
+      );
+      expect(
+        body('abdominoperineal-resection-apr'),
+        contains('no other anastomosis'),
+      );
+      expect(
+        body('ostomy-creation-reversal-ileostomy-colostomy'),
+        contains('no universally reliable volume threshold'),
+      );
+      expect(
+        body('bowel-obstruction-surgery-open-laparoscopic'),
+        contains('does not guarantee an empty stomach'),
+      );
+      expect(
+        body('bowel-obstruction-surgery-open-laparoscopic'),
+        contains('Do not delay urgent source control'),
+      );
+      expect(
+        body('hemorrhoidectomy'),
+        contains('routine postoperative analgesic adjunct'),
+      );
+      expect(
+        body('anal-fistula-repair-fistulotomy-lift-seton'),
+        contains('cutting seton is not sphincter-sparing'),
+      );
+      expect(
+        searchSurgicalCases('high output stoma')
+            .any((c) => c.id == 'ostomy-creation-reversal-ileostomy-colostomy'),
+        true,
+      );
+      expect(
+        searchSurgicalCases(
+          'pudendal',
+          category: 'Colorectal',
+        ).any((c) => c.id == 'hemorrhoidectomy'),
+        true,
+      );
+      expect(
+        searchSurgicalCases(
+          'well leg compartment',
+          category: 'Colorectal',
+        ).any((c) => c.id == 'low-anterior-resection-lar'),
+        true,
+      );
+    },
+  );
+
   test('manual safety corrections survive catalog generation', () async {
     final cases = await SurgicalCatalog.load();
     final tbi = cases['craniotomy-for-traumatic-brain-injury-tbi']!;
@@ -219,6 +291,8 @@ void main() {
         null,
         'specialty/bariatric',
         'specialty/burns',
+        'specialty/colorectal',
+        'colectomy-open-laparoscopic-robotic',
         'escharotomy-fasciotomy-for-burns',
         'laparoscopic-cholecystectomy',
       ]) {
@@ -282,6 +356,25 @@ void main() {
   );
 
   for (final width in [320.0, 820.0]) {
+    testWidgets(
+      'colorectal specialty and detail fit width $width at double text',
+      (tester) async {
+        tester.view.physicalSize = Size(width, 1400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(app(id: 'specialty/colorectal', scale: 2));
+        await tester.pumpAndSettle();
+        expect(find.text('Colorectal cases'), findsOneWidget);
+        await tester.enterText(find.byType(TextField), 'hemorrhoidectomy');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Hemorrhoidectomy'));
+        await tester.tap(find.text('Hemorrhoidectomy'));
+        await tester.pumpAndSettle();
+        expect(find.text('Quick clinical overview'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
     testWidgets(
       'cardiothoracic tiles and new detail fit width $width at double text',
       (tester) async {

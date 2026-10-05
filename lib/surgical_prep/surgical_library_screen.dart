@@ -257,6 +257,15 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'burn-related-amputation',
         'burn-contracture-release-reconstruction',
       ],
+      'Colorectal': [
+        'colectomy-open-laparoscopic-robotic',
+        'low-anterior-resection-lar',
+        'abdominoperineal-resection-apr',
+        'ostomy-creation-reversal-ileostomy-colostomy',
+        'bowel-obstruction-surgery-open-laparoscopic',
+        'hemorrhoidectomy',
+        'anal-fistula-repair-fistulotomy-lift-seton',
+      ],
       'Cardiac & thoracic': [
         'cabg-coronary-artery-bypass-grafting',
         'aortic-valve-replacement-avr',
