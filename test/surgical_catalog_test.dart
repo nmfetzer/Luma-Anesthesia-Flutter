@@ -9,6 +9,7 @@ import 'package:luma_anesthesia/surgical_prep/ep_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/abdominal_gi_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/gynecology_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/hpb_groups.dart';
+import 'package:luma_anesthesia/surgical_prep/neuro_groups.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/theme/luma_theme.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -56,15 +57,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('306 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('313 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 305);
-    expect(cases.length, 306);
+    expect(raw.length, 312);
+    expect(cases.length, 313);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 306);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 313);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -108,6 +109,118 @@ void main() {
       true,
     );
   });
+
+  test('neuro groups retain canonical routes including endocrine overlap', () {
+    final listed = surgicalNeuroGroups.values.expand((ids) => ids).toList();
+    final found = searchSurgicalCases('', category: 'Neuro & spine');
+    expect(listed, hasLength(31));
+    expect(listed.toSet().length, listed.length);
+    expect(found.map((c) => c.id).toSet(), listed.toSet());
+    expect(
+      listed,
+      containsAll([
+        'transsphenoidal-pituitary-surgery-tsps-endoscopic',
+        'craniopharyngioma-resection-adult',
+      ]),
+    );
+    expect(
+      searchSurgicalCases(
+        '2026 stroke guideline',
+        category: 'Neuro & spine',
+      ).any((c) => c.id == 'mechanical-thrombectomy-for-ischemic-stroke'),
+      isTrue,
+    );
+    expect(
+      searchSurgicalCases(
+        'intramedullary',
+        category: 'Neuro & spine',
+      ).any((c) => c.id == 'spinal-cord-tumor-resection'),
+      isTrue,
+    );
+  });
+
+  test(
+    'neuro disease-specific pressure, rescue and device qualifiers persist',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      String d(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      expect(
+        d('mechanical-thrombectomy-for-ischemic-stroke'),
+        contains('first 72 hours is harmful'),
+      );
+      expect(
+        d('mechanical-thrombectomy-for-ischemic-stroke'),
+        contains('without another BP indication'),
+      );
+      expect(
+        d('craniotomy-for-traumatic-brain-injury-tbi'),
+        contains('not blanket targets'),
+      );
+      expect(
+        d('craniotomy-for-traumatic-brain-injury-tbi'),
+        contains('methylprednisolone increases mortality'),
+      );
+      expect(
+        d('craniotomy-for-cerebral-aneurysm-clipping'),
+        contains('does not establish one universal BP target'),
+      );
+      expect(
+        d('intracerebral-hemorrhage-evacuation'),
+        contains('without emergency surgery'),
+      );
+      expect(
+        d('mep-monitoring-anesthesia-considerations'),
+        contains('immediately announce it'),
+      );
+      expect(
+        d('mep-monitoring-anesthesia-considerations'),
+        contains('in parallel'),
+      );
+      expect(
+        d('external-ventricular-drain-evd-placement'),
+        contains('Do not routinely clamp every EVD'),
+      );
+      expect(
+        d('acdf-anterior-cervical-discectomy-and-fusion'),
+        contains('cannot wait for routine imaging'),
+      );
+      expect(
+        d('spinal-cord-stimulator-scs-implantation'),
+        contains('not a blanket prohibition'),
+      );
+      expect(
+        d('spinal-cord-stimulator-scs-implantation'),
+        contains('never assume a magnet universally'),
+      );
+      expect(
+        d('intracranial-avm-resection'),
+        contains('not a proven one-size BP recipe'),
+      );
+    },
+  );
+
+  for (final width in [390.0, 900.0]) {
+    testWidgets('neuro groups open at width $width and double text', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 1050);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(app(id: 'specialty/neuro-spine', scale: 2));
+      await tester.pumpAndSettle();
+      expect(find.text('Planning & neuromonitoring'), findsOneWidget);
+      await tester.ensureVisible(
+        find.text('Neuro & Spine: Clinical Framework'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Neuro & Spine: Clinical Framework'));
+      await tester.pumpAndSettle();
+      expect(find.text('Quick clinical overview'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   test('HPB grouping reuses GI and endocrine canonical references', () {
     final listed = surgicalHpbGroups.values.expand((ids) => ids).toList();

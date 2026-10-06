@@ -10,6 +10,7 @@ import 'ep_groups.dart';
 import 'abdominal_gi_groups.dart';
 import 'gynecology_groups.dart';
 import 'hpb_groups.dart';
+import 'neuro_groups.dart';
 
 String surgicalSpecialtySlug(String category) => category
     .toLowerCase()
@@ -347,6 +348,8 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         ? surgicalGynecologyGroups
         : widget.category == 'Hepatobiliary & transplant'
         ? surgicalHpbGroups
+        : widget.category == 'Neuro & spine'
+        ? surgicalNeuroGroups
         : surgicalAbdominalGiGroups[widget.category];
     final order =
         displayGroups?.values.expand((ids) => ids).toList() ??
