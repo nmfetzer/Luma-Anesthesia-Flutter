@@ -8,6 +8,7 @@ import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
 import 'package:luma_anesthesia/surgical_prep/ep_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/abdominal_gi_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/gynecology_groups.dart';
+import 'package:luma_anesthesia/surgical_prep/hpb_groups.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/theme/luma_theme.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -55,15 +56,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('296 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('306 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 295);
-    expect(cases.length, 296);
+    expect(raw.length, 305);
+    expect(cases.length, 306);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 296);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 306);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -106,6 +107,91 @@ void main() {
       ).every((c) => c.category == 'Obstetric'),
       true,
     );
+  });
+
+  test('HPB grouping reuses GI and endocrine canonical references', () {
+    final listed = surgicalHpbGroups.values.expand((ids) => ids).toList();
+    final found = searchSurgicalCases(
+      '',
+      category: 'Hepatobiliary & transplant',
+    );
+    expect(listed, hasLength(21));
+    expect(listed.toSet().length, listed.length);
+    expect(found.map((c) => c.id).toSet(), listed.toSet());
+    for (final id in [
+      'insulinoma-resection',
+      'pancreatic-neuroendocrine-tumor-resection',
+      'whipple-procedure-pancreaticoduodenectomy',
+      'ercp-endoscopic-retrograde-cholangiopancreatography',
+    ]) {
+      expect(found.where((c) => c.id == id), hasLength(1));
+      expect(found.singleWhere((c) => c.id == id).route, '/surgical-prep/$id');
+    }
+    expect(
+      searchSurgicalCases(
+        'anhepatic',
+        category: 'Hepatobiliary & transplant',
+      ).any((c) => c.id == 'liver-transplant'),
+      isTrue,
+    );
+  });
+
+  test(
+    'HPB safety qualifiers distinguish INR, perfusion and urgent drainage',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      String d(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      expect(
+        d('hepatic-resection-open-laparoscopic'),
+        contains('Do not chase a CVP number'),
+      );
+      expect(
+        d('hepatic-resection-open-laparoscopic'),
+        contains('must not delay source control or CPR'),
+      );
+      expect(
+        d('cirrhosis-portal-hypertension-perioperative'),
+        contains('INR alone does not measure overall bleeding risk'),
+      );
+      expect(
+        d('cholangitis-obstructed-biliary-drainage'),
+        contains('not permission to wait'),
+      );
+      expect(
+        d('pancreatitis-necrosis-intervention'),
+        contains('not routine prophylaxis for sterile pancreatitis'),
+      );
+      expect(
+        d('liver-transplant'),
+        contains('do not wait for a formal post-reperfusion-syndrome'),
+      );
+      expect(d('tips-portal-decompression'), contains('at least overnight'));
+      expect(d('living-donor-hepatectomy'), contains('ability to withdraw'));
+    },
+  );
+
+  testWidgets('HPB groups and canonical overview fit narrow double-text view', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 1050);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      app(
+        id: 'specialty/${surgicalSpecialtySlug('Hepatobiliary & transplant')}',
+        scale: 2,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Planning & liver physiology'), findsOneWidget);
+    await tester.ensureVisible(find.text('Hepatobiliary: Clinical Framework'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hepatobiliary: Clinical Framework'));
+    await tester.pumpAndSettle();
+    expect(find.text('Quick clinical overview'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   test(
