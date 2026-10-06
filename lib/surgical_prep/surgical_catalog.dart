@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'surgical_case.dart';
 import 'abdominal_gi_groups.dart';
 import 'hpb_groups.dart';
+import 'final_specialty_groups.dart';
 import 'drafts/laparoscopic_cholecystectomy.dart';
 
 part 'surgical_index.dart';
@@ -37,6 +38,8 @@ final surgicalSpecialtyCrossListings = <String, Set<String>>{
   'Hepatobiliary & transplant': surgicalHpbGroups.values
       .expand((ids) => ids)
       .toSet(),
+  for (final entry in surgicalFinalSpecialtyGroups.entries)
+    entry.key: entry.value.values.expand((ids) => ids).toSet(),
 };
 
 String _normalize(String s) =>
