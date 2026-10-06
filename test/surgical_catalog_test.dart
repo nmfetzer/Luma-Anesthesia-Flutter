@@ -7,6 +7,7 @@ import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
 import 'package:luma_anesthesia/surgical_prep/ep_groups.dart';
 import 'package:luma_anesthesia/surgical_prep/abdominal_gi_groups.dart';
+import 'package:luma_anesthesia/surgical_prep/gynecology_groups.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/theme/luma_theme.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -54,15 +55,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('288 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('296 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 287);
-    expect(cases.length, 288);
+    expect(raw.length, 295);
+    expect(cases.length, 296);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 288);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 296);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -106,6 +107,107 @@ void main() {
       true,
     );
   });
+
+  test(
+    'gynecology groups preserve routes and keep postpartum hemorrhage in OB',
+    () {
+      final listed = surgicalGynecologyGroups.values
+          .expand((ids) => ids)
+          .toList();
+      final found = searchSurgicalCases('', category: 'Gynecology');
+      expect(listed, hasLength(27));
+      expect(listed.toSet().length, listed.length);
+      expect(found.map((c) => c.id).toSet(), listed.toSet());
+      expect(
+        listed,
+        containsAll(['cervical-cerclage', 'postpartum-tubal-ligation']),
+      );
+      expect(listed, isNot(contains('postpartum-hemorrhage-management')));
+      expect(
+        searchSurgicalCases(
+          'postpartum hemorrhage',
+          category: 'Obstetric',
+        ).any((c) => c.id == 'postpartum-hemorrhage-management'),
+        isTrue,
+      );
+      expect(
+        searchSurgicalCases('open oophorectomy', category: 'Gynecology').any(
+          (c) =>
+              c.route ==
+              '/surgical-prep/laparoscopic-ovarian-cystectomy-oophorectomy',
+        ),
+        isTrue,
+      );
+      expect(
+        searchSurgicalCases(
+          'fluid deficit',
+          category: 'Gynecology',
+        ).any((c) => c.id == 'hysteroscopy'),
+        isTrue,
+      );
+    },
+  );
+
+  test('gynecology clinical qualifiers remain explicit', () async {
+    final cases = await SurgicalCatalog.load();
+    String details(String id) =>
+        cases[id]!.sections.expand((s) => s.bullets).join(' ');
+    final hyst = details('hysteroscopy');
+    expect(hyst, contains('1000 mL for hypotonic and 2500 mL for isotonic'));
+    expect(hyst, contains('750 mL hypotonic and 1500 mL isotonic'));
+    expect(hyst, contains('not identical to intravascular absorption'));
+    expect(hyst, contains('isotonic saline generally avoids this mechanism'));
+    expect(hyst, contains('not proven safe intravascular doses'));
+    expect(
+      details('myomectomy-open-laparoscopic'),
+      contains('rather than systemic hypotension'),
+    );
+    expect(
+      details('myomectomy-open-laparoscopic'),
+      contains('do not establish a universally safe dose'),
+    );
+    expect(
+      details('dilation-and-curettage-d-c'),
+      contains('contraindicated in hypertension'),
+    );
+    expect(
+      details('salpingectomy-ectopic-pregnancy-surgery'),
+      contains('do not automatically apply every late-pregnancy'),
+    );
+    expect(
+      details('endometrial-ablation'),
+      contains('do not impose hysteroscopic saline deficit limits'),
+    );
+    expect(
+      details('robotic-hysterectomy'),
+      contains('even with palpable pulses'),
+    );
+    expect(details('robotic-hysterectomy'), contains('TOF ratio at least 0.9'));
+    expect(
+      details('gynecologic-oncology-staging-laparotomy'),
+      contains('not accessible for verification'),
+    );
+  });
+
+  for (final width in [390.0, 900.0]) {
+    testWidgets('gynecology groups open at width $width and double text', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 1050);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(app(id: 'specialty/gynecology', scale: 2));
+      await tester.pumpAndSettle();
+      expect(find.text('Planning & emergencies'), findsOneWidget);
+      await tester.ensureVisible(find.text('Gynecology: Clinical Framework'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Gynecology: Clinical Framework'));
+      await tester.pumpAndSettle();
+      expect(find.text('Quick clinical overview'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   test(
     'abdominal and GI groups are complete, unique and reuse canonical routes',

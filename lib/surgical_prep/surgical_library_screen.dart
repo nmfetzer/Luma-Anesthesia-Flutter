@@ -8,6 +8,7 @@ import 'surgical_case.dart';
 import 'surgical_case_screen.dart';
 import 'ep_groups.dart';
 import 'abdominal_gi_groups.dart';
+import 'gynecology_groups.dart';
 
 String surgicalSpecialtySlug(String category) => category
     .toLowerCase()
@@ -341,6 +342,8 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
     };
     final displayGroups = widget.category == 'EP & structural heart'
         ? surgicalEpGroups
+        : widget.category == 'Gynecology'
+        ? surgicalGynecologyGroups
         : surgicalAbdominalGiGroups[widget.category];
     final order =
         displayGroups?.values.expand((ids) => ids).toList() ??
