@@ -57,15 +57,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('313 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('351 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 312);
-    expect(cases.length, 313);
+    expect(raw.length, 350);
+    expect(cases.length, 351);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 313);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 351);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);

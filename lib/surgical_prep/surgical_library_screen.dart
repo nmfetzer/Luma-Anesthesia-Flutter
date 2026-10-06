@@ -11,6 +11,7 @@ import 'abdominal_gi_groups.dart';
 import 'gynecology_groups.dart';
 import 'hpb_groups.dart';
 import 'neuro_groups.dart';
+import 'final_specialty_groups.dart';
 
 String surgicalSpecialtySlug(String category) => category
     .toLowerCase()
@@ -350,7 +351,8 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         ? surgicalHpbGroups
         : widget.category == 'Neuro & spine'
         ? surgicalNeuroGroups
-        : surgicalAbdominalGiGroups[widget.category];
+        : surgicalFinalSpecialtyGroups[widget.category] ??
+              surgicalAbdominalGiGroups[widget.category];
     final order =
         displayGroups?.values.expand((ids) => ids).toList() ??
         preferredOrder[widget.category];
