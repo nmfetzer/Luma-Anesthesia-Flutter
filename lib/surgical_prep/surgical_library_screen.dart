@@ -7,6 +7,7 @@ import 'surgical_catalog.dart';
 import 'surgical_case.dart';
 import 'surgical_case_screen.dart';
 import 'ep_groups.dart';
+import 'abdominal_gi_groups.dart';
 
 String surgicalSpecialtySlug(String category) => category
     .toLowerCase()
@@ -338,9 +339,12 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
         'bronchoscopy-flexible-rigid',
       ],
     };
-    final order = widget.category == 'EP & structural heart'
-        ? surgicalEpGroups.values.expand((ids) => ids).toList()
-        : preferredOrder[widget.category];
+    final displayGroups = widget.category == 'EP & structural heart'
+        ? surgicalEpGroups
+        : surgicalAbdominalGiGroups[widget.category];
+    final order =
+        displayGroups?.values.expand((ids) => ids).toList() ??
+        preferredOrder[widget.category];
     if (!isSearching && order != null) {
       matches.sort((a, b) {
         final ai = order.indexOf(a.id);
@@ -457,9 +461,8 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
                       itemCount: matches.length,
                       itemBuilder: (_, i) {
                         String? group;
-                        if (widget.category == 'EP & structural heart' &&
-                            !isSearching) {
-                          for (final entry in surgicalEpGroups.entries) {
+                        if (displayGroups != null && !isSearching) {
+                          for (final entry in displayGroups.entries) {
                             if (entry.value.first == matches[i].id) {
                               group = entry.key;
                               break;

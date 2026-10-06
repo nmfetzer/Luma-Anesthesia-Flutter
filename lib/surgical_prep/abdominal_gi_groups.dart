@@ -1,0 +1,82 @@
+// Specialty display groups; canonical routes and clinical records are reused.
+const surgicalAbdominalGiGroups = <String, Map<String, List<String>>>{
+  "General & abdominal": {
+    "Planning & emergency abdomen": [
+      "general-abdominal-anesthesia-framework",
+      "exploratory-laparotomy-nontraumatic",
+      "bowel-obstruction-surgery-open-laparoscopic",
+      "perforated-viscus-repair",
+      "bowel-resection-small-large",
+    ],
+    "Common abdominal operations": [
+      "appendectomy-laparoscopic-open",
+      "diagnostic-laparoscopy-lysis-of-adhesions",
+    ],
+    "Hernia & abdominal wall": [
+      "inguinal-hernia-repair-open-laparoscopic-robotic",
+      "femoral-hernia-repair",
+      "umbilical-ventral-incisional-hernia-repair",
+      "robotic-hernia-repair-abdominal-wall-reconstruction",
+    ],
+    "Upper GI & hepatopancreatobiliary": [
+      "laparoscopic-cholecystectomy",
+      "robotic-cholecystectomy",
+      "open-cholecystectomy",
+      "hiatal-hernia-repair-nissen-fundoplication",
+      "gastrectomy-partial-total",
+      "hepatic-resection-open-laparoscopic",
+      "whipple-procedure-pancreaticoduodenectomy",
+      "distal-pancreatectomy",
+      "splenectomy-laparoscopic-open",
+    ],
+    "Related specialty references": [
+      "colectomy-open-laparoscopic-robotic",
+      "sleeve-gastrectomy",
+      "roux-en-y-gastric-bypass-rygb",
+      "adjustable-gastric-band-lap-band",
+      "biliopancreatic-diversion-duodenal-switch",
+      "sadi-s",
+      "feeding-tube-placement-peg-j-tube",
+      "upper-gi-bleed-endoscopic-hemostasis",
+      "open-aaa-repair-elective",
+      "ruptured-abdominal-aortic-aneurysm-raaa",
+      "mesenteric-revascularization-open-endovascular",
+    ],
+    "Other general procedures": [
+      "abscess-incision-and-drainage-i-d",
+      "breast-biopsy-lumpectomy-mastectomy",
+      "lower-extremity-amputation-toe-foot-bka-aka",
+      "pilonidal-cyst-excision",
+      "port-placement-removal-mediport-picc-port",
+      "soft-tissue-mass-excision",
+      "tracheostomy-placement",
+      "wound-debridement",
+    ],
+  },
+  "GI endoscopy": {
+    "Planning & routine endoscopy": [
+      "gi-endoscopy-anesthesia-framework",
+      "egd-upper-endoscopy",
+      "colonoscopy-diagnostic-therapeutic",
+    ],
+    "Biliary, pancreatic & advanced endoscopy": [
+      "ercp-endoscopic-retrograde-cholangiopancreatography",
+      "eus-diagnostic-sampling",
+      "eus-guided-therapeutic-interventions",
+      "emr-esd-endoscopic-resection",
+      "poem-peroral-endoscopic-myotomy",
+    ],
+    "Bleeding & esophageal emergencies": [
+      "upper-gi-bleed-endoscopic-hemostasis",
+      "variceal-banding-hemorrhage",
+      "esophageal-dilation",
+      "esophageal-stent-placement",
+      "esophageal-foreign-body-food-bolus",
+    ],
+    "Feeding access & small-bowel procedures": [
+      "feeding-tube-placement-peg-j-tube",
+      "device-assisted-enteroscopy",
+      "capsule-endoscopy-placement",
+    ],
+  },
+};

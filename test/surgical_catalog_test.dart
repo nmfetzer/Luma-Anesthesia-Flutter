@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
 import 'package:luma_anesthesia/surgical_prep/ep_groups.dart';
+import 'package:luma_anesthesia/surgical_prep/abdominal_gi_groups.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/theme/luma_theme.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
@@ -53,15 +54,15 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('271 unique adult/OB references are bundled and all remain release-deferred', () async {
+  test('288 unique adult/OB references are bundled and all remain release-deferred', () async {
     final raw = jsonDecode(
       await rootBundle.loadString('assets/data/surgical_cases.json'),
     ) as List;
     final cases = await SurgicalCatalog.load();
-    expect(raw.length, 270);
-    expect(cases.length, 271);
+    expect(raw.length, 287);
+    expect(cases.length, 288);
     expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 271);
+    expect(surgicalIndex.map((r) => r.id).toSet().length, 288);
     expect(surgicalCategories.length, 23); // 22 categories and All.
     for (final item in surgicalIndex) {
       expect(cases.containsKey(item.id), true, reason: item.title);
@@ -105,6 +106,135 @@ void main() {
       true,
     );
   });
+
+  test(
+    'abdominal and GI groups are complete, unique and reuse canonical routes',
+    () {
+      for (final entry in surgicalAbdominalGiGroups.entries) {
+        final listed = entry.value.values.expand((ids) => ids).toList();
+        final found = searchSurgicalCases('', category: entry.key);
+        expect(listed.toSet().length, listed.length);
+        expect(found.map((c) => c.id).toSet(), listed.toSet());
+        expect(found.map((c) => c.route).toSet().length, found.length);
+      }
+      expect(searchSurgicalCases('', category: 'GI endoscopy'), hasLength(16));
+      expect(
+        searchSurgicalCases('', category: 'General & abdominal'),
+        hasLength(39),
+      );
+      for (final category in ['General & abdominal', 'GI endoscopy']) {
+        expect(
+          searchSurgicalCases(
+            'PEG',
+            category: category,
+          ).any((c) => c.id == 'feeding-tube-placement-peg-j-tube'),
+          isTrue,
+        );
+      }
+      expect(
+        searchSurgicalCases(
+          '',
+          category: 'General & abdominal',
+        ).any((c) => c.id == 'thyroidectomy'),
+        isFalse,
+      );
+      expect(
+        searchSurgicalCases('thyroidectomy', category: 'Endocrine').first.route,
+        '/surgical-prep/thyroidectomy',
+      );
+      expect(
+        searchSurgicalCases(
+          'bronchoscopy',
+          category: 'GI endoscopy',
+        ).any((c) => c.id == 'bronchoscopy-flexible-rigid'),
+        isFalse,
+      );
+    },
+  );
+
+  test(
+    'new abdominal and GI clinical qualifiers remain searchable and explicit',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      String details(String id) =>
+          cases[id]!.sections.expand((s) => s.bullets).join(' ');
+      expect(
+        details('ercp-endoscopic-retrograde-cholangiopancreatography'),
+        contains('Age or ASA classification alone'),
+      );
+      expect(
+        details('upper-gi-bleed-endoscopic-hemostasis'),
+        contains('advises against routine prophylactic intubation'),
+      );
+      expect(
+        details('feeding-tube-placement-peg-j-tube'),
+        contains('against routine withholding of antiplatelets'),
+      );
+      expect(
+        details('variceal-banding-hemorrhage'),
+        contains('does not reliably represent hemostatic status'),
+      );
+      expect(
+        details('capsule-endoscopy-placement'),
+        contains('not a reason by itself to provide IV sedation'),
+      );
+      expect(
+        details('poem-peroral-endoscopic-myotomy'),
+        contains('not mandatory prerequisites for rescue'),
+      );
+      expect(
+        details('hepatic-resection-open-laparoscopic'),
+        contains('Do not chase a CVP number'),
+      );
+      expect(
+        details('ruptured-abdominal-aortic-aneurysm-raaa'),
+        contains('not an instruction to tolerate absent perfusion'),
+      );
+      expect(
+        searchSurgicalCases(
+          'capnothorax',
+          category: 'GI endoscopy',
+        ).any((c) => c.id == 'poem-peroral-endoscopic-myotomy'),
+        isTrue,
+      );
+      expect(
+        searchSurgicalCases(
+          'loss of domain',
+          category: 'General & abdominal',
+        ).any(
+          (c) => c.id == 'robotic-hernia-repair-abdominal-wall-reconstruction',
+        ),
+        isTrue,
+      );
+    },
+  );
+
+  for (final category in ['General & abdominal', 'GI endoscopy']) {
+    testWidgets(
+      '$category grouping and case opening fit narrow double-text view',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 1050);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          app(id: 'specialty/${surgicalSpecialtySlug(category)}', scale: 2),
+        );
+        await tester.pumpAndSettle();
+        final firstGroup = surgicalAbdominalGiGroups[category]!.keys.first;
+        expect(find.text(firstGroup), findsOneWidget);
+        final title = category == 'GI endoscopy'
+            ? 'GI / Endoscopy: Clinical Framework'
+            : 'General & Abdominal: Clinical Framework';
+        await tester.ensureVisible(find.text(title));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(title));
+        await tester.pumpAndSettle();
+        expect(find.text('Quick clinical overview'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   test(
     'EP groups cover every reference exactly once and retain clinical depth',
@@ -223,7 +353,7 @@ void main() {
           'thyroidectomy',
           category: 'General & abdominal',
         ).any((c) => c.id == 'thyroidectomy'),
-        true,
+        false,
       );
       expect(
         searchSurgicalCases(
