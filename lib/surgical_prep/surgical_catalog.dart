@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'surgical_case.dart';
+import 'abdominal_gi_groups.dart';
 import 'drafts/laparoscopic_cholecystectomy.dart';
 
 part 'surgical_index.dart';
@@ -22,7 +23,7 @@ class SurgicalCaseIndex {
 }
 
 // Cross-list canonical records without copying their clinical content.
-const surgicalSpecialtyCrossListings = <String, Set<String>>{
+final surgicalSpecialtyCrossListings = <String, Set<String>>{
   'ENT & shared airway': {'tracheostomy-placement'},
   'Endocrine': {
     'thyroidectomy',
@@ -30,6 +31,8 @@ const surgicalSpecialtyCrossListings = <String, Set<String>>{
     'craniopharyngioma-resection-adult',
     'whipple-procedure-pancreaticoduodenectomy',
   },
+  for (final entry in surgicalAbdominalGiGroups.entries)
+    entry.key: entry.value.values.expand((ids) => ids).toSet(),
 };
 
 String _normalize(String s) =>
@@ -56,6 +59,10 @@ List<SurgicalCaseIndex> searchSurgicalCases(
                 item.category == category ||
                 (surgicalSpecialtyCrossListings[category]?.contains(item.id) ??
                     false)) &&
+            // Keep the canonical thyroid URL/content unchanged, but place its
+            // specialty discovery in Endocrine, not the abdominal procedure list.
+            !(category == 'General & abdominal' &&
+                item.id == 'thyroidectomy') &&
             (q.isEmpty ||
                 words.every(
                   (w) => _tokens[item.id]!.any((t) => t.startsWith(w)),
