@@ -33,11 +33,77 @@ before(async () => {
     native.indexOf('REVOKE ALL ON FUNCTION public.luma_ce_checkout_status()'))
     .replace('CREATE FUNCTION public.luma_ce_checkout_status()', 'CREATE FUNCTION luma_review.luma_ce_checkout_status()'));
   await db.exec(await read('../schema.sql'));
+  await db.exec(`alter table auth.users add column email text default 'learner@example.test';
+    alter table auth.users add column email_confirmed_at timestamptz default now();
+    create table public.user_profiles(id uuid primary key, full_name text,role text,is_guest boolean default false);
+  `);
+  await db.exec(await read('../guest-schema.sql'));
 });
 after(async () => db?.close());
 beforeEach(async () => {
-  await db.exec(`truncate ce_stripe_live.events,ce_stripe_live.orders,public.luma_ce_bonus_purchases,public.luma_ce_bonus_refunds;
+  await db.exec(`truncate ce_stripe_live.guest_events,ce_stripe_live.guest_orders,public.user_profiles;
+    update ce_stripe_live.guest_settings set enabled=true;
+    truncate ce_stripe_live.events,ce_stripe_live.orders,public.luma_ce_bonus_purchases,public.luma_ce_bonus_refunds;
     update public.ce_course1_certificate_settings set enabled=true;`);
+});
+async function guestReserve(code='medication') {
+  return (await db.query('select public.ce_stripe_guest_reserve($1,$2) v',[crypto.randomUUID(),code])).rows[0].v;
+}
+async function guestApply(o,state='paid',email='learner@example.test') {
+  await db.query('select public.ce_stripe_guest_apply($1,$2,$3,$4,$5,$6,$7)',[
+    o.id,`guest_${o.id}_${state}`,`cs_live_guest_${o.id}`,`pi_guest_${o.id}`,state,o.created_at,email]);
+}
+async function guestClaim(o,user=uid) {
+  return (await db.query('select public.ce_stripe_guest_claim($1,$2,$3,$4) v',[o.id,user,'Example Learner','CRNA'])).rows[0].v;
+}
+test('guest: disabled switch prevents reservations without affecting existing purchases',async()=>{
+  await db.exec('update ce_stripe_live.guest_settings set enabled=false');
+  await assert.rejects(guestReserve(),/disabled/);
+  assert.ok(await reserve());
+});
+test('guest: payment alone grants nothing; verified matching claim grants once',async()=>{
+  const o=await guestReserve();
+  await guestApply(o);
+  assert.deepEqual(await owned(),[]);
+  assert.equal((await guestClaim(o)).claimed,true);
+  assert.equal((await guestClaim(o)).claimed,true);
+  assert.deepEqual(await owned(),[1]);
+  assert.equal((await db.query('select count(*)::int n from public.luma_ce_bonus_purchases')).rows[0].n,1);
+});
+test('guest: different email cannot claim and paid email is immutable',async()=>{
+  const o=await guestReserve();await guestApply(o,'paid','other@example.test');
+  await assert.rejects(guestClaim(o),/email mismatch/);
+  await assert.rejects(guestApply(o,'refunded','learner@example.test'),/Email mismatch/);
+  assert.deepEqual(await owned(),[]);
+});
+test('guest: refund before claim is terminal; out-of-order paid event cannot grant',async()=>{
+  const o=await guestReserve();await guestApply(o,'refunded',null);await guestApply(o);
+  await assert.rejects(guestClaim(o),/Paid purchase required/);
+  assert.deepEqual(await owned(),[]);
+});
+test('guest: refund after claim revokes only its grant and preserves lifetime award',async()=>{
+  const o=await guestReserve();await guestApply(o);await guestClaim(o);await guestApply(o,'refunded');
+  assert.deepEqual(await owned(),[]);
+  assert.equal((await db.query('select awarded_months from public.luma_ce_bonus_purchases')).rows[0].awarded_months,1);
+});
+test('guest: bundle overlap is held for review and existing ownership remains',async()=>{
+  const first=await reserve();await apply(first);
+  const o=await guestReserve('bundle');await guestApply(o);
+  assert.equal((await guestClaim(o)).needs_review,true);
+  assert.deepEqual(await owned(),[1]);
+});
+test('guest: orders survive browser loss and list only under matching account',async()=>{
+  const o=await guestReserve();await guestApply(o);
+  const list=(await db.query('select public.ce_stripe_guest_list($1) v',[uid])).rows[0].v;
+  assert.equal(list.orders[0].id,o.id);
+});
+test('guest: private RPCs cannot be called directly by browser roles',async()=>{
+  for(const role of ['anon','authenticated']){
+    await db.exec(`set role ${role}`);
+    await assert.rejects(db.query('select public.ce_stripe_guest_catalog()'),/permission denied/);
+    await assert.rejects(db.query('select public.ce_stripe_guest_claim($1,$2,$3,$4)',[crypto.randomUUID(),uid,'Name','CRNA']),/permission denied/);
+    await db.exec('reset role');
+  }
 });
 async function reserve(code='medication') {
   return (await db.query('select public.ce_stripe_live_reserve($1,$2) v',[uid,code])).rows[0].v;

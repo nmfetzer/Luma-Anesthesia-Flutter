@@ -9,6 +9,7 @@ import '../welcome/welcome_background.dart';
 import '../widgets/luma_home_button.dart';
 import 'ce_paywall_copy.dart';
 import 'web/ce_web_checkout.dart';
+import 'web/ce_guest_checkout.dart';
 
 /// Each route presents ONE exact course or bundle. The no-ID route is only
 /// an options index; it never displays four separate checkout forms.
@@ -102,85 +103,89 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
   @override
   Widget build(BuildContext context) =>
       CeWebCheckoutScope.maybeOf(context) != null
-      ? CeWebPurchaseScreen(productId: widget.productId)
+      ? CeGuestCheckout.enabled
+            ? CeGuestCheckout(productId: widget.productId)
+            : CeWebPurchaseScreen(productId: widget.productId)
       : Scaffold(
-    backgroundColor: brand.LumaColors.navyDeep,
-    body: Stack(
-      children: [
-        const WelcomeBackground(heroHaloOpacity: 0),
-        SafeArea(
-          child: Column(
+          backgroundColor: brand.LumaColors.navyDeep,
+          body: Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
+              const WelcomeBackground(heroHaloOpacity: 0),
+              SafeArea(
+                child: Column(
                   children: [
-                    Image.asset(
-                      'assets/branding/luma_symbol_halo.png',
-                      height: 38,
-                      fit: BoxFit.contain,
-                      excludeFromSemantics: true,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'CE HALO',
-                        style: brand.LumaText.body(
-                          size: 16,
-                          color: brand.LumaColors.goldSoft,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'assets/branding/luma_symbol_halo.png',
+                            height: 38,
+                            fit: BoxFit.contain,
+                            excludeFromSemantics: true,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'CE HALO',
+                              style: brand.LumaText.body(
+                                size: 16,
+                                color: brand.LumaColors.goldSoft,
+                              ),
+                            ),
+                          ),
+                          const LumaHomeButton(color: cream),
+                          IconButton(
+                            tooltip: 'Close CE purchase options',
+                            color: cream,
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                Navigator.of(context)
+                                    .pushReplacementNamed('/ce-halo');
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    const LumaHomeButton(color: cream),
-                    IconButton(
-                      tooltip: 'Close CE purchase options',
-                      color: cream,
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        } else {
-                          Navigator.of(context)
-                              .pushReplacementNamed('/ce-halo');
-                        }
-                      },
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 600),
+                            child: Material(
+                              color: cream,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                side: const BorderSide(
+                                  color: brand.LumaColors.goldSoft,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(
+                                  MediaQuery.sizeOf(context).width < 400
+                                      ? 20
+                                      : 28,
+                                ),
+                                child: selected == null
+                                    ? options()
+                                    : paywall(selected!),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 600),
-                      child: Material(
-                        color: cream,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          side: const BorderSide(
-                            color: brand.LumaColors.goldSoft,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(
-                            MediaQuery.sizeOf(context).width < 400 ? 20 : 28,
-                          ),
-                          child: selected == null
-                              ? options()
-                              : paywall(selected!),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
+        );
 
   Widget options() => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,

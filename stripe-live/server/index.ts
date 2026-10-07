@@ -1,5 +1,7 @@
 import { configFrom, createHandler, setupStatus, ORIGIN } from './core.mjs';
 import { adapters } from './adapters.mjs';
+import { createGuest } from './guest.mjs';
+import { guestAdapters } from './guest-adapters.mjs';
 // Authorization: browser routes validate Luma tokens at /auth/v1/user;
 // webhook route validates the exact raw-body Stripe signature before processing.
 Deno.serve(async (request: Request) => {
@@ -16,7 +18,12 @@ Deno.serve(async (request: Request) => {
   }
   try {
     const config = configFrom(env);
-    return await createHandler(config, adapters(config))(request);
+    const deps = { ...adapters(config), ...guestAdapters(config) };
+    const guest = createGuest(config, deps);
+    if (new URL(request.url).pathname.split('/').at(-1)?.startsWith('guest-')) {
+      return await guest.handle(request);
+    }
+    return await createHandler(config, { ...deps, guest })(request);
   } catch {
     return new Response(JSON.stringify({ error: 'Website checkout is not configured yet.' }),
       { status: 503, headers });
