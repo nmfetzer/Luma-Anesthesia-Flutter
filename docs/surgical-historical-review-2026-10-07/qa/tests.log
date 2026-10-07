@@ -1,0 +1,130 @@
+Resolving dependencies...
+Downloading packages...
+  cupertino_icons 1.0.9 (2.0.0 available)
+  equatable 2.1.0 (3.0.0 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  google_fonts 8.2.1 (9.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  purchases_flutter 10.13.2 (10.14.0 available)
+  qr 3.0.2 (4.0.0 available)
+  test_api 0.7.12 (0.7.14 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/user/workspace/luma-surgical-prep/test/surgical_case_content_test.dart
+00:00 +0: /home/user/workspace/luma-surgical-prep/test/surgical_case_content_test.dart: populated adult preview has overview, all details and named HTTPS sources
+00:00 +1: loading /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart
+00:00 +1: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: case contents disappear if premium access is revoked
+00:01 +2: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: models reject missing overview detail, duplicated sections and unsafe links
+00:01 +3: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: overview is always open; details start closed and toggle together or individually
+00:02 +4: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: search reveals matches without hiding overview; reset restores browsing
+00:02 +5: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: source failures are handled and correct URI is passed
+00:02 +6: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: changing cases resets expansion and search state
+00:02 +7: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: overview and expanded details fit Size(320.0, 568.0) at double text size
+00:02 +8: /home/user/workspace/luma-surgical-prep/test/surgical_case_layout_test.dart: overview and expanded details fit Size(820.0, 1180.0) at double text size
+00:02 +9: loading /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart
+00:03 +9: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: (setUpAll)
+00:03 +9: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: 351 unique adult/OB references are bundled and all remain release-deferred
+00:04 +10: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: case search matches titles, prefixes, aliases and clinical text
+00:04 +11: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: neuro groups retain canonical routes including endocrine overlap
+00:04 +12: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: neuro disease-specific pressure, rescue and device qualifiers persist
+00:04 +13: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: neuro groups open at width 390.0 and double text
+00:05 +14: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: neuro groups open at width 900.0 and double text
+00:05 +15: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: HPB grouping reuses GI and endocrine canonical references
+00:05 +16: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: HPB safety qualifiers distinguish INR, perfusion and urgent drainage
+00:05 +17: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: HPB groups and canonical overview fit narrow double-text view
+00:05 +18: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: gynecology groups preserve routes and keep postpartum hemorrhage in OB
+00:05 +19: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: gynecology clinical qualifiers remain explicit
+00:05 +20: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: gynecology groups open at width 390.0 and double text
+00:05 +21: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: gynecology groups open at width 900.0 and double text
+00:06 +22: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: abdominal and GI groups are complete, unique and reuse canonical routes
+00:06 +23: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: new abdominal and GI clinical qualifiers remain searchable and explicit
+00:06 +24: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: General & abdominal grouping and case opening fit narrow double-text view
+00:06 +25: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: GI endoscopy grouping and case opening fit narrow double-text view
+00:06 +26: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: EP groups cover every reference exactly once and retain clinical depth
+00:06 +27: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: EP safety distinctions are searchable and source-linked
+00:06 +28: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: EP groups and search work at width 320.0 with large text
+00:06 +29: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: EP groups and search work at width 820.0 with large text
+00:06 +30: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Endocrine cross-listing preserves canonical routes without duplicates
+00:06 +31: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Endocrine clinical qualifiers survive catalog generation
+00:06 +32: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: generator change uses asynchronous pacing and ICD magnet qualification
+00:06 +33: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: plastic skin graft harmonizes burn succinylcholine cautions
+00:06 +34: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: loop recorder does not prescribe universal magnet activation
+00:06 +35: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT cross-lists tracheostomy without moving or duplicating its route
+00:06 +36: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT tracheostomy shortcut opens the existing reference
+00:07 +37: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT expansion preserves adult airway safety distinctions
+00:07 +38: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT clinical terms resolve to their existing procedure routes
+00:07 +39: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: cardiothoracic expansion preserves scope and safety distinctions
+00:07 +40: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: colorectal expansion preserves distinct pathways and searchable details
+00:07 +41: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: dental references preserve adult scope and procedure-specific safeguards
+00:07 +42: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: manual safety corrections survive catalog generation
+00:07 +43: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: unsubscribed hub and direct detail show paywall, never case content
+00:07 +44: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: detail checks entitlement once, then shows bundled content
+00:07 +45: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: hub search opens case and Home returns to dashboard
+00:08 +46: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: unknown route gives useful recovery instead of empty reference
+00:08 +47: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Endocrine related case fits width 320.0 at double text
+00:08 +48: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT specialty and awake airway reference fit width 320.0 at double text
+00:08 +49: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: dental specialty and jaw reference fit width 320.0 at double text
+00:08 +50: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: colorectal specialty and detail fit width 320.0 at double text
+00:08 +51: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: cardiothoracic tiles and new detail fit width 320.0 at double text
+00:09 +52: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: specialty tiles fit width 320.0 with double text and searches reset
+00:09 +53: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Endocrine related case fits width 820.0 at double text
+00:09 +54: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: ENT specialty and awake airway reference fit width 820.0 at double text
+00:09 +55: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: dental specialty and jaw reference fit width 820.0 at double text
+00:09 +56: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: colorectal specialty and detail fit width 820.0 at double text
+00:09 +57: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: cardiothoracic tiles and new detail fit width 820.0 at double text
+00:10 +58: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: specialty tiles fit width 820.0 with double text and searches reset
+00:10 +59: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Bariatric content includes five cases and preserves clinical qualifiers
+00:10 +60: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: Burns has seven cases and clinically important searchable warnings
+00:10 +61: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: old combined burn URL opens Burns specialty and Home works
+00:10 +62: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: library reserves footer clearance for the floating shortcut
+00:10 +63: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: specialty opens case and unknown specialty can recover
+00:10 +64: /home/user/workspace/luma-surgical-prep/test/surgical_catalog_test.dart: (tearDownAll)
+00:10 +64: loading /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart
+00:11 +64: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: (setUpAll)
+00:11 +64: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: nineteen exact corrections preserve inventory, identities, draft and release gates
+00:11 +65: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: updated sections have unique identities and HTTPS sources
+00:11 +66: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: blood patch has qualified platelets, red flags and no mandatory imaging
+00:11 +67: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: labor epidural distinguishes LMWH regimens and links LAST rescue
+00:11 +68: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: cesarean timing and morphine monitoring are scoped not absolute
+00:11 +69: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: PPH TXA timing is from birth and bundle scope is not overstated
+00:11 +70: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: cardiac PAH and HM3 guidance stays lesion and device specific
+00:11 +71: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: HELLP interval not generalized and ERAS blocked verification remains visible
+00:11 +72: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: new clinical concepts are searchable
+00:12 +73: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: orthopedic additions preserve procedural and evidence boundaries
+00:12 +74: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: PAS timing discrepancy and cardiac uterotonic caveats remain explicit
+00:12 +75: /home/user/workspace/luma-surgical-prep/test/surgical_clinical_updates_test.dart: (tearDownAll)
+00:12 +75: loading /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart
+00:12 +75: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: (setUpAll)
+00:12 +75: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: all original inventory entries resolve, including the split burn route
+00:12 +76: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: six specialty groups contain every canonical entry and no duplicate tiles
+00:13 +77: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: new clinical distinctions and prior safety corrections remain searchable
+00:13 +78: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: NORA & procedures grouped list fits a small phone at double text
+00:13 +79: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: Ophthalmology grouped list fits a small phone at double text
+00:14 +80: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: Plastic & reconstructive grouped list fits a small phone at double text
+00:14 +81: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: Trauma grouped list fits a small phone at double text
+00:14 +82: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: Urology grouped list fits a small phone at double text
+00:14 +83: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: Vascular grouped list fits a small phone at double text
+00:14 +84: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: mri-under-anesthesia-adult remains gated and renders its overview when entitled
+00:14 +85: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: ophthalmic-block-safety remains gated and renders its overview when entitled
+00:14 +86: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: head-neck-free-flap-reconstruction remains gated and renders its overview when entitled
+00:14 +87: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: trauma-massive-hemorrhage remains gated and renders its overview when entitled
+00:14 +88: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: turp-transurethral-resection-of-the-prostate remains gated and renders its overview when entitled
+00:15 +89: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: thoracoabdominal-aortic-repair remains gated and renders its overview when entitled
+00:15 +90: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: all 350 JSON records retain populated cited details
+00:15 +91: /home/user/workspace/luma-surgical-prep/test/surgical_final_specialties_test.dart: (tearDownAll)
+00:15 +91: loading /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart
+00:15 +91: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: (setUpAll)
+00:16 +91: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: ten exact postimages preserve identities, draft and deferred routes
+00:16 +92: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: changed records have unique section identities and HTTPS references
+00:16 +93: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: bariatric recovery threshold is conditional and PONV is not a fixed regimen
+00:16 +94: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: RYGB NSAID risk is not negated by PPI prophylaxis
+00:16 +95: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: burn hemoglobin threshold has population and active-bleeding exceptions
+00:16 +96: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: burn TXA, cell salvage and timing retain evidence limits
+00:16 +97: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: escharotomy local analgesia and reassessment are explicit
+00:16 +98: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: ostomy review qualifies testing and escalates below-fascia necrosis
+00:16 +99: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: hemorrhoid preparation and antithrombotics preserve procedure distinctions
+00:16 +100: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: all 128 historical items preserve exact text, current evidence and nonapproval
+00:16 +101: /home/user/workspace/luma-surgical-prep/test/surgical_historical_review_test.dart: (tearDownAll)
+00:16 +101: All tests passed!

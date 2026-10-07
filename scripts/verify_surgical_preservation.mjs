@@ -15,10 +15,14 @@ const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
 // Verify exact recorded postimages, then validate inherited retention against archived
 // preimages. Do not put superseded clinical instructions back in the reader merely
 // to satisfy the historical preservation fixture.
-const ledgerPath=path.join(root,'docs/surgical-review-2026-10-07/correction-ledger.json');
+// Reverse chronological order preserves sequential correction history.
+const ledgerPaths=[
+ 'docs/surgical-historical-review-2026-10-07/correction-ledger.json',
+ 'docs/surgical-review-2026-10-07/correction-ledger.json',
+].map(p=>path.join(root,p));
 const verificationCases=structuredClone(cases);
 let corrected=0;
-if(fs.existsSync(ledgerPath)){
+for(const ledgerPath of ledgerPaths.filter(p=>fs.existsSync(p))){
  const ledger=JSON.parse(fs.readFileSync(ledgerPath));
  const seen=new Set();
  for(const row of ledger.records){

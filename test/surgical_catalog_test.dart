@@ -974,7 +974,15 @@ void main() {
       expect(colorectal.length, 7);
       for (final c in colorectal) {
         expect(c.overview.bullets.length, 4);
-        expect(c.sections.length, inInclusiveRange(12, 13));
+        if (c.id == 'hemorrhoidectomy') {
+          expect(c.sections.length, 14);
+          expect(
+            c.sections.any((s) => s.id == 'preparation-antithrombotics'),
+            true,
+          );
+        } else {
+          expect(c.sections.length, inInclusiveRange(12, 13));
+        }
       }
       String body(String id) =>
           cases[id]!.sections.expand((s) => s.bullets).join(' ');
