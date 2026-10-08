@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {GUEST,guestPayload,verifyGuestSession,verifyGuestIntent,requireFreshEmailProof,createGuest} from '../server/guest.mjs';
+import {GUEST,CATALOG_PREVIEW,guestPayload,verifyGuestSession,verifyGuestIntent,requireFreshEmailProof,createGuest} from '../server/guest.mjs';
 import {PRODUCTS,PROJECT,ORIGIN} from '../server/core.mjs';
 const id='11111111-1111-4111-8111-111111111111';
 const o={id,product_code:'legal',price_id:PRODUCTS.legal.price,amount:24999,created_at:new Date().toISOString()};
@@ -48,4 +48,18 @@ test('guest activation validates the token at Auth before trusting its AMR',asyn
   const r=await g.handle(new Request(`${PROJECT}/functions/v1/ce-stripe-live/guest-list`,{
     method:'POST',headers:{Origin:ORIGIN,Authorization:token(claims)},body:'{}'}));
   assert.equal(called,true);assert.notEqual(r.status,200);
+});
+test('immutable deployment can only inspect catalog, never start or claim a payment',async()=>{
+  const g=createGuest({enabled:true},{guestStore:{catalog:async()=>({enabled:true,products:[]})}});
+  const request=route=>new Request(`${PROJECT}/functions/v1/ce-stripe-live/${route}`,{
+    method:'POST',headers:{Origin:CATALOG_PREVIEW},body:'{}'});
+  const catalog=await g.handle(request('guest-catalog'));
+  assert.equal(catalog.status,200);
+  assert.equal(catalog.headers.get('Access-Control-Allow-Origin'),CATALOG_PREVIEW);
+  assert.equal((await catalog.json()).enabled,false);
+  for(const route of ['guest-checkout','guest-list','guest-claim'])
+    assert.equal((await g.handle(request(route))).status,403);
+  const another=await g.handle(new Request(`${PROJECT}/functions/v1/ce-stripe-live/guest-catalog`,{
+    method:'POST',headers:{Origin:'https://other--mellifluous-tartufo-a5c6b2.netlify.app'},body:'{}'}));
+  assert.equal(another.status,403);
 });

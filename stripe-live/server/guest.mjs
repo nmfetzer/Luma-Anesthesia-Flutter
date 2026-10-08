@@ -2,6 +2,9 @@
 import { PRODUCTS, ORIGIN, PROJECT, validatePrice } from './core.mjs';
 import { Fault, requireThat, safeCheckoutUrl } from '../../stripe-test/server/core.mjs';
 export const GUEST = 'ce-stripe-guest-v1';
+// Immutable, owner-supplied deployment. Catalog inspection only; no payment,
+// account lookup, claims, or arbitrary Netlify origins are authorized here.
+export const CATALOG_PREVIEW = 'https://6ac6f38d36c36480ba724497--mellifluous-tartufo-a5c6b2.netlify.app';
 const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 export function guestPayload(o) {
   return { mode: 'payment', 'payment_method_types[0]': 'card',
@@ -97,6 +100,14 @@ export function createGuest(config,deps) {
   }
   const handle=async request=>{
     try {
+      const previewRoute=new URL(request.url).pathname.split('/').at(-1);
+      if(request.headers.get('origin')===CATALOG_PREVIEW && previewRoute==='guest-catalog') {
+        const previewHeaders={...headers,'Access-Control-Allow-Origin':CATALOG_PREVIEW};
+        if(request.method==='OPTIONS')return new Response(null,{status:204,headers:previewHeaders});
+        requireThat(request.method==='POST','POST required.',405);
+        return new Response(JSON.stringify({live:true,...await deps.guestStore.catalog(),enabled:false}),
+          {status:200,headers:previewHeaders});
+      }
       requireThat(request.headers.get('origin')===ORIGIN,'Origin not allowed.',403);
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
       const route=new URL(request.url).pathname.split('/').at(-1);
