@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/medication_repository.dart';
 
 import '../launch/launch_scope.dart';
+import '../surgical_prep/surgical_review_config.dart';
 import 'home_background.dart';
 import 'home_tile.dart';
 import 'home_menu_drawer.dart';
@@ -95,6 +96,14 @@ const _tiles = [
     style: HomeTileStyle.parchment,
     route: '/regional-procedures',
   ),
+  if (SurgicalReviewConfig.enabled)
+    HomeTileData(
+      eyebrow: 'Internal clinical review',
+      titlePlain: 'Surgical',
+      titleAccent: 'Case Prep',
+      subtitle: 'Adult & OB drafts · Not for clinical use',
+      route: '/surgical-prep',
+    ),
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -216,6 +225,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   pair(7, 8),
                                   const SizedBox(height: 8),
                                   HomeTile(data: _tiles[9], wide: true),
+                                  if (SurgicalReviewConfig.enabled) ...[
+                                    const SizedBox(height: 8),
+                                    HomeTile(data: _tiles[10], wide: true),
+                                  ],
                                   const SizedBox(height: 8),
                                   HomeTile(data: _tiles[6], wide: true),
                                 ],
@@ -339,7 +352,7 @@ class _ComingSoonPanel extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         for (final entry in LaunchScope.deferred.entries)
-          if (entry.key != '/ekg')
+          if (entry.key != '/ekg' && LaunchScope.isDeferred(entry.key))
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(

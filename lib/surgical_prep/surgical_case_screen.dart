@@ -154,6 +154,26 @@ class _CaseReaderState extends State<_CaseReader> {
                     ),
                     const SizedBox(height: 8),
                     Text(reference.title, style: lumaDisplay(size: 28)),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Clinical review draft · Not for clinical use',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    if (reference.reviewNotice != null) ...[
+                      const SizedBox(height: 12),
+                      Semantics(
+                        container: true,
+                        child: Container(
+                          key: const ValueKey('surgical-review-notice'),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: LumaColors.haloGoldLight,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(reference.reviewNotice!),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(18),

@@ -130,6 +130,7 @@ class SurgicalCatalog {
           title: r['title'] as String,
           category: '${r['category']} · Clinical draft',
           aliases: List<String>.from(r['aliases'] as List),
+          reviewNotice: r['reviewNotice'] as String?,
           overview: section(Map<String, dynamic>.from(r['overview'] as Map)),
           sections: (r['sections'] as List)
               .map((e) => section(Map<String, dynamic>.from(e as Map)))

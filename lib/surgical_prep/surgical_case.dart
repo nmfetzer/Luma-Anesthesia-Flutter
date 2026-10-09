@@ -56,6 +56,7 @@ class SurgicalCaseReference {
     required this.overview,
     required List<SurgicalSection> sections,
     List<String> aliases = const [],
+    this.reviewNotice,
   }) : sections = List.unmodifiable(sections),
        aliases = List.unmodifiable(aliases) {
     if (id.trim().isEmpty ||
@@ -76,5 +77,6 @@ class SurgicalCaseReference {
   final SurgicalSection overview;
   final List<SurgicalSection> sections;
   final List<String> aliases;
+  final String? reviewNotice;
   String get route => '/surgical-prep/$id';
 }

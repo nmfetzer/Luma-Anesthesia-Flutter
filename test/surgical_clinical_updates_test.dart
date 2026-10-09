@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
 
+import 'support/surgical_correction_history.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late List<Map<String, dynamic>> records;
@@ -33,7 +35,14 @@ void main() {
     expect((ledger['records'] as List).length, 19);
     for (final dynamic row in ledger['records']) {
       final r = record(row['id'] as String);
-      expect(r, equals(row['after']));
+      expect(
+        r,
+        equals(
+          latestSurgicalPostimage(
+            Map<String, dynamic>.from(row['after'] as Map),
+          ),
+        ),
+      );
       expect(r['id'], row['before']['id']);
       expect(r['category'], row['before']['category']);
       expect(r['clinicalStatus'], 'draft');
@@ -123,14 +132,14 @@ void main() {
       contains('not a universal VA-ECMO target'),
     );
   });
-  test('HELLP interval not generalized and ERAS blocked verification remains visible', () {
+  test('HELLP interval not generalized and ERAS full-text reconciliation is recorded', () {
     expect(
       body('preeclampsia-severe-preeclampsia-anesthesia-management', 'preop'),
       contains('do not apply a six-hour rule indiscriminately'),
     );
     expect(
       body('gynecology-anesthesia-framework', 'eras-verification'),
-      contains('full text could not be verified'),
+      contains('prior full-text access hold is closed'),
     );
   });
   test('new clinical concepts are searchable', () {
