@@ -17,6 +17,7 @@ const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
 // to satisfy the historical preservation fixture.
 // Reverse chronological order preserves sequential correction history.
 const ledgerPaths=[
+ 'docs/surgical-testflight-2026-10-08/correction-ledger.json',
  'docs/surgical-historical-review-2026-10-07/correction-ledger.json',
  'docs/surgical-review-2026-10-07/correction-ledger.json',
 ].map(p=>path.join(root,p));

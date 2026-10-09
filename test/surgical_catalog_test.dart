@@ -384,7 +384,7 @@ void main() {
     expect(details('robotic-hysterectomy'), contains('TOF ratio at least 0.9'));
     expect(
       details('gynecologic-oncology-staging-laparotomy'),
-      contains('not accessible for verification'),
+      contains('reconciled against the 2026 full text'),
     );
   });
 

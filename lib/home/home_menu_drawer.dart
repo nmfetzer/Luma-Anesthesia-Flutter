@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../surgical_prep/surgical_review_config.dart';
+
 class HomeMenuDrawer extends StatelessWidget {
   const HomeMenuDrawer({super.key});
 
@@ -52,6 +54,12 @@ class HomeMenuDrawer extends StatelessWidget {
                   _sectionLabel('CLINICAL'),
                   _link(context, 'Practice Guidelines', '/practice-guidelines'),
                   _link(context, 'Diagnostics', '/diagnostics'),
+                  if (SurgicalReviewConfig.enabled)
+                    _link(
+                      context,
+                      'Surgical Case Prep · Review',
+                      '/surgical-prep',
+                    ),
                   _link(
                     context,
                     'Regional & Procedures',

@@ -1,0 +1,36 @@
+Resolving dependencies...
+Downloading packages...
+  app_links 7.2.1 (7.2.2 available)
+  app_links_linux 1.0.3 (1.0.4 available)
+  app_links_web 1.0.4 (1.0.5 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  equatable 2.1.0 (3.0.0 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  google_fonts 8.2.1 (9.0.0 available)
+  jni_flutter 1.0.3 (1.0.4+1 available)
+  lints 4.0.0 (6.1.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  purchases_flutter 10.13.2 (10.15.2 available)
+  qr 3.0.2 (4.0.0 available)
+  shared_preferences 2.5.5 (2.5.6 available)
+  test_api 0.7.12 (0.7.15 available)
+Got dependencies!
+14 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/user/workspace/luma-surgical-prep/test/surgical_testflight_review_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: only explicit build flag opens surgical review; other holds remain
+00:00 +1: nine recorded source updates preserve identities and draft status
+00:00 +2: ERAS full text replaces blocked status without hiding GLP-1 difference
+00:00 +3: oncology updates distinguish laparotomy, MIS and neuraxial timing
+00:00 +4: PAS is attributed, urgent exceptions retained, discrepancy not declared closed
+00:00 +5: specialist checks are not represented as signoff
+00:00 +6: new content is indexed and all review notices reach model
+00:00 +7: real main routes open only compile-time review without access bypass
+00:00 +8: review flag never grants unpaid access to catalog
+00:01 +9: review flag never grants unpaid access to placenta-accreta-spectrum-pas-cesarean-hysterectomy
+00:01 +10: review flag never grants unpaid access to specialty/obstetric
+00:01 +11: home and drawer discoverability follows review flag on small phone
+00:01 +12: case warning visible above overview, including at large text
+00:01 +13: (tearDownAll)
+00:01 +13: All tests passed!
