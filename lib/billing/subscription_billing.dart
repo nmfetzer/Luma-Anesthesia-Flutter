@@ -128,7 +128,7 @@ class SubscriptionBilling extends ChangeNotifier {
       if (!_sameUser(version, user)) return;
       message = ceStatus!.owned.contains(id)
           ? 'Your CE purchase is verified. Return to your course to continue.'
-          : 'Apple completed checkout. Course verification is pending. '
+          : 'The store completed checkout. Course verification is pending. '
                 'Use Refresh CE access; do not purchase again.';
     });
   }

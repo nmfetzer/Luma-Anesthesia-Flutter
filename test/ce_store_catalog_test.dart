@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:luma_anesthesia/billing/ce_billing.dart';
@@ -34,6 +35,7 @@ void main() {
     () async {
       List<String>? requested;
       final catalog = CeStoreCatalog(
+        platform: TargetPlatform.iOS,
         loadOfferings: () async => offering([CeProduct.medication]),
         loadProducts: (ids) async {
           requested = ids;
@@ -59,6 +61,7 @@ void main() {
 
   test('complete offering needs no extra store lookup', () async {
     final catalog = CeStoreCatalog(
+      platform: TargetPlatform.iOS,
       loadOfferings: () async =>
           offering(CeProduct.all.map((p) => p.id).toList()),
       loadProducts: (_) => throw StateError('must not be called'),
@@ -71,6 +74,7 @@ void main() {
     'offering error still permits explicit existing-product lookup',
     () async {
       final catalog = CeStoreCatalog(
+        platform: TargetPlatform.iOS,
         loadOfferings: () async =>
             throw StateError('simulated offering failure'),
         loadProducts: (ids) async => ids.map(product).toList(),
@@ -85,6 +89,7 @@ void main() {
     'unreturned products stay disabled and are identified without secrets',
     () async {
       final catalog = CeStoreCatalog(
+        platform: TargetPlatform.iOS,
         loadOfferings: () async => offering([CeProduct.medication]),
         loadProducts: (_) async => [],
       );
@@ -98,6 +103,7 @@ void main() {
     'direct lookup failure retains Course 1 and never fabricates prices',
     () async {
       final catalog = CeStoreCatalog(
+        platform: TargetPlatform.iOS,
         loadOfferings: () async => offering([CeProduct.medication]),
         loadProducts: (_) async => throw StateError('private diagnostic'),
       );
@@ -111,6 +117,7 @@ void main() {
     'unknown IDs and subscription-shaped products cannot become CE purchases',
     () async {
       final catalog = CeStoreCatalog(
+        platform: TargetPlatform.iOS,
         loadOfferings: () async => const Offerings({}),
         loadProducts: (_) async => [
           product('unrelated-product'),
@@ -127,6 +134,7 @@ void main() {
   test('retry replaces missing results and clears old diagnostics', () async {
     var complete = false;
     final catalog = CeStoreCatalog(
+      platform: TargetPlatform.iOS,
       loadOfferings: () async => offering([CeProduct.medication]),
       loadProducts: (ids) async => complete ? ids.map(product).toList() : [],
     );
@@ -134,5 +142,50 @@ void main() {
     complete = true;
     expect(await catalog.load(), hasLength(4));
     expect(catalog.diagnostic, isEmpty);
+  });
+
+  test('android fetches lowercase Play ids but exposes canonical ids', () async {
+    List<String>? requested;
+    final catalog = CeStoreCatalog(
+      platform: TargetPlatform.android,
+      loadOfferings: () async => const Offerings({}),
+      loadProducts: (ids) async {
+        requested = ids;
+        return ids.map(product).toList();
+      },
+    );
+    final loaded = await catalog.load();
+    // The store is queried with the all-lowercase Play ids.
+    expect(requested, [
+      'medication_review_for_the_experienced_crna',
+      'uncommon_anesthesia_events',
+      'legal_essentials_crna',
+      '3_course_bundle_pack',
+    ]);
+    // ...but the app sees the canonical (Apple) ids throughout.
+    expect(loaded.map((p) => p.id), CeProduct.all.map((p) => p.id));
+    // Purchase params resolve by canonical id to the lowercase store product.
+    expect(
+      catalog.purchaseParams(CeProduct.legal)!.product!.identifier,
+      'legal_essentials_crna',
+    );
+  });
+
+  test('CeProduct maps canonical ids to Play ids and back', () {
+    // Capitalized Apple ids become all-lowercase on Android.
+    expect(
+      CeProduct.storeId(CeProduct.legal, TargetPlatform.android),
+      'legal_essentials_crna',
+    );
+    expect(CeProduct.storeId(CeProduct.legal, TargetPlatform.iOS), CeProduct.legal);
+    // Already-lowercase ids are identical on both stores.
+    expect(
+      CeProduct.storeId(CeProduct.uncommon, TargetPlatform.android),
+      CeProduct.uncommon,
+    );
+    // Any store id maps back to its canonical id; unknown ids return null.
+    expect(CeProduct.canonicalFor('legal_essentials_crna'), CeProduct.legal);
+    expect(CeProduct.canonicalFor(CeProduct.legal), CeProduct.legal);
+    expect(CeProduct.canonicalFor('not_a_course'), isNull);
   });
 }

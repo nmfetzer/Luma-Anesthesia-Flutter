@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'ce_billing.dart';
@@ -6,13 +7,16 @@ import 'ce_billing.dart';
 /// Only existing, allowlisted, one-time store products may reach checkout.
 class CeStoreCatalog {
   CeStoreCatalog({
+    required this.platform,
     Future<Offerings> Function()? loadOfferings,
     Future<List<StoreProduct>> Function(List<String>)? loadProducts,
   }) : _loadOfferings = loadOfferings ?? Purchases.getOfferings,
        _loadProducts = loadProducts ?? _fetchProducts;
 
+  final TargetPlatform platform;
   final Future<Offerings> Function() _loadOfferings;
   final Future<List<StoreProduct>> Function(List<String>) _loadProducts;
+  // Keyed by canonical CE id; Play store ids are mapped back to canonical.
   final Map<String, Package> packages = {};
   final Map<String, StoreProduct> products = {};
   String diagnostic = '';
@@ -26,7 +30,7 @@ class CeStoreCatalog {
       );
 
   bool _accepts(StoreProduct product) =>
-      CeProduct.accepts(product.identifier) &&
+      CeProduct.canonicalFor(product.identifier) != null &&
       product.subscriptionPeriod == null &&
       product.productCategory != ProductCategory.subscription;
 
@@ -41,8 +45,9 @@ class CeStoreCatalog {
       for (final package in offering?.availablePackages ?? <Package>[]) {
         final product = package.storeProduct;
         if (!_accepts(product)) continue;
-        packages.putIfAbsent(product.identifier, () => package);
-        products.putIfAbsent(product.identifier, () => product);
+        final canonical = CeProduct.canonicalFor(product.identifier)!;
+        packages.putIfAbsent(canonical, () => package);
+        products.putIfAbsent(canonical, () => product);
       }
     } catch (_) {
       notes.add('CE offering lookup could not complete.');
@@ -54,10 +59,16 @@ class CeStoreCatalog {
     ];
     if (missing.isNotEmpty) {
       try {
-        final direct = await _loadProducts(missing).timeout(_timeout);
+        final storeIds = [
+          for (final id in missing) CeProduct.storeId(id, platform),
+        ];
+        final direct = await _loadProducts(storeIds).timeout(_timeout);
         for (final product in direct) {
-          if (missing.contains(product.identifier) && _accepts(product)) {
-            products[product.identifier] = product;
+          final canonical = CeProduct.canonicalFor(product.identifier);
+          if (canonical != null &&
+              missing.contains(canonical) &&
+              _accepts(product)) {
+            products[canonical] = product;
           }
         }
       } catch (_) {
@@ -79,7 +90,7 @@ class CeStoreCatalog {
     return [
       for (final item in CeProduct.all)
         if (products[item.id] case final product?)
-          CeStoreProduct(product.identifier, product.priceString),
+          CeStoreProduct(item.id, product.priceString),
     ];
   }
 

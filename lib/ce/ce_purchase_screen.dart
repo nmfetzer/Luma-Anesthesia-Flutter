@@ -334,7 +334,7 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              'Design preview. Complete purchases in the iOS app; '
+              'Design preview. Complete purchases in the mobile app; '
               'no payment is taken here.',
               textAlign: TextAlign.center,
               style: body(12),
@@ -439,7 +439,7 @@ class _CePurchaseScreenState extends State<CePurchaseScreen> {
     }
     if (billing.ceAwaitingVerification(id)) return 'Verifying purchase';
     if (billing.busy) return 'Loading…';
-    if (!billing.ceAvailable) return 'Available in the iOS app';
+    if (!billing.ceAvailable) return 'Available in the mobile app';
     if (!billing.signedIn) return 'Sign in to purchase';
     if (!billing.ceReady) return 'Unable to check purchase access';
     if (billing.ceStatus?.enabled.contains(id) != true) {

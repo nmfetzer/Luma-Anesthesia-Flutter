@@ -24,6 +24,7 @@ class RevenueCatConfig {
   );
   static const googleKey = String.fromEnvironment(
     'REVENUECAT_GOOGLE_PUBLIC_KEY',
+    defaultValue: 'goog_VxNkXWKRuOOTngYLibZXwbOVomy',
   );
   static const entitlement = 'Luma Anesthesia App Pro';
   static const offering = 'default';
@@ -108,13 +109,19 @@ class RevenueCatGateway
   final String key;
   final TargetPlatform platform;
   final Map<String, Package> _packages = {};
-  final _ceCatalog = CeStoreCatalog();
+  late final _ceCatalog = CeStoreCatalog(platform: platform);
   @override
   String get ceStoreDiagnostic => _ceCatalog.diagnostic;
   @override
-  bool get ceSupported =>
-      (RevenueCatConfig.ceEnabled || RevenueCatConfig.appleReview) &&
-      platform == TargetPlatform.iOS;
+  bool get ceSupported {
+    if (platform == TargetPlatform.iOS) {
+      return RevenueCatConfig.ceEnabled || RevenueCatConfig.appleReview;
+    }
+    if (platform == TargetPlatform.android) {
+      return RevenueCatConfig.ceEnabled;
+    }
+    return false;
+  }
 
   Future<bool> _subscriptionCheckoutAllowed(String expectedUser) async {
     final raw = await client.rpc('luma_billing_policy');
@@ -156,15 +163,16 @@ class RevenueCatGateway
         throw StateError('Invalid CE product');
       }
       final id = item['product_id'] as String;
-      if (!CeProduct.accepts(id)) continue;
+      final canonical = CeProduct.canonicalFor(id);
+      if (canonical == null) continue;
       if (ceSupported &&
           (raw['apple_review'] == true
               ? RevenueCatConfig.appleReview
               : RevenueCatConfig.ceEnabled) &&
           item['enabled'] == true) {
-        enabled.add(id);
+        enabled.add(canonical);
       }
-      if (item['owned'] == true) owned.add(id);
+      if (item['owned'] == true) owned.add(canonical);
     }
     return CePurchaseStatus(
       userId: expectedUser,
@@ -195,11 +203,12 @@ class RevenueCatGateway
     if (expected != userId) {
       throw const BillingFailure('Your account changed. Refresh CE access.');
     }
+    final storeId = CeProduct.storeId(product.id, platform);
     if (info.nonSubscriptionTransactions.any(
-      (t) => t.productIdentifier == product.id,
+      (t) => t.productIdentifier == storeId,
     )) {
       throw const BillingFailure(
-        'Apple already reports this purchase. Use Restore CE purchases or '
+        'The store already reports this purchase. Use Restore CE purchases or '
         'Refresh CE access. If access remains unavailable, contact info@cehalo.com.',
       );
     }

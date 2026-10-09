@@ -58,6 +58,8 @@ void main() {
     expect(RevenueCatConfig.ceEnabled, false);
     expect(RevenueCatConfig.appleKey.startsWith('appl_'), true);
     expect(RevenueCatConfig.appleKey.startsWith('sk_'), false);
+    expect(RevenueCatConfig.googleKey.startsWith('goog_'), true);
+    expect(RevenueCatConfig.googleKey.startsWith('sk_'), false);
     expect(c.canPurchase, false);
     expect(c.plan(SubscriptionTerm.annual), null);
   });
