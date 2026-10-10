@@ -70,7 +70,38 @@ void main() {
       }
       expect(shown, contains('Before release, discuss staged reperfusion'));
       expect(shown, contains('before release/completion'));
-      expect(shown, contains('signoff has not been recorded'));
+      for (final internal in [
+        'signoff has not been recorded',
+        'does not constitute independent',
+        'is not specialist approval',
+      ]) {
+        expect(shown, isNot(contains(internal)), reason: internal);
+      }
+      for (final c in cases.values) {
+        for (final s in [c.overview, ...c.sections]) {
+          expect(s.title, isNot(contains('pending specialist')));
+          expect(s.title, isNot(contains('review status')));
+        }
+        final n = c.reviewNotice ?? '';
+        for (final internal in [
+          'signoff pending',
+          'needs clinician review',
+          'Final clinician review',
+        ]) {
+          expect(n, isNot(contains(internal)), reason: c.id);
+        }
+      }
+      expect(cases.values.where((c) => c.reviewNotice != null), hasLength(9));
+      expect(
+        cases['placenta-accreta-spectrum-pas-cesarean-hysterectomy']!
+            .reviewNotice,
+        contains('Do not use this reference alone to schedule delivery'),
+      );
+      expect(shown, contains('Do not average'));
+      expect(
+        shown.toLowerCase(),
+        contains('device/lesion-specific management'),
+      );
       expect(
         publicSurgicalText(
           'Adult clinical review draft, not a patient-specific order set.',

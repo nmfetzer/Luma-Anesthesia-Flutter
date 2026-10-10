@@ -113,7 +113,7 @@ class SurgicalCatalog {
     final records = jsonDecode(text) as List<dynamic>;
     SurgicalSection section(Map<String, dynamic> s) => SurgicalSection(
       id: s['id'] as String,
-      title: s['title'] as String,
+      title: publicSurgicalTitle(s['title'] as String),
       bullets: publicSurgicalBullets(List<String>.from(s['bullets'] as List)),
       sources: (s['sources'] as List)
           .map(
@@ -131,7 +131,10 @@ class SurgicalCatalog {
           title: r['title'] as String,
           category: r['category'] as String,
           aliases: List<String>.from(r['aliases'] as List),
-          reviewNotice: r['reviewNotice'] as String?,
+          reviewNotice: publicSurgicalNotice(
+            r['id'] as String,
+            r['reviewNotice'] as String?,
+          ),
           overview: section(Map<String, dynamic>.from(r['overview'] as Map)),
           sections: (r['sections'] as List)
               .map((e) => section(Map<String, dynamic>.from(e as Map)))
