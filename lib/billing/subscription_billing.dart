@@ -5,10 +5,23 @@ import 'ce_billing.dart';
 enum SubscriptionTerm { monthly, annual }
 
 class BillingPlan {
-  const BillingPlan(this.term, this.productId, this.price);
+  const BillingPlan(this.term, this.productId, this.price, {this.freeTrial});
   final SubscriptionTerm term;
   final String productId;
   final String price;
+
+  /// Store-reported free trial length, e.g. '2-week'. Null when the store
+  /// reports no free trial or this customer is not eligible for it.
+  final String? freeTrial;
+}
+
+/// '2-week', '14-day', '1-month' from a store introductory period.
+String? freeTrialLength(int units, String unit) {
+  if (units <= 0) return null;
+  return switch (unit) {
+    'day' || 'week' || 'month' || 'year' => '$units-$unit',
+    _ => null,
+  };
 }
 
 class BillingFailure implements Exception {

@@ -286,9 +286,45 @@ class RevenueCatGateway
         continue;
       }
       _packages[product.identifier] = package;
-      result.add(BillingPlan(term, product.identifier, product.priceString));
+      result.add(
+        BillingPlan(
+          term,
+          product.identifier,
+          product.priceString,
+          freeTrial: await _freeTrial(product),
+        ),
+      );
     }
     return result;
+  }
+
+  /// Paywall disclosure (Guideline 3.1.2): report a free trial only when the
+  /// store offers one and the customer is not known to be ineligible.
+  Future<String?> _freeTrial(StoreProduct product) async {
+    final intro = product.introductoryPrice;
+    if (intro == null || intro.price != 0) return null;
+    final length = freeTrialLength(
+      intro.periodNumberOfUnits * (intro.cycles < 1 ? 1 : intro.cycles),
+      intro.periodUnit.name,
+    );
+    if (length == null) return null;
+    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+      try {
+        final status =
+            (await Purchases.checkTrialOrIntroductoryPriceEligibility([
+              product.identifier,
+            ]))[product.identifier]?.status;
+        if (status == IntroEligibilityStatus.introEligibilityStatusIneligible ||
+            status ==
+                IntroEligibilityStatus
+                    .introEligibilityStatusNoIntroOfferExists) {
+          return null;
+        }
+      } catch (_) {
+        // Unknown eligibility: keep the store-reported trial disclosed.
+      }
+    }
+    return length;
   }
 
   @override

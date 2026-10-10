@@ -6,6 +6,23 @@ import 'package:luma_anesthesia/billing/subscription_billing.dart';
 
 import 'subscription_billing_test.dart' show FakeStore, GuestStore;
 
+class TrialStore extends FakeStore {
+  @override
+  Future<List<BillingPlan>> plans() async => const [
+    BillingPlan(
+      SubscriptionTerm.monthly,
+      'Luma_Anesthesia_App_Monthly',
+      r'$9.99',
+      freeTrial: '2-week',
+    ),
+    BillingPlan(
+      SubscriptionTerm.annual,
+      'Luma_Anesthesia_Yearly_Pro',
+      r'$69.99',
+    ),
+  ];
+}
+
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
@@ -236,6 +253,75 @@ void main() {
     expect(store.guestStarts, 1);
     expect(store.purchases, 1);
     expect(find.text('Account destination'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('paywall discloses the free trial and the charge after it', (
+    tester,
+  ) async {
+    final billing = SubscriptionBilling(gateway: TrialStore());
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(disableAnimations: true),
+          child: child!,
+        ),
+        home: SubscriptionScreen(billing: billing),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('2-week free trial'), findsOneWidget);
+    await tester.ensureVisible(find.text('Monthly'));
+    await tester.tap(find.text('Monthly'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining(
+        r'2-week free trial for eligible new subscribers, then $9.99 per month until canceled',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('before the trial ends'), findsOneWidget);
+    await tester.ensureVisible(find.text('Yearly'));
+    await tester.tap(find.text('Yearly'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining(r'Billed $69.99 per year.'), findsOneWidget);
+    expect(find.textContaining('free trial for eligible'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('free trial length formats store periods', () {
+    expect(freeTrialLength(2, 'week'), '2-week');
+    expect(freeTrialLength(14, 'day'), '14-day');
+    expect(freeTrialLength(0, 'week'), isNull);
+    expect(freeTrialLength(1, 'unknown'), isNull);
+  });
+
+  testWidgets('trial wording fits a small phone at double text size', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final billing = SubscriptionBilling(gateway: TrialStore());
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            disableAnimations: true,
+            textScaler: const TextScaler.linear(2),
+          ),
+          child: child!,
+        ),
+        home: SubscriptionScreen(billing: billing),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Monthly'));
+    await tester.tap(find.text('Monthly'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.textContaining('before the trial ends'));
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 }
