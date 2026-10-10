@@ -46,10 +46,7 @@ void main() {
           expect(cases.containsKey(id), true, reason: '$id');
         }
       }
-      expect(
-        cases.values.where((c) => c.category.startsWith('Obstetric ·')).length,
-        9,
-      );
+      expect(cases.values.where((c) => c.category == 'Obstetric').length, 9);
     },
   );
 
@@ -68,7 +65,7 @@ void main() {
         );
         for (final id in listed) {
           expect(cases.containsKey(id), true);
-          expect(LaunchScope.isDeferred('/surgical-prep/$id'), true);
+          expect(LaunchScope.isDeferred('/surgical-prep/$id'), false);
         }
       }
       expect(

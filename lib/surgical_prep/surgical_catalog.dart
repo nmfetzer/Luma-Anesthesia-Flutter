@@ -8,6 +8,7 @@ import 'surgical_case.dart';
 import 'abdominal_gi_groups.dart';
 import 'hpb_groups.dart';
 import 'final_specialty_groups.dart';
+import 'surgical_public_text.dart';
 import 'drafts/laparoscopic_cholecystectomy.dart';
 
 part 'surgical_index.dart';
@@ -113,7 +114,7 @@ class SurgicalCatalog {
     SurgicalSection section(Map<String, dynamic> s) => SurgicalSection(
       id: s['id'] as String,
       title: s['title'] as String,
-      bullets: List<String>.from(s['bullets'] as List),
+      bullets: publicSurgicalBullets(List<String>.from(s['bullets'] as List)),
       sources: (s['sources'] as List)
           .map(
             (e) => SurgicalSource(
@@ -128,7 +129,7 @@ class SurgicalCatalog {
         r['id'] as String: SurgicalCaseReference(
           id: r['id'] as String,
           title: r['title'] as String,
-          category: '${r['category']} · Clinical draft',
+          category: r['category'] as String,
           aliases: List<String>.from(r['aliases'] as List),
           reviewNotice: r['reviewNotice'] as String?,
           overview: section(Map<String, dynamic>.from(r['overview'] as Map)),

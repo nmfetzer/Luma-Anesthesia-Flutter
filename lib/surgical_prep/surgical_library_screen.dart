@@ -417,7 +417,7 @@ class _SurgicalLibraryScreenState extends State<SurgicalLibraryScreen> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'Clinical review drafts · Not yet approved for release',
+                          'Educational reference · Use with clinical judgment',
                           style: TextStyle(color: LumaColors.inkMuted),
                         ),
                         const SizedBox(height: 18),

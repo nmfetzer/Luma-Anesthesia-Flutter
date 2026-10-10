@@ -9,8 +9,7 @@ import 'package:luma_anesthesia/home/home_screen.dart';
 import 'package:luma_anesthesia/home/home_tile.dart';
 import 'package:luma_anesthesia/home/home_menu_drawer.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
-import 'package:luma_anesthesia/launch/deferred_section_screen.dart';
-import 'package:luma_anesthesia/surgical_prep/surgical_review_config.dart';
+import 'package:luma_anesthesia/surgical_prep/surgical_public_text.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_catalog.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_library_screen.dart';
 import 'package:luma_anesthesia/surgical_prep/surgical_case_screen.dart';
@@ -19,7 +18,6 @@ import 'package:luma_anesthesia/theme/luma_theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const review = SurgicalReviewConfig.enabled;
   const pas = 'placenta-accreta-spectrum-pas-cesarean-hysterectomy';
   const gyn = 'gynecology-anesthesia-framework';
   const cardiac = 'high-risk-obstetric-anesthesia-cardiac-disease-in-pregnancy';
@@ -36,23 +34,55 @@ void main() {
           .join(' ');
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
+  test('surgical case prep is public; other deferred sections stay closed', () {
+    expect(LaunchScope.isDeferred('/surgical-prep'), false);
+    expect(LaunchScope.isDeferred('/surgical-prep/specialty/obstetric'), false);
+    for (final path in ['/luma-ai', '/ekg', '/luma-academy']) {
+      expect(LaunchScope.isDeferred(path), true);
+    }
+    expect(
+      File('scripts/build_surgical_testflight_review.sh').existsSync(),
+      false,
+    );
+  });
   test(
-    'only explicit build flag opens surgical review; other holds remain',
-    () {
-      expect(LaunchScope.isDeferred('/surgical-prep'), !review);
-      expect(
-        LaunchScope.isDeferred('/surgical-prep/specialty/obstetric'),
-        !review,
-      );
-      for (final path in ['/luma-ai', '/ekg', '/luma-academy']) {
-        expect(LaunchScope.isDeferred(path), true);
+    'public text drops draft status wording and keeps clinical release',
+    () async {
+      final cases = await SurgicalCatalog.load();
+      final shown = [
+        for (final c in cases.values) ...[
+          c.category,
+          for (final s in [c.overview, ...c.sections]) ...s.bullets,
+        ],
+      ].join(' ');
+      for (final internal in [
+        'review draft',
+        'clinical-review draft',
+        'Clinical draft',
+        'owner review',
+        'available for review only',
+        'review before release',
+        'review is required before release',
+        'essential before release',
+        'authorize release',
+      ]) {
+        expect(shown, isNot(contains(internal)), reason: internal);
       }
-      final script = File('scripts/build_surgical_testflight_review.sh')
-          .readAsStringSync();
-      expect(script, contains('--dart-define=LUMA_SURGICAL_REVIEW=true'));
-      expect(script, contains('No upload performed'));
-      final normal = File('scripts/build_apple_release.sh').readAsStringSync();
-      expect(normal, isNot(contains('LUMA_SURGICAL_REVIEW=true')));
+      expect(shown, contains('Before release, discuss staged reperfusion'));
+      expect(shown, contains('before release/completion'));
+      expect(shown, contains('signoff has not been recorded'));
+      expect(
+        publicSurgicalText(
+          'Adult clinical review draft, not a patient-specific order set.',
+        ),
+        'Adult clinical reference, not a patient-specific order set.',
+      );
+      expect(
+        publicSurgicalBullets([
+          'This remains a clinical-review draft. Evidence reconciliation, software testing and source integration do not establish independent clinician approval or authorize release.',
+        ]),
+        isEmpty,
+      );
     },
   );
   test('nine recorded source updates preserve identities and draft status', () {
@@ -140,7 +170,7 @@ void main() {
     expect(searchSurgicalCases('Caprini').map((r) => r.id), contains(gyn));
   });
   testWidgets(
-    'real main routes open only compile-time review without access bypass',
+    'real main routes open surgical prep with the real access check',
     (tester) async {
       await tester.pumpWidget(const LumaApp());
       await tester.pump(const Duration(milliseconds: 500));
@@ -157,13 +187,9 @@ void main() {
           RouteSettings(name: path),
         ) as MaterialPageRoute;
         final screen = route.builder(context);
-        if (review) {
-          expect(screen, isA<SurgicalPrepFeature>());
-          expect((screen as SurgicalPrepFeature).checkAccess, isNull);
-          expect(screen.accessChanges, isNull);
-        } else {
-          expect(screen, isA<DeferredSectionScreen>());
-        }
+        expect(screen, isA<SurgicalPrepFeature>());
+        expect((screen as SurgicalPrepFeature).checkAccess, isNull);
+        expect(screen.accessChanges, isNull);
       }
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
@@ -171,7 +197,7 @@ void main() {
   );
   for (final id in [null, pas, 'specialty/obstetric']) {
     testWidgets(
-      'review flag never grants unpaid access to ${id ?? 'catalog'}',
+      'public release never grants unpaid access to ${id ?? 'catalog'}',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -194,47 +220,41 @@ void main() {
       },
     );
   }
-  testWidgets(
-    'home and drawer discoverability follows review flag on small phone',
-    (tester) async {
-      tester.view.physicalSize = const Size(320, 568);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(
-        MaterialApp(
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(2),
-              disableAnimations: true,
-            ),
-            child: child!,
+  testWidgets('home and drawer show surgical case prep on small phone', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(2),
+            disableAnimations: true,
           ),
-          home: const HomeScreen(),
+          child: child!,
         ),
-      );
-      await tester.pumpAndSettle();
-      final tile = find.byWidgetPredicate(
-        (w) => w is HomeTile && w.data.route == '/surgical-prep',
-      );
-      expect(tile, review ? findsOneWidget : findsNothing);
-      if (review) {
-        await tester.ensureVisible(tile);
-        await tester.pumpAndSettle();
-        expect(tile.hitTestable(), findsOneWidget);
-      }
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: HomeMenuDrawer())),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        find.text('Surgical Case Prep · Review'),
-        review ? findsOneWidget : findsNothing,
-      );
-      await tester.pumpWidget(const SizedBox());
-    },
-  );
+        home: const HomeScreen(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final tile = find.byWidgetPredicate(
+      (w) => w is HomeTile && w.data.route == '/surgical-prep',
+    );
+    expect(tile, findsOneWidget);
+    await tester.ensureVisible(tile);
+    await tester.pumpAndSettle();
+    expect(tile.hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: HomeMenuDrawer())),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Surgical Case Prep'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
   testWidgets('case warning visible above overview, including at large text', (
     tester,
   ) async {
