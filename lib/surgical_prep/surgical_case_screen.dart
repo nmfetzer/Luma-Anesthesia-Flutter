@@ -156,7 +156,7 @@ class _CaseReaderState extends State<_CaseReader> {
                     Text(reference.title, style: lumaDisplay(size: 28)),
                     const SizedBox(height: 12),
                     const Text(
-                      'Clinical review draft · Not for clinical use',
+                      'Educational reference · Use with clinical judgment',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     if (reference.reviewNotice != null) ...[

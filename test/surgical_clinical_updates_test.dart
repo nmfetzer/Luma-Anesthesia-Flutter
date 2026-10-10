@@ -29,7 +29,7 @@ void main() {
     ) as Map<String, dynamic>;
     await SurgicalCatalog.load();
   });
-  test('nineteen exact corrections preserve inventory, identities, draft and release gates', () {
+  test('nineteen exact corrections preserve inventory, identities, draft data and public routes', () {
     expect(records.length, 350);
     expect(records.map((r) => r['id']).toSet().length, 350);
     expect((ledger['records'] as List).length, 19);
@@ -46,7 +46,7 @@ void main() {
       expect(r['id'], row['before']['id']);
       expect(r['category'], row['before']['category']);
       expect(r['clinicalStatus'], 'draft');
-      expect(LaunchScope.isDeferred('/surgical-prep/${r['id']}'), true);
+      expect(LaunchScope.isDeferred('/surgical-prep/${r['id']}'), false);
     }
     expect(records.where((r) => r['category'] == 'Obstetric').length, 9);
   });

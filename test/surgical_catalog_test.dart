@@ -57,40 +57,43 @@ void main() {
   setUpAll(() async {
     await SurgicalCatalog.load();
   });
-  test('351 unique adult/OB references are bundled and all remain release-deferred', () async {
-    final raw = jsonDecode(
-      await rootBundle.loadString('assets/data/surgical_cases.json'),
-    ) as List;
-    final cases = await SurgicalCatalog.load();
-    expect(raw.length, 350);
-    expect(cases.length, 351);
-    expect(surgicalIndex.length, cases.length);
-    expect(surgicalIndex.map((r) => r.id).toSet().length, 351);
-    expect(surgicalCategories.length, 23); // 22 categories and All.
-    for (final item in surgicalIndex) {
-      expect(cases.containsKey(item.id), true, reason: item.title);
-      expect(LaunchScope.isDeferred(item.route), true);
-      expect(item.title.toLowerCase(), isNot(contains('pediatric')));
-      expect(item.aliases.toLowerCase(), isNot(contains('pediatric')));
-      final c = cases[item.id]!;
-      expect(
-        c.overview.bullets.length,
-        inInclusiveRange(3, 5),
-        reason: c.title,
-      );
-      expect(c.sections.length, greaterThanOrEqualTo(10));
-      for (final section in [c.overview, ...c.sections]) {
-        expect(section.bullets, isNotEmpty);
-        expect(section.sources, isNotEmpty);
-        for (final source in section.sources) {
-          final uri = Uri.parse(source.url);
-          expect(uri.scheme, 'https');
-          expect(uri.host, isNotEmpty);
+  test(
+    '351 unique adult/OB references are bundled and all are publicly routed',
+    () async {
+      final raw = jsonDecode(
+        await rootBundle.loadString('assets/data/surgical_cases.json'),
+      ) as List;
+      final cases = await SurgicalCatalog.load();
+      expect(raw.length, 350);
+      expect(cases.length, 351);
+      expect(surgicalIndex.length, cases.length);
+      expect(surgicalIndex.map((r) => r.id).toSet().length, 351);
+      expect(surgicalCategories.length, 23); // 22 categories and All.
+      for (final item in surgicalIndex) {
+        expect(cases.containsKey(item.id), true, reason: item.title);
+        expect(LaunchScope.isDeferred(item.route), false);
+        expect(item.title.toLowerCase(), isNot(contains('pediatric')));
+        expect(item.aliases.toLowerCase(), isNot(contains('pediatric')));
+        final c = cases[item.id]!;
+        expect(
+          c.overview.bullets.length,
+          inInclusiveRange(3, 5),
+          reason: c.title,
+        );
+        expect(c.sections.length, greaterThanOrEqualTo(10));
+        for (final section in [c.overview, ...c.sections]) {
+          expect(section.bullets, isNotEmpty);
+          expect(section.sources, isNotEmpty);
+          for (final source in section.sources) {
+            final uri = Uri.parse(source.url);
+            expect(uri.scheme, 'https');
+            expect(uri.host, isNotEmpty);
+          }
         }
       }
-    }
-    expect(identical(cases, await SurgicalCatalog.load()), true);
-  });
+      expect(identical(cases, await SurgicalCatalog.load()), true);
+    },
+  );
 
   test('case search matches titles, prefixes, aliases and clinical text', () {
     expect(
@@ -798,7 +801,7 @@ void main() {
     () async {
       const id = 'tracheostomy-placement';
       final cases = await SurgicalCatalog.load();
-      expect(cases[id]!.category, 'General & abdominal · Clinical draft');
+      expect(cases[id]!.category, 'General & abdominal');
       expect(
         surgicalIndex.singleWhere((c) => c.id == id).category,
         'General & abdominal',

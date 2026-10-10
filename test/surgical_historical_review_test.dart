@@ -32,7 +32,7 @@ void main() {
   setUpAll(() async => SurgicalCatalog.load());
 
   test(
-    'ten exact postimages preserve identities, draft and deferred routes',
+    'ten exact postimages preserve identities, draft data and public routes',
     () {
       expect(records.length, 350);
       expect((ledger['records'] as List).length, 10);
@@ -42,7 +42,7 @@ void main() {
         expect(r['id'], row['before']['id']);
         expect(r['category'], row['before']['category']);
         expect(r['clinicalStatus'], 'draft');
-        expect(LaunchScope.isDeferred('/surgical-prep/${r['id']}'), true);
+        expect(LaunchScope.isDeferred('/surgical-prep/${r['id']}'), false);
       }
     },
   );

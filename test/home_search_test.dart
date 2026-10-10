@@ -196,7 +196,7 @@ void main() {
         Finder tile(String route) => find.byWidgetPredicate(
           (w) => w is HomeTile && w.data.route == route,
         );
-        expect(find.byType(HomeTile), findsNWidgets(10));
+        expect(find.byType(HomeTile), findsNWidgets(11));
         for (final path in [
           '/drug-library',
           '/crisis-guidelines',
@@ -208,6 +208,7 @@ void main() {
           '/practice-guidelines',
           '/diagnostics',
           '/regional-procedures',
+          '/surgical-prep',
         ]) {
           expect(tile(path), findsOneWidget);
         }

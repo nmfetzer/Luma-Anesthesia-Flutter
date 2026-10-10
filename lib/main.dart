@@ -14,7 +14,6 @@ import 'billing/revenuecat_billing.dart';
 import 'home/home_screen.dart';
 import 'regional/regional_screen.dart';
 import 'surgical_prep/surgical_library_screen.dart';
-import 'surgical_prep/surgical_review_config.dart';
 import 'screens/drugs_categories_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/subscription_screen.dart';
@@ -173,8 +172,7 @@ class _LumaAppState extends State<LumaApp> {
             builder: (_) => const OfflineDownloadsScreen(),
           );
         }
-        if (SurgicalReviewConfig.enabled &&
-            (path == '/surgical-prep' || path.startsWith('/surgical-prep/'))) {
+        if (path == '/surgical-prep' || path.startsWith('/surgical-prep/')) {
           return MaterialPageRoute(
             settings: settings,
             builder: (_) => SurgicalPrepFeature(

@@ -25,7 +25,7 @@ final _physiology = SurgicalSource(
 final laparoscopicCholecystectomyDraft = SurgicalCaseReference(
   id: 'laparoscopic-cholecystectomy',
   title: 'Laparoscopic cholecystectomy',
-  category: 'General & abdominal · Adult · Clinical draft',
+  category: 'General & abdominal · Adult',
   aliases: ['lap chole', 'gallbladder removal', 'LC'],
   overview: SurgicalSection(
     id: 'overview',
@@ -161,7 +161,7 @@ final laparoscopicCholecystectomyDraft = SurgicalCaseReference(
       id: 'evidence',
       title: 'Evidence scope & reference notes',
       bullets: [
-        'This is an adult clinical draft for owner review, not a patient-specific anesthetic order set. Source pages were checked October 4, 2026; that date does not represent independent clinical approval.',
+        'This is an adult clinical reference, not a patient-specific anesthetic order set. Source pages were checked October 4, 2026.',
         'PROSPECT provides procedure-specific analgesia recommendations published in 2024, based on evidence searched through December 2022. Its recommendations should not be described as incorporating every later trial.',
         'OpenAnesthesia supplies general laparoscopic physiology and anesthesia context. APSF summarizes the 2023 ASA neuromuscular guideline; StatPearls supplies procedural anatomy and complications.',
         'The 2011 BJA review is used for established physiologic and perioperative context, not as the authority for current drug regimens or all modern practice recommendations.',

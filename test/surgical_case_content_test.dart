@@ -20,10 +20,7 @@ void main() {
       expect(text, contains('adductor pollicis'));
       expect(text, contains('against combining'));
       expect(text, contains('evidence searched through December 2022'));
-      expect(
-        text,
-        contains('does not represent independent clinical approval'),
-      );
+      expect(text, contains('Source pages were checked October 4, 2026.'));
       expect(text, isNot(contains('ETT mandatory')));
     },
   );
