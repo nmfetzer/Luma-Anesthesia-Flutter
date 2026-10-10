@@ -118,8 +118,8 @@ class SupabaseCrisisRepository implements CrisisDataSource {
 
   @override
   Future<CrisisAccess> access() async {
-    if (client.auth.currentUser == null ||
-        client.auth.currentUser!.isAnonymous) {
+    // Guest subscribers qualify; reviewer drafts above stay account-only.
+    if (client.auth.currentUser == null) {
       return const CrisisAccess();
     }
     if (OfflineCache.instance.networkUnavailable) {

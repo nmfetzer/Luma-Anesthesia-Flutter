@@ -103,7 +103,11 @@ class LumaBilling with WidgetsBindingObserver {
 }
 
 class RevenueCatGateway
-    implements BillingGateway, CeBillingGateway, CeStoreDiagnosticSource {
+    implements
+        BillingGateway,
+        GuestBillingGateway,
+        CeBillingGateway,
+        CeStoreDiagnosticSource {
   RevenueCatGateway(this.client, this.key, this.platform);
   final SupabaseClient client;
   final String key;
@@ -146,6 +150,11 @@ class RevenueCatGateway
   @override
   Future<CePurchaseStatus> ceStatus(String expectedUser) async {
     if (userId != expectedUser) throw StateError('CE account changed');
+    if (isGuest) {
+      throw const BillingFailure(
+        'Sign in or create a free account to buy CE courses.',
+      );
+    }
     final raw = await client.rpc('luma_ce_checkout_status');
     if (raw is! Map ||
         raw['user_id'] != expectedUser ||
@@ -214,10 +223,26 @@ class RevenueCatGateway
     }
     await Purchases.purchase(params);
   });
+
+  /// Subscription identity: a registered account or an anonymous guest.
+  /// CE checks reject guests separately ([isGuest]).
   @override
-  String? get userId {
-    final user = client.auth.currentUser;
-    return user == null || user.isAnonymous ? null : user.id;
+  String? get userId => client.auth.currentUser?.id;
+
+  @override
+  bool get isGuest => client.auth.currentUser?.isAnonymous == true;
+
+  /// Guest checkout (Guideline 5.1.1(v)): no email, name or password.
+  @override
+  Future<void> startGuest() async {
+    if (client.auth.currentUser != null) return;
+    try {
+      await client.auth.signInAnonymously();
+    } on AuthException {
+      throw const BillingFailure(
+        'Checkout could not start. Check your connection and try again.',
+      );
+    }
   }
 
   @override
@@ -237,7 +262,9 @@ class RevenueCatGateway
   Future<List<BillingPlan>> plans() async {
     _packages.clear();
     final expected = userId;
-    if (expected == null || !await _subscriptionCheckoutAllowed(expected)) {
+    // Signed out: prices are shown for display. Checkout starts a guest
+    // session and reloads plans under the server policy before purchase.
+    if (expected != null && !await _subscriptionCheckoutAllowed(expected)) {
       return [];
     }
     final offering =
@@ -337,10 +364,8 @@ class RevenueCatGateway
   @override
   Future<bool> verify(String expectedUser) async {
     final session = client.auth.currentSession;
-    if (session == null ||
-        session.user.id != expectedUser ||
-        session.user.isAnonymous) {
-      throw const BillingFailure('Please sign in to your Luma account first.');
+    if (session == null || session.user.id != expectedUser) {
+      throw const BillingFailure('Your session changed. Refresh access.');
     }
     final response = await client.functions.invoke(
       'revenuecat-sync',

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:luma_anesthesia/screens/subscription_screen.dart';
 import 'package:luma_anesthesia/billing/subscription_billing.dart';
 
-import 'subscription_billing_test.dart' show FakeStore;
+import 'subscription_billing_test.dart' show FakeStore, GuestStore;
 
 void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
@@ -203,4 +203,39 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('guests can subscribe and restore without an account', (
+    tester,
+  ) async {
+    final store = GuestStore();
+    final billing = SubscriptionBilling(gateway: store);
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(disableAnimations: true),
+          child: child!,
+        ),
+        home: SubscriptionScreen(billing: billing),
+        routes: {
+          '/account': (_) => const Scaffold(body: Text('Account destination')),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sign in to subscribe'), findsNothing);
+    expect(
+      find.textContaining('No account needed to subscribe'),
+      findsOneWidget,
+    );
+    expect(find.text('Create free account'), findsOneWidget);
+    final restore = find.widgetWithText(TextButton, 'Restore purchases');
+    expect(tester.widget<TextButton>(restore).onPressed, isNotNull);
+    await tester.ensureVisible(find.text('Subscribe annually'));
+    await tester.tap(find.text('Subscribe annually'));
+    await tester.pumpAndSettle();
+    expect(store.guestStarts, 1);
+    expect(store.purchases, 1);
+    expect(find.text('Account destination'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

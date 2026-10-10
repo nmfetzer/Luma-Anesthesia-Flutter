@@ -62,7 +62,8 @@ class _MedicationDeepDiveState extends State<MedicationDeepDive> {
     if (!LumaConfig.supabaseConfigured) return {'allowed': false};
     final client = Supabase.instance.client;
     final user = client.auth.currentUser;
-    if (user == null || user.isAnonymous) return {'allowed': false};
+    // Guest subscribers qualify; the server decides access.
+    if (user == null) return {'allowed': false};
     return OfflineLibrary(client).medicationDeepDive(widget.medicationId);
   }
 
