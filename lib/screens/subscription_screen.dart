@@ -48,6 +48,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       _billing.plan(term)?.price ??
       (term == SubscriptionTerm.annual ? r'$69.99' : r'$9.99');
 
+  String? _trial(SubscriptionTerm term) => _billing.plan(term)?.freeTrial;
+
+  /// Guideline 3.1.2: state the trial and what is charged when it ends.
+  String _terms() {
+    final unit = _annual ? 'year' : 'month';
+    final trial = _trial(_term);
+    final kind =
+        '${_annual ? '1-year' : '1-month'} auto-renewable subscription. ';
+    return trial == null
+        ? '${kind}Billed ${_price(_term)} per $unit.'
+        : '$kind$trial free trial for eligible new subscribers, then '
+              '${_price(_term)} per $unit until canceled. Cancel at least '
+              '24 hours before the trial ends to avoid being charged.';
+  }
+
   Future<void> _account() async {
     await Navigator.pushNamed(context, '/account');
     if (mounted) await _billing.refresh();
@@ -187,10 +202,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 ),
                               const SizedBox(height: 7),
                               Text(
-                                loaded
-                                    ? '${_annual ? '1-year' : '1-month'} auto-renewable subscription. '
-                                          'Billed ${_price(_term)} per ${_annual ? 'year' : 'month'}.'
-                                    : 'Prices shown in USD. Your app store confirms local pricing before purchase.',
+                                loaded ? _terms() : 'Prices shown in USD. Your app store confirms local pricing before purchase.',
                                 style: _body(11),
                               ),
                               const SizedBox(height: 10),
@@ -277,7 +289,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 ),
                               Text(
                                 'Subscriptions automatically renew unless canceled at least '
-                                '24 hours before the end of the current period. '
+                                '24 hours before the end of the free trial or current period. '
                                 '${subscriptionBillingNotice(Theme.of(context).platform, isWeb: kIsWeb)}',
                                 style: _body(11),
                               ),
@@ -346,13 +358,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   Widget _plan(bool annual, String label) {
     final selected = annual == _annual;
-    final price = _price(
-      annual ? SubscriptionTerm.annual : SubscriptionTerm.monthly,
-    );
+    final term = annual ? SubscriptionTerm.annual : SubscriptionTerm.monthly;
+    final price = _price(term);
+    final trial = _trial(term);
     return Semantics(
       button: true,
       selected: selected,
-      label: '$label plan, $price per ${annual ? 'year' : 'month'}',
+      label:
+          '$label plan, ${trial == null ? '' : '$trial free trial, then '}'
+          '$price per ${annual ? 'year' : 'month'}',
       child: Material(
         color: selected ? const Color(0xFFEDE4D2) : brand.LumaColors.cream,
         shape: RoundedRectangleBorder(
@@ -378,6 +392,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 const SizedBox(height: 4),
                 Text(price, style: brand.LumaText.title(size: 24, color: _ink)),
                 Text(annual ? 'per year' : 'per month', style: _body(11)),
+                if (trial != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '$trial free trial',
+                    style: _body(11)
+                        .copyWith(color: _ink, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ],
             ),
           ),
