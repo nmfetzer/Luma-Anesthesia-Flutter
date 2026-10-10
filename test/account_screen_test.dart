@@ -17,6 +17,7 @@ class FakeAccount implements AccountAccess {
   Set<OAuthProvider> providers = {OAuthProvider.apple, OAuthProvider.google};
   bool failProviderCheck = false;
   bool failSocialLaunch = false;
+  bool cancelSocial = false;
   bool openBrowser = true;
   final socialCalls = <OAuthProvider>[];
   @override
@@ -29,6 +30,7 @@ class FakeAccount implements AccountAccess {
   Future<bool> signInWithProvider(OAuthProvider provider) async {
     socialCalls.add(provider);
     if (failSocialLaunch) throw StateError('provider unavailable');
+    if (cancelSocial) throw const SignInCanceled();
     return openBrowser;
   }
 
@@ -44,13 +46,18 @@ class FakeAccount implements AccountAccess {
   bool? lastCreate;
   bool rejectLogin = false;
   @override
-  Future<bool> submit(String email, String password,
-      {required bool create}) async {
+  Future<bool> submit(
+    String email,
+    String password, {
+    required bool create,
+  }) async {
     submissions++;
     lastCreate = create;
     if (rejectLogin) {
-      throw const AuthException('Invalid login credentials',
-          code: 'invalid_credentials');
+      throw const AuthException(
+        'Invalid login credentials',
+        code: 'invalid_credentials',
+      );
     }
     if (immediateSession) this.email = email;
     return immediateSession;
@@ -67,16 +74,22 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
-  testWidgets('account header uses the symbol-only halo artwork', (tester) async {
+  testWidgets('account header uses the symbol-only halo artwork', (
+    tester,
+  ) async {
     final account = FakeAccount();
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.pumpAndSettle();
     final header = tester.widget<Image>(
-      find.byWidgetPredicate((widget) =>
-          widget is Image && widget.semanticLabel == 'Luma symbol and halo'),
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image && widget.semanticLabel == 'Luma symbol and halo',
+      ),
     );
-    expect((header.image as AssetImage).assetName,
-        'assets/branding/luma_symbol_halo.png');
+    expect(
+      (header.image as AssetImage).assetName,
+      'assets/branding/luma_symbol_halo.png',
+    );
     expect(header.fit, BoxFit.contain);
     expect(header.height, 72);
   });
@@ -95,7 +108,9 @@ void main() {
     final account = FakeAccount();
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.enterText(
-        find.byType(TextFormField).at(0), 'review@example.com');
+      find.byType(TextFormField).at(0),
+      'review@example.com',
+    );
     await tester.enterText(find.byType(TextFormField).at(1), 'test-password');
     await tester.ensureVisible(find.text('Sign in'));
     await tester.tap(find.text('Sign in'));
@@ -109,8 +124,9 @@ void main() {
     expect(find.text('Welcome back'), findsOneWidget);
   });
 
-  testWidgets('signup without a session asks for email confirmation',
-      (tester) async {
+  testWidgets('signup without a session asks for email confirmation', (
+    tester,
+  ) async {
     final account = FakeAccount()..immediateSession = false;
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.pumpAndSettle();
@@ -118,7 +134,9 @@ void main() {
     await tester.tap(find.text('New account'));
     await tester.pumpAndSettle();
     await tester.enterText(
-        find.byType(TextFormField).at(0), 'review@example.com');
+      find.byType(TextFormField).at(0),
+      'review@example.com',
+    );
     await tester.enterText(find.byType(TextFormField).at(1), 'test-password');
     await tester.ensureVisible(find.text('Create account'));
     await tester.tap(find.text('Create account'));
@@ -129,12 +147,15 @@ void main() {
     expect(find.text('Welcome back'), findsOneWidget);
   });
 
-  testWidgets('invalid login explains new account registration safely',
-      (tester) async {
+  testWidgets('invalid login explains new account registration safely', (
+    tester,
+  ) async {
     final account = FakeAccount()..rejectLogin = true;
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.enterText(
-        find.byType(TextFormField).at(0), 'review@example.com');
+      find.byType(TextFormField).at(0),
+      'review@example.com',
+    );
     await tester.enterText(find.byType(TextFormField).at(1), 'test-password');
     await tester.ensureVisible(find.text('Sign in'));
     await tester.tap(find.text('Sign in'));
@@ -148,29 +169,37 @@ void main() {
   });
 
   testWidgets(
-      'both providers launch their own flow without submitting a password',
-      (tester) async {
-    final account = FakeAccount();
-    await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
-    await tester.pumpAndSettle();
-    for (final name in ['Apple', 'Google']) {
-      await tester.ensureVisible(find.text('Continue with $name'));
-      await tester.tap(find.text('Continue with $name'));
+    'both providers launch their own flow without submitting a password',
+    (tester) async {
+      final account = FakeAccount();
+      await tester.pumpWidget(
+        MaterialApp(home: AccountScreen(access: account)),
+      );
       await tester.pumpAndSettle();
-      expect(find.textContaining('Continue with $name in your browser'),
-          findsOneWidget);
-      expect(find.text('Your account'), findsNothing);
-    }
-    expect(account.socialCalls, [OAuthProvider.apple, OAuthProvider.google]);
-    expect(account.submissions, 0);
-    account.completeSocialSignIn();
-    await tester.pumpAndSettle();
-    expect(find.text('Your account'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsNothing);
-  });
+      for (final name in ['Apple', 'Google']) {
+        await tester.ensureVisible(find.text('Continue with $name'));
+        await tester.tap(find.text('Continue with $name'));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining(
+            'Finish signing in with $name in the sign-in window',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Your account'), findsNothing);
+      }
+      expect(account.socialCalls, [OAuthProvider.apple, OAuthProvider.google]);
+      expect(account.submissions, 0);
+      account.completeSocialSignIn();
+      await tester.pumpAndSettle();
+      expect(find.text('Your account'), findsOneWidget);
+      expect(find.text('Continue with Google'), findsNothing);
+    },
+  );
 
-  testWidgets('disabled backend providers do not open misleading login pages',
-      (tester) async {
+  testWidgets('disabled backend providers do not open misleading login pages', (
+    tester,
+  ) async {
     final account = FakeAccount()..providers = {};
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.pumpAndSettle();
@@ -184,60 +213,77 @@ void main() {
     await tester.tap(find.text('Check availability again'));
     await tester.pumpAndSettle();
     expect(
-        tester
-            .widget<OutlinedButton>(
-                find.widgetWithText(OutlinedButton, 'Continue with Google'))
-            .onPressed,
-        isNotNull);
+      tester
+          .widget<OutlinedButton>(
+            find.widgetWithText(OutlinedButton, 'Continue with Google'),
+          )
+          .onPressed,
+      isNotNull,
+    );
     expect(account.socialCalls, isEmpty);
   });
 
   testWidgets(
-      'launch failure and callback errors recover without claiming success',
-      (tester) async {
-    final account = FakeAccount()..openBrowser = false;
-    await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Continue with Apple'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Could not open Apple sign-in'), findsOneWidget);
-    account.failSocialLaunch = true;
-    await tester.ensureVisible(find.text('Continue with Google'));
-    await tester.tap(find.text('Continue with Google'));
-    await tester.pumpAndSettle();
-    expect(
-        find.textContaining('Google sign-in is unavailable'), findsOneWidget);
-    account._changes.addError(StateError('invalid callback'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Sign-in was not completed'), findsOneWidget);
-    expect(find.text('Your account'), findsNothing);
-  });
+    'launch failure and callback errors recover without claiming success',
+    (tester) async {
+      final account = FakeAccount()..openBrowser = false;
+      await tester.pumpWidget(
+        MaterialApp(home: AccountScreen(access: account)),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue with Apple'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('Could not open Apple sign-in'),
+        findsOneWidget,
+      );
+      account.failSocialLaunch = true;
+      await tester.ensureVisible(find.text('Continue with Google'));
+      await tester.tap(find.text('Continue with Google'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('Google sign-in is unavailable'),
+        findsOneWidget,
+      );
+      account._changes.addError(StateError('invalid callback'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Sign-in was not completed'), findsOneWidget);
+      expect(find.text('Your account'), findsNothing);
+    },
+  );
 
   testWidgets('provider lookup failure can be retried', (tester) async {
     final account = FakeAccount()..failProviderCheck = true;
     await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.pumpAndSettle();
     expect(
-        find.textContaining('Could not check social sign-in'), findsOneWidget);
+      find.textContaining('Could not check social sign-in'),
+      findsOneWidget,
+    );
     account.failProviderCheck = false;
     await tester.ensureVisible(find.text('Check availability again'));
     await tester.tap(find.text('Check availability again'));
     await tester.pumpAndSettle();
     expect(
-        tester
-            .widget<OutlinedButton>(
-                find.widgetWithText(OutlinedButton, 'Continue with Apple'))
-            .onPressed,
-        isNotNull);
+      tester
+          .widget<OutlinedButton>(
+            find.widgetWithText(OutlinedButton, 'Continue with Apple'),
+          )
+          .onPressed,
+      isNotNull,
+    );
   });
 
-  testWidgets('a callback landing page can return to the app after sign-in',
-      (tester) async {
+  testWidgets('a callback landing page can return to the app after sign-in', (
+    tester,
+  ) async {
     final account = FakeAccount()..email = 'review@example.com';
-    await tester.pumpWidget(MaterialApp(
-      home: AccountScreen(access: account),
-      routes: {'/home': (_) => const Scaffold(body: Text('Luma home'))},
-    ));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AccountScreen(access: account),
+        routes: {'/home': (_) => const Scaffold(body: Text('Luma home'))},
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Continue to Luma'));
     await tester.tap(find.text('Continue to Luma'));
@@ -245,39 +291,66 @@ void main() {
     expect(find.text('Luma home'), findsOneWidget);
   });
 
-  testWidgets('embedded preview does not start an unrecoverable OAuth redirect',
-      (tester) async {
-    final account = FakeAccount();
-    await tester.pumpWidget(MaterialApp(
-        home: AccountScreen(access: account, allowSocialSignIn: false)));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('unavailable inside this embedded preview'),
-        findsOneWidget);
-    expect(
+  testWidgets(
+    'embedded preview does not start an unrecoverable OAuth redirect',
+    (tester) async {
+      final account = FakeAccount();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AccountScreen(access: account, allowSocialSignIn: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('unavailable inside this embedded preview'),
+        findsOneWidget,
+      );
+      expect(
         tester
             .widget<OutlinedButton>(
-                find.widgetWithText(OutlinedButton, 'Continue with Apple'))
+              find.widgetWithText(OutlinedButton, 'Continue with Apple'),
+            )
             .onPressed,
-        isNull);
-    expect(account.socialCalls, isEmpty);
-  });
+        isNull,
+      );
+      expect(account.socialCalls, isEmpty);
+    },
+  );
 
-  testWidgets('social login and email remain usable with enlarged mobile text',
-      (tester) async {
-    tester.view.physicalSize = const Size(375, 812);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(MaterialApp(
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(2)),
-        child: child!,
-      ),
-      home: AccountScreen(access: FakeAccount()),
-    ));
+  testWidgets(
+    'social login and email remain usable with enlarged mobile text',
+    (tester) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(2)),
+            child: child!,
+          ),
+          home: AccountScreen(access: FakeAccount()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Continue with Google'));
+      await tester.ensureVisible(find.text('Sign in'));
+    },
+  );
+
+  testWidgets('closing the Apple sheet explains nothing changed', (
+    tester,
+  ) async {
+    final account = FakeAccount()..cancelSocial = true;
+    await tester.pumpWidget(MaterialApp(home: AccountScreen(access: account)));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Continue with Google'));
-    await tester.ensureVisible(find.text('Sign in'));
+    await tester.ensureVisible(find.text('Continue with Apple'));
+    await tester.tap(find.text('Continue with Apple'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Apple sign-in was canceled'), findsOneWidget);
+    expect(find.textContaining('unavailable'), findsNothing);
+    expect(account.email, isNull);
   });
 }

@@ -41,20 +41,35 @@ void main() {
     expect(allowed(policy, customers: true), isTrue);
     expect(allowed(const CheckoutPolicy(true, true), customers: true), isFalse);
   });
-  test('release build supports both server-authorized review and customers', () {
-    expect(
-      allowed(const CheckoutPolicy(true, true), customers: true, review: true),
-      isTrue,
-    );
-    expect(
-      allowed(const CheckoutPolicy(false, true), customers: true, review: true),
-      isTrue,
-    );
-    expect(
-      allowed(const CheckoutPolicy(false, false), customers: true, review: true),
-      isFalse,
-    );
-  });
+  test(
+    'release build supports both server-authorized review and customers',
+    () {
+      expect(
+        allowed(
+          const CheckoutPolicy(true, true),
+          customers: true,
+          review: true,
+        ),
+        isTrue,
+      );
+      expect(
+        allowed(
+          const CheckoutPolicy(false, true),
+          customers: true,
+          review: true,
+        ),
+        isTrue,
+      );
+      expect(
+        allowed(
+          const CheckoutPolicy(false, false),
+          customers: true,
+          review: true,
+        ),
+        isFalse,
+      );
+    },
+  );
   test('missing, malformed and cross-account responses fail closed', () {
     for (final raw in [
       null,
@@ -79,6 +94,25 @@ void main() {
         'apple_review': false,
         'customer_subscriptions_enabled': false,
       }, 'u').appleReview,
+      isFalse,
+    );
+  });
+  test('Android tester accounts follow the customer rule', () {
+    const tester = CheckoutPolicy(true, true);
+    expect(
+      allowed(tester, customers: true, platform: TargetPlatform.android),
+      isTrue,
+    );
+    expect(
+      allowed(
+        const CheckoutPolicy(true, false),
+        customers: true,
+        platform: TargetPlatform.android,
+      ),
+      isFalse,
+    );
+    expect(
+      allowed(tester, review: true, platform: TargetPlatform.android),
       isFalse,
     );
   });

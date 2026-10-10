@@ -17,8 +17,9 @@ class SupabaseSpecialConsiderationRepository
   final SupabaseClient client;
 
   @override
-  bool get hasAccount =>
-      client.auth.currentUser != null && !client.auth.currentUser!.isAnonymous;
+  // Guests who subscribed without an account (Guideline 5.1.1(v)) qualify;
+  // the server still decides access for every deep dive.
+  bool get hasAccount => client.auth.currentUser != null;
 
   @override
   Stream<void> get authChanges => OfflineLibrary.authChanges(client);

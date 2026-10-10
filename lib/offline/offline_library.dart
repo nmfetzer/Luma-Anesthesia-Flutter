@@ -37,21 +37,14 @@ class OfflineLibrary {
 
   static Future<void> initialize(SupabaseClient client) async {
     final lib = OfflineLibrary(client);
-    await lib.cache.setOwner(
-      client.auth.currentUser?.isAnonymous == false
-          ? client.auth.currentUser!.id
-          : null,
-    );
+    // Paid offline copies are bound to the current account or guest session.
+    await lib.cache.setOwner(client.auth.currentUser?.id);
     await lib.cache.restoreLease();
     lib._scheduleExpiry();
     await _auth?.cancel();
     _auth = client.auth.onAuthStateChange.listen((state) async {
       try {
-        await lib.cache.setOwner(
-          state.session?.user.isAnonymous == false
-              ? state.session!.user.id
-              : null,
-        );
+        await lib.cache.setOwner(state.session?.user.id);
         await lib.refreshAccess();
       } catch (_) {
         /* No offline grant on an unverified response. */
@@ -73,9 +66,7 @@ class OfflineLibrary {
   }
 
   Future<void> refreshAccess() async {
-    final id = client.auth.currentUser?.isAnonymous == false
-        ? client.auth.currentUser!.id
-        : null;
+    final id = client.auth.currentUser?.id;
     await cache.setOwner(id);
     if (id == null || !cache.storage.supportsPrivate) return;
     final epoch = cache.generation;

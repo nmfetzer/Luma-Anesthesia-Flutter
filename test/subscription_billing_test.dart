@@ -51,6 +51,38 @@ class FakeStore implements BillingGateway {
   }
 }
 
+/// Store that supports buying without an account (Guideline 5.1.1(v)).
+class GuestStore extends FakeStore implements GuestBillingGateway {
+  GuestStore() {
+    userId = null;
+  }
+  @override
+  bool isGuest = false;
+  int guestStarts = 0;
+  bool failGuest = false;
+  final planIdentities = <String?>[];
+  bool activateOnRestore = false;
+  @override
+  Future<void> restore() async {
+    await super.restore();
+    if (activateOnRestore) active = true;
+  }
+
+  @override
+  Future<void> startGuest() async {
+    guestStarts++;
+    if (failGuest) throw const BillingFailure('Checkout could not start.');
+    userId = 'guest-1';
+    isGuest = true;
+  }
+
+  @override
+  Future<List<BillingPlan>> plans() {
+    planIdentities.add(userId);
+    return super.plans();
+  }
+}
+
 void main() {
   test('billing disabled by default and no real prices invented', () {
     final c = SubscriptionBilling();
@@ -180,5 +212,108 @@ void main() {
     await c.purchase(SubscriptionTerm.annual);
     expect(store.purchases, 0);
     expect(c.verified, true);
+  });
+  group('guest purchases (Guideline 5.1.1(v))', () {
+    test('signed-out shoppers see prices without a session', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      expect(store.guestStarts, 0);
+      expect(c.plan(SubscriptionTerm.monthly)?.price, '€8,49');
+      expect(c.hasIdentity, isFalse);
+      expect(c.canStartPurchase, isTrue);
+      expect(c.canRestore, isTrue);
+      expect(c.message, isNull);
+    });
+
+    test('subscribe starts a guest session and buys under it', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      await c.purchase(SubscriptionTerm.annual);
+      expect(store.guestStarts, 1);
+      expect(store.purchases, 1);
+      expect(store.identities, contains('guest-1'));
+      expect(store.planIdentities.last, 'guest-1');
+      expect(c.isGuest, isTrue);
+      expect(c.signedIn, isFalse, reason: 'guests never unlock CE checkout');
+    });
+
+    test('restore works without an account', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      store.active = true;
+      await c.restore();
+      expect(store.guestStarts, 1);
+      expect(store.restores, 1);
+      expect(store.purchases, 0);
+      expect(c.verified, isTrue);
+    });
+
+    test('a failed guest start takes no payment', () async {
+      final store = GuestStore()..failGuest = true;
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      await c.purchase(SubscriptionTerm.monthly);
+      expect(store.purchases, 0);
+      expect(c.busy, isFalse);
+      expect(c.message, 'Checkout could not start.');
+    });
+
+    test('token refresh for the same identity keeps checkout state', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      await c.purchase(SubscriptionTerm.monthly);
+      store.active = true;
+      await c.refresh();
+      expect(c.verified, isTrue);
+      await c.identityChanged();
+      expect(c.verified, isTrue);
+    });
+
+    test('a paying guest who signs in moves the purchase by restore', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      store.active = true;
+      await c.restore();
+      expect(c.verified, isTrue);
+      final restoresBefore = store.restores;
+      // Signs in to an existing account; the server has no lease yet.
+      store
+        ..userId = 'account-b'
+        ..isGuest = false
+        ..active = false
+        ..activateOnRestore = true;
+      await c.identityChanged();
+      final calls = store.restores - restoresBefore;
+      expect(calls, 1);
+      expect(c.signedIn, isTrue);
+      expect(c.verified, isTrue);
+    });
+
+    test('an unpaid guest who signs in is not prompted to restore', () async {
+      final store = GuestStore();
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      await c.purchase(SubscriptionTerm.monthly);
+      store
+        ..userId = 'account-b'
+        ..isGuest = false;
+      await c.identityChanged();
+      expect(store.restores, 0);
+    });
+
+    test('stores without guest support still ask for sign-in', () async {
+      final store = FakeStore()..userId = null;
+      final c = SubscriptionBilling(gateway: store);
+      await c.refresh();
+      expect(c.guestCheckout, isFalse);
+      expect(c.canStartPurchase, isFalse);
+      expect(c.canRestore, isFalse);
+      expect(c.message, contains('Sign in'));
+    });
   });
 }

@@ -119,10 +119,17 @@ class _AccountScreenState extends State<AccountScreen> {
       if (!mounted || _access.email != null) return;
       setState(
         () => _message = opened
-            ? 'Continue with $name in your browser, then return to Luma. '
+            ? 'Finish signing in with $name in the sign-in window. '
                   'If you canceled, you can try again or use email.'
             : 'Could not open $name sign-in. Please try again.',
       );
+    } on SignInCanceled {
+      if (mounted) {
+        setState(
+          () => _message =
+              '$name sign-in was canceled. You can try again or use email.',
+        );
+      }
     } catch (_) {
       if (mounted) {
         setState(

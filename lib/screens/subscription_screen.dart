@@ -77,6 +77,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     final loaded = _billing.plan(_term) != null;
     final canBuy = _billing.canPurchase && loaded;
+    // Guideline 5.1.1(v): subscribing never requires an account.
+    final guestCheckout = _billing.guestCheckout;
+    final canStartGuest =
+        guestCheckout &&
+        !_billing.hasIdentity &&
+        loaded &&
+        _billing.canStartPurchase;
+    final showAccountOffer = guestCheckout && !_billing.signedIn;
     return Scaffold(
       backgroundColor: brand.LumaColors.navyDeep,
       body: Stack(
@@ -189,10 +197,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               FilledButton(
                                 onPressed: _billing.busy || _billing.verified
                                     ? null
-                                    : !_billing.signedIn
-                                    ? _account
-                                    : canBuy
+                                    : canBuy || canStartGuest
                                     ? () => _billing.purchase(_term)
+                                    : !_billing.hasIdentity && !guestCheckout
+                                    ? _account
                                     : null,
                                 style: FilledButton.styleFrom(
                                   backgroundColor: _ink,
@@ -204,14 +212,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                       ? 'Please wait…'
                                       : _billing.verified
                                       ? 'Premium access verified'
-                                      : !_billing.signedIn
+                                      : !_billing.hasIdentity && !guestCheckout
                                       ? 'Sign in to subscribe'
                                       : !_billing.available
                                       ? 'Purchases coming soon'
                                       : 'Subscribe ${_annual ? 'annually' : 'monthly'}',
                                 ),
                               ),
-                              if (_billing.signedIn && _billing.message != null)
+                              if (_billing.message != null &&
+                                  (_billing.hasIdentity || guestCheckout))
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
@@ -234,11 +243,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 spacing: 8,
                                 children: [
                                   TextButton(
-                                    onPressed:
-                                        _billing.available &&
-                                            _billing.signedIn &&
-                                            _billing.serverReady &&
-                                            !_billing.busy
+                                    onPressed: _billing.canRestore
                                         ? _billing.restore
                                         : null,
                                     child: const Text('Restore purchases'),
@@ -252,11 +257,24 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                     child: Text(
                                       _billing.signedIn
                                           ? 'Refresh access'
+                                          : showAccountOffer
+                                          ? 'Create free account'
                                           : 'Create account',
                                     ),
                                   ),
                                 ],
                               ),
+                              if (showAccountOffer)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Text(
+                                    'No account needed to subscribe. Optionally create '
+                                    'a free account to use your subscription on all '
+                                    'your devices.',
+                                    style: _body(11),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               Text(
                                 'Subscriptions automatically renew unless canceled at least '
                                 '24 hours before the end of the current period. '

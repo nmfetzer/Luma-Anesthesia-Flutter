@@ -20,11 +20,14 @@ class CheckoutPolicy {
     );
   }
 
+  /// Sandbox tester status only applies to Apple's review/TestFlight checkout.
+  /// On Android a tester account follows the normal customer rule, so new
+  /// accounts are not blocked from real Google Play purchases.
   bool allowsSubscriptions({
     required bool customerBuild,
     required bool reviewBuild,
     required TargetPlatform platform,
-  }) => appleReview
-      ? reviewBuild && platform == TargetPlatform.iOS
+  }) => appleReview && platform == TargetPlatform.iOS
+      ? reviewBuild
       : customerBuild && customerSubscriptions;
 }

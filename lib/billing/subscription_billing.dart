@@ -27,6 +27,17 @@ abstract interface class BillingGateway {
   Future<bool> verify(String userId);
 }
 
+/// Optional capability: buy and restore subscriptions without registering
+/// (App Review Guideline 5.1.1(v)). The gateway creates an anonymous guest
+/// session that collects no personal information.
+abstract interface class GuestBillingGateway {
+  /// True while the current identity is an anonymous guest session.
+  bool get isGuest;
+
+  /// Starts a guest session when no session exists. Never collects an email.
+  Future<void> startGuest();
+}
+
 /// Serializes store operations and discards results after an account change.
 class SubscriptionBilling extends ChangeNotifier {
   SubscriptionBilling({
@@ -89,7 +100,8 @@ class SubscriptionBilling extends ChangeNotifier {
       final products = await ceGateway!.ceProducts();
       if (!_sameUser(version, user)) return;
       ceProducts = products;
-      if (user == null) {
+      // CE courses and certificates stay tied to a registered account.
+      if (user == null || isGuest) {
         ceReady = false;
         message =
             'Sign in to link CE purchases and certificates to your account.';
@@ -153,9 +165,33 @@ class SubscriptionBilling extends ChangeNotifier {
   }
 
   bool get available => gateway != null;
-  bool get signedIn => gateway?.userId != null;
+  GuestBillingGateway? get _guestGateway =>
+      gateway is GuestBillingGateway ? gateway as GuestBillingGateway : null;
+
+  /// Subscriptions can be bought without an account.
+  bool get guestCheckout => _guestGateway != null;
+
+  /// The current identity is an anonymous guest session.
+  bool get isGuest => hasIdentity && _guestGateway?.isGuest == true;
+
+  /// Any store identity: a registered account or a guest.
+  bool get hasIdentity => gateway?.userId != null;
+
+  /// A registered (non-guest) account. Required for CE purchases.
+  bool get signedIn => hasIdentity && !isGuest;
   bool get canPurchase =>
-      available && signedIn && serverReady && !busy && !verified;
+      available && hasIdentity && serverReady && !busy && !verified;
+
+  /// Subscribe can be tapped. Without an identity a guest session starts first.
+  bool get canStartPurchase =>
+      available &&
+      !busy &&
+      !verified &&
+      (hasIdentity ? serverReady : guestCheckout);
+
+  /// Restore can be tapped. Without an identity a guest session starts first.
+  bool get canRestore =>
+      available && !busy && (hasIdentity ? serverReady : guestCheckout);
   BillingPlan? plan(SubscriptionTerm term) {
     for (final item in plans) {
       if (item.term == term) return item;
@@ -163,7 +199,24 @@ class SubscriptionBilling extends ChangeNotifier {
     return null;
   }
 
-  void identityChanged() {
+  String? _knownUser;
+  bool _knownSet = false;
+  bool _knownGuest = false;
+  bool _restoreAfterSwitch = false;
+  Future<void>? _current;
+
+  /// Auth events also fire for token refreshes; only a real identity change
+  /// resets billing state, so a refresh never cancels an open checkout.
+  Future<void> identityChanged() {
+    final current = gateway?.userId;
+    if (_knownSet && current == _knownUser) return Future.value();
+    // A guest who already paid and then signs in or registers: move the
+    // store purchase to the account with a store restore after the switch.
+    _restoreAfterSwitch =
+        _knownSet && _knownGuest && verified && current != null && !isGuest;
+    _knownSet = true;
+    _knownUser = current;
+    _knownGuest = isGuest;
     _identityVersion++;
     verified = false;
     serverReady = false;
@@ -176,41 +229,75 @@ class SubscriptionBilling extends ChangeNotifier {
     _emit();
     if (busy) {
       _refreshPending = true;
-    } else {
-      refresh();
+      return Future.value();
     }
+    return refresh();
   }
 
   Future<void> refresh() => _run(() async {
     final source = gateway!;
     final version = _identityVersion;
     final user = source.userId;
+    if (!_knownSet) {
+      _knownSet = true;
+      _knownUser = user;
+      _knownGuest = isGuest;
+    }
     await source.identify(user);
     final loaded = await source.plans();
     if (!_sameUser(version, user)) return;
     plans = loaded;
     if (user == null) {
-      message =
-          'Sign in to link a purchase to your Luma account. '
-          'Creating an account does not start a subscription.';
+      message = guestCheckout
+          ? null
+          : 'Sign in to link a purchase to your Luma account. '
+                'Creating an account does not start a subscription.';
       return;
     }
-    final active = await source.verify(user);
+    var active = await source.verify(user);
     if (!_sameUser(version, user)) return;
+    if (!active && _restoreAfterSwitch) {
+      _restoreAfterSwitch = false;
+      message = 'Moving your subscription to this account…';
+      _emit();
+      await source.restore();
+      if (!_sameUser(version, user)) return;
+      active = await source.verify(user);
+      if (!_sameUser(version, user)) return;
+    }
+    _restoreAfterSwitch = false;
     verified = active;
     serverReady = true;
     message = active ? 'Your premium access is verified.' : null;
   });
 
   Future<void> purchase(SubscriptionTerm term) async {
+    if (!await _ensureIdentity()) return;
     final selected = plan(term);
     if (!canPurchase || selected == null) return;
     await _transaction(() => gateway!.purchase(selected), buying: true);
   }
 
   Future<void> restore() async {
-    if (!available || !signedIn || busy || !serverReady) return;
+    if (!await _ensureIdentity()) return;
+    if (!available || !hasIdentity || busy || !serverReady) return;
     await _transaction(() => gateway!.restore());
+  }
+
+  /// Starts a guest session when nobody is signed in, then waits for the
+  /// server policy and verification so checkout uses the guest identity.
+  Future<bool> _ensureIdentity() async {
+    if (gateway == null || _disposed) return false;
+    if (hasIdentity) return true;
+    final guest = _guestGateway;
+    if (guest == null || busy) return false;
+    await _run(() => guest.startGuest());
+    if (_disposed || !hasIdentity) return false;
+    await identityChanged();
+    while (busy && _current != null && !_disposed) {
+      await _current;
+    }
+    return !_disposed && hasIdentity;
   }
 
   Future<void> _transaction(
@@ -241,8 +328,14 @@ class SubscriptionBilling extends ChangeNotifier {
               'purchase, use Refresh access or Restore purchases. Do not buy again.';
   });
 
-  Future<void> _run(Future<void> Function() action) async {
-    if (gateway == null || busy || _disposed) return;
+  Future<void> _run(Future<void> Function() action) {
+    if (gateway == null || busy || _disposed) return Future.value();
+    final run = _runLocked(action);
+    _current = run;
+    return run;
+  }
+
+  Future<void> _runLocked(Future<void> Function() action) async {
     busy = true;
     message = null;
     _emit();

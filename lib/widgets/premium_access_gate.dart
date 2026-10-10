@@ -63,7 +63,8 @@ class _PremiumAccessGateState extends State<PremiumAccessGate>
   Future<bool> _serverAccess() async {
     final client = Supabase.instance.client;
     final user = client.auth.currentUser;
-    if (user == null || user.isAnonymous) return false;
+    // Guest subscribers qualify; has_clinical_premium_access decides.
+    if (user == null) return false;
     final owner = user.id;
     final cache = OfflineCache.instance;
     await cache.setOwner(owner);

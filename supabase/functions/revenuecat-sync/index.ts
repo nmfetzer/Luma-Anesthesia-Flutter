@@ -24,7 +24,9 @@ Deno.serve(createHandler({
   now: Date.now,
   async user(authorization) {
     const { data: { user }, error } = await userClient(authorization).auth.getUser();
-    return error || !user || user.is_anonymous ? null : user.id;
+    // Guest (anonymous) sessions may verify subscriptions: App Review
+    // Guideline 5.1.1(v). CE functions still require permanent accounts.
+    return error || !user ? null : user.id;
   },
   async subscriber(userId) {
     const response = await fetch(
