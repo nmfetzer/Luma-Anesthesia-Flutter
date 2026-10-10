@@ -3,8 +3,8 @@
 Branch: `fix/apple-review-signin-and-guest-purchase`
 Purpose: App Review rejection of 3.0.0 (3), Guidelines 4 and 5.1.1(v).
 
-Nothing in this branch has been applied to production. Every step below
-changes live systems and needs the owner's approval first.
+Status 2026-10-10: steps 1-3 and 5 are live (owner-approved). Steps 4 and 6
+remain. The app changes are not merged or released.
 
 ## What changed
 
@@ -25,11 +25,15 @@ changes live systems and needs the owner's approval first.
 ## Go-live order (server first; the current app is unaffected by it)
 
 1. Supabase -> Authentication -> Sign In / Providers -> enable
-   **Allow anonymous sign-ins**.
+   **Allow anonymous sign-ins**. Done by owner 2026-10-10. Captcha stays off
+   until the app sends captcha tokens (turning it on would block all sign-ins).
 2. Apply `supabase/migrations/20261010120000_guest_subscription_purchases.sql`.
    It replaces five functions with their live definitions plus the guest
    condition. Local test: `node scripts/test_guest_subscriptions_db.mjs`.
+   Applied 2026-10-10; execute grants unchanged.
 3. Deploy `supabase/functions/revenuecat-sync` (only `index.ts` changed).
+   Deployed 2026-10-10 as version 12, JWT verification on; still returns 401
+   without a session.
 4. RevenueCat -> Project settings -> Restore behavior: confirm
    **Transfer to new App User ID** (needed for guest -> account moves).
 5. Supabase -> Apple provider Client IDs:
