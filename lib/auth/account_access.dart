@@ -1,8 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart' show closeInAppWebView;
 
 import '../config.dart';
 import '../offline/offline_cache.dart';
@@ -22,6 +27,79 @@ String accountAuthRedirect({required bool isWeb, required Uri base}) => isWeb
       ).toString()
     : mobileAuthRedirect;
 
+/// Apple and Google sign-in must stay inside the app (App Review Guideline 4).
+/// Web keeps the existing same-tab redirect; native apps use an in-app sheet.
+LaunchMode socialAuthLaunchMode({required bool isWeb}) =>
+    isWeb ? LaunchMode.externalApplication : LaunchMode.inAppBrowserView;
+
+/// Apple devices use the native Sign in with Apple sheet instead of a webpage.
+bool usesNativeAppleSignIn({
+  required bool isWeb,
+  required TargetPlatform platform,
+}) =>
+    !isWeb &&
+    (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS);
+
+/// The person closed the native sign-in sheet. Nothing changed.
+class SignInCanceled implements Exception {
+  const SignInCanceled();
+}
+
+class AppleIdCredential {
+  const AppleIdCredential(this.idToken, {this.givenName, this.familyName});
+  final String idToken;
+  final String? givenName;
+  final String? familyName;
+
+  String get fullName => [givenName, familyName]
+      .whereType<String>()
+      .map((part) => part.trim())
+      .where((part) => part.isNotEmpty)
+      .join(' ');
+}
+
+/// Requests a native Apple credential bound to [hashedNonce].
+typedef AppleCredentialRequest = Future<AppleIdCredential> Function(
+  String hashedNonce,
+);
+
+Future<AppleIdCredential> requestNativeAppleCredential(
+  String hashedNonce,
+) async {
+  try {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: const [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: hashedNonce,
+    );
+    final token = credential.identityToken;
+    if (token == null || token.isEmpty) {
+      throw const AuthException('Apple did not return a sign-in token.');
+    }
+    return AppleIdCredential(
+      token,
+      givenName: credential.givenName,
+      familyName: credential.familyName,
+    );
+  } on SignInWithAppleAuthorizationException catch (error) {
+    if (error.code == AuthorizationErrorCode.canceled) {
+      throw const SignInCanceled();
+    }
+    rethrow;
+  }
+}
+
+/// Single-use random nonce. Only its SHA-256 hash is sent to Apple.
+String generateRawNonce([Random? random]) {
+  final source = random ?? Random.secure();
+  return base64Url.encode(List<int>.generate(32, (_) => source.nextInt(256)));
+}
+
+String hashNonce(String rawNonce) =>
+    sha256.convert(utf8.encode(rawNonce)).toString();
+
 abstract class AccountAccess {
   String? get email;
   Stream<void> get changes;
@@ -37,9 +115,21 @@ abstract interface class PasswordRecoveryAccess {
 }
 
 class SupabaseAccountAccess implements AccountAccess, PasswordRecoveryAccess {
-  SupabaseAccountAccess(this.client, {this.settingsClient});
+  SupabaseAccountAccess(
+    this.client, {
+    this.settingsClient,
+    this.appleCredential = requestNativeAppleCredential,
+    bool? nativeApple,
+  }) : nativeApple =
+           nativeApple ??
+           usesNativeAppleSignIn(
+             isWeb: kIsWeb,
+             platform: defaultTargetPlatform,
+           );
   final SupabaseClient client;
   final http.Client? settingsClient;
+  final AppleCredentialRequest appleCredential;
+  final bool nativeApple;
 
   @override
   String? get email => client.auth.currentUser?.isAnonymous == false
@@ -79,12 +169,60 @@ class SupabaseAccountAccess implements AccountAccess, PasswordRecoveryAccess {
     if (provider != OAuthProvider.apple && provider != OAuthProvider.google) {
       throw ArgumentError('Unsupported sign-in provider');
     }
+    if (provider == OAuthProvider.apple && nativeApple) {
+      return _signInWithNativeApple();
+    }
     // A successful launch is not a successful login. The UI observes changes.
+    if (!kIsWeb) _closeSignInSheetAfterLogin();
     return client.auth.signInWithOAuth(
       provider,
       redirectTo: accountAuthRedirect(isWeb: kIsWeb, base: Uri.base),
-      authScreenLaunchMode: LaunchMode.externalApplication,
+      authScreenLaunchMode: socialAuthLaunchMode(isWeb: kIsWeb),
     );
+  }
+
+  StreamSubscription<AuthState>? _sheetWatch;
+
+  /// Supabase does not dismiss the in-app sign-in sheet after the callback.
+  void _closeSignInSheetAfterLogin() {
+    _sheetWatch?.cancel();
+    _sheetWatch = client.auth.onAuthStateChange.listen((state) {
+      if (state.event != AuthChangeEvent.signedIn) return;
+      _sheetWatch?.cancel();
+      _sheetWatch = null;
+      closeInAppWebView().catchError((_) {});
+    }, onError: (_) {});
+  }
+
+  /// Native Sign in with Apple. Supabase verifies Apple's token and nonce.
+  Future<bool> _signInWithNativeApple() async {
+    final rawNonce = generateRawNonce();
+    final credential = await appleCredential(hashNonce(rawNonce));
+    final result = await client.auth.signInWithIdToken(
+      provider: OAuthProvider.apple,
+      idToken: credential.idToken,
+      nonce: rawNonce,
+    );
+    // Apple shares the name only on the first authorization.
+    final name = credential.fullName;
+    if (result.session != null && name.isNotEmpty) {
+      try {
+        await client.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': name,
+              if (credential.givenName?.trim().isNotEmpty == true)
+                'given_name': credential.givenName!.trim(),
+              if (credential.familyName?.trim().isNotEmpty == true)
+                'family_name': credential.familyName!.trim(),
+            },
+          ),
+        );
+      } catch (_) {
+        // The sign-in succeeded; a missing display name is not fatal.
+      }
+    }
+    return result.session != null;
   }
 
   @override
