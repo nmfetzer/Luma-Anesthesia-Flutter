@@ -11,7 +11,7 @@ fi
 cd "$(dirname "$0")/.."
 flutter pub get
 flutter build appbundle --release \
-  --build-name=2.3 \
+  --build-name=3.0 \
   --build-number="$1" \
   --dart-define=LUMA_BILLING_ENABLED=true \
   --dart-define=LUMA_CE_BILLING_ENABLED=true
@@ -20,6 +20,6 @@ if [[ ! -f "$bundle" ]]; then
   echo "Expected bundle not found: $bundle" >&2
   exit 1
 fi
-echo "Built Play Store bundle: $bundle (versionName 3.0.0, versionCode $1)."
+echo "Built Play Store bundle: $bundle (versionName 3.0, versionCode $1)."
 echo "Purchase environment is verified server-side; the build flag grants no access."
 echo "Upload only this new bundle. This command has not uploaded or released it."

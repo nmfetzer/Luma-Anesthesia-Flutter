@@ -162,6 +162,12 @@ class RevenueCatGateway
         userId != expectedUser) {
       throw StateError('Invalid CE verification');
     }
+    // Apple's sandbox/review mode only applies to Apple's own review build on
+    // iOS. On Android a customer follows the normal release rule, so a backend
+    // apple_review flag (kept on so Apple's reviewer can test iOS) must not
+    // disable Google Play CE. Mirrors the subscription checkout policy.
+    final inAppleReview =
+        raw['apple_review'] == true && platform == TargetPlatform.iOS;
     final enabled = <String>{};
     final owned = <String>{};
     for (final item in raw['products'] as List) {
@@ -175,7 +181,7 @@ class RevenueCatGateway
       final canonical = CeProduct.canonicalFor(id);
       if (canonical == null) continue;
       if (ceSupported &&
-          (raw['apple_review'] == true
+          (inAppleReview
               ? RevenueCatConfig.appleReview
               : RevenueCatConfig.ceEnabled) &&
           item['enabled'] == true) {
@@ -187,7 +193,7 @@ class RevenueCatGateway
       userId: expectedUser,
       enabled: enabled,
       owned: owned,
-      appleReview: raw['apple_review'] == true,
+      appleReview: inAppleReview,
     );
   }
 
