@@ -1,4 +1,5 @@
 import { verifiedSnapshot } from "./validation.ts";
+import { type CePurchase, verifiedCePurchases } from "./ce_reconcile.ts";
 
 export interface SyncDependencies {
   enabled: boolean;
@@ -7,6 +8,8 @@ export interface SyncDependencies {
   subscriber(userId: string): Promise<unknown>;
   record(userId: string, snapshot: ReturnType<typeof verifiedSnapshot>, sandbox: boolean): Promise<void>;
   access(authorization: string): Promise<boolean>;
+  /** Records one verified Apple CE purchase; must never throw past the handler. */
+  reconcileCe?(userId: string, purchase: CePurchase): Promise<void>;
   now(): number;
 }
 const cors = {
@@ -31,7 +34,8 @@ export function createHandler(deps: SyncDependencies) {
       const user = await deps.user(authorization);
       if (!user) return json({ error: "Sign in required" }, 401);
       const reviewer = await deps.reviewAllowed(authorization, user);
-      const snapshot = verifiedSnapshot(await deps.subscriber(user), deps.now(), reviewer);
+      const body = await deps.subscriber(user);
+      const snapshot = verifiedSnapshot(body, deps.now(), reviewer);
       if (snapshot.sandbox === true) {
         // Do not replace a production lease with a sandbox snapshot, even an
         // expired/refunded one. Ineligible sandbox receipts confer no access.
@@ -40,6 +44,13 @@ export function createHandler(deps: SyncDependencies) {
         await deps.record(user, snapshot, false);
         // An empty/production response must also clear an old test lease.
         if (reviewer) await deps.record(user, { ...snapshot, active: false }, true);
+      }
+      // Recover CE purchases the webhook could not attribute (offer codes,
+      // guest aliases, restore transfers). Best effort: never blocks access.
+      if (deps.reconcileCe) {
+        for (const purchase of verifiedCePurchases(body, deps.now())) {
+          try { await deps.reconcileCe(user, purchase); } catch { /* retry next sync */ }
+        }
       }
       const active = await deps.access(authorization);
       if (typeof active !== "boolean") throw new Error("Invalid access response");

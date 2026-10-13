@@ -1,4 +1,4 @@
 {
   "compilerOptions": { "strict": true },
-  "tasks": { "test": "deno test validation_test.ts handler_test.ts" }
+  "tasks": { "test": "deno test validation_test.ts handler_test.ts ce_reconcile_test.ts" }
 }

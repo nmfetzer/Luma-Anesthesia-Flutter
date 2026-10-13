@@ -45,6 +45,14 @@ Deno.serve(createHandler({
     });
     if (error) throw new Error("Storage unavailable");
   },
+  async reconcileCe(userId, purchase) {
+    const { error } = await createClient(url, serviceKey, options).rpc(
+      "reconcile_revenuecat_ce_purchase", {
+        p_transaction_id: purchase.transactionId, p_product_id: purchase.productId,
+        p_user_id: userId, p_purchased_at: purchase.purchasedAt,
+      });
+    if (error) throw new Error("CE storage unavailable");
+  },
   async access(authorization) {
     const { data, error } = await userClient(authorization).rpc("has_clinical_premium_access");
     if (error) throw new Error("Access unavailable");
