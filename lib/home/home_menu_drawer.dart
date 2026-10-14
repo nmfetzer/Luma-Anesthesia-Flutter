@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'education_labels.dart';
 
 class HomeMenuDrawer extends StatelessWidget {
   const HomeMenuDrawer({super.key});
@@ -76,7 +77,7 @@ class HomeMenuDrawer extends StatelessWidget {
                     accent: const Color(0xFFB43C37),
                   ),
                   _sectionLabel('EDUCATION'),
-                  _link(context, 'CE Halo', '/ce-halo'),
+                  _link(context, ceHaloNavigationLabel, '/ce-halo'),
                   _sub(context, 'My Courses', '/ce-halo/courses'),
                   _sectionLabel('ACCOUNT'),
                   _link(context, 'Luma Premium', '/subscribe'),

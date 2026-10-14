@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "11081de0fdf3245d3aa6aa190a9f86d568d7841f",
+  "reviewStatus": "needs_clinical_review",
+  "shippedInApp": false,
+  "flashcardRecordsImported": false,
+  "notes": [
+    "Archive is not an approved question bank and is not included in Flutter assets.",
+    "Flashcard deck definitions are available; Flashcard records are stored separately in Base44.",
+    "JSX modules are preserved verbatim, not yet converted into native lessons."
+  ],
+  "files": [
+    {
+      "file": "ABAAdvancedAdultPedsModule.jsx",
+      "sha256": "2c3dc8ff030e601441dd823b5a59c97df66b2a7c66e48a207942c33af76b0444",
+      "literalBlocks": [
+        "QUESTIONS"
+      ],
+      "questionCount": 50
+    },
+    {
+      "file": "ABAAdvancedCardiothoracicModule.jsx",
+      "sha256": "aa691b97e07d7449dc173873799c61d0a91a06c1d3c45f87369e89795b04be88",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAdvancedCriticalCareModule.jsx",
+      "sha256": "b2f3a727495e3126c60284c04d341f3dc11f3c7bd1bb13d75540dff0c8e257d2",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAdvancedEthicsModule.jsx",
+      "sha256": "7dd35f65090008dc593476d73191a49bccfb00b3144c7cd7603350c48df8db37",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAdvancedNeuroModule.jsx",
+      "sha256": "cc12e49aeadfc9c59a236934daafdc200ba471f719aadfdd9d16dbce484ce4f1",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAdvancedObstetricModule.jsx",
+      "sha256": "bfcbfc69a46a419ea00195f30e24bd50b10db0c561eba18e2d38e2019fce1e5f",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAdvancedRegionalPainModule.jsx",
+      "sha256": "29ce4842fedb47592adfaedd221ba1e21c8251229c2c1525d4ae125e424adb70",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAAnatomyModule.jsx",
+      "sha256": "1696e5b29cc0c4af720677dd4becf2eb9e18c8716858bff5471826a5fa8d6bd7",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAClinicalproceduresModule.jsx",
+      "sha256": "9d4eb11156e372f460d5aaa3f05264bd72ad25fe093036791be2af58113bb36f",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAEquipmentModule.jsx",
+      "sha256": "a5cd7e2c5fa1bc9528d0dcac8325926d0cabe0f8898d858168f42457144f5d50",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAOrganDiseaseModule.jsx",
+      "sha256": "ecf2c43e4e224649590edc1297aacc074a02a2e473efbaa3da01d72fe40ad7e6",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAPharmacologyModule.jsx",
+      "sha256": "315cd491fb0678ee1d512be809018ae988fe73b1488674eb837d47dadf610d59",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAPhysiologyModule.jsx",
+      "sha256": "751964d1667636972db6901f393e121c9b666bf00d4097d0cc4f45a650597847",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAPracticeExam.jsx",
+      "sha256": "a8d46cb51cdcdf9b832873691a885e6c1bdc76fab132a7006247fdcf25b9a4e5",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABAPracticeExamData.js",
+      "sha256": "a4ac4f81402940403b2d58ce642a9fb88df7c4c3622c4ff693f32f4b89aaccc0",
+      "literalBlocks": [
+        "SECTIONS",
+        "QUESTIONS"
+      ],
+      "questionCount": 301
+    },
+    {
+      "file": "ABASpecialProblemsModule.jsx",
+      "sha256": "c5b23ef8a2490d5fb757e2e0a3e540919ec7e0f6fa6db17f52df916aaf444db3",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "ABASubspecialtyModule.jsx",
+      "sha256": "1e57fe215f7c45da534e7014ad13d74b8749a5c20947e4e7d7a064171e6a6202",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "AcademySkeleton.jsx",
+      "sha256": "e3189dfee2557e7ef8284d59022598131cdf4f01fe78943d09cf27bf02dc05eb",
+      "literalBlocks": [
+        "SECTIONS"
+      ],
+      "questionCount": 0
+    },
+    {
+      "file": "CEModules.jsx",
+      "sha256": "12a7a9cd4cfbb5ff4b5bd83b049a37c8185e260f879c89d54e871425f2aaa447",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "CoursePreviewPaywall.jsx",
+      "sha256": "1a507579beca29ebbb167aa031d4595155a90c7ce9e618a99ac254e4304bc082",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "DrugInteractionChecker.jsx",
+      "sha256": "953f446c721fef89e2fa10888caede6817e8392893c46875ce9c4d8da2d8ac0f",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "EquipmentQuiz.jsx",
+      "sha256": "ca54590be1a5b6f5533cb621fa1dd01d9100e142534e6173eb70342293a81792",
+      "literalBlocks": [
+        "QUESTIONS"
+      ],
+      "questionCount": 50
+    },
+    {
+      "file": "EquipmentReviewGuide.jsx",
+      "sha256": "d527c9b9ec3a6b05c84e525b5c759dee2eb8eaf39b79711a25b061421148725e",
+      "literalBlocks": [
+        "SECTIONS"
+      ],
+      "questionCount": 0
+    },
+    {
+      "file": "FirstDayORModule.jsx",
+      "sha256": "d5c6c2326c263af6138e35ef531bc105627e8f4d14a4a29c34e7ef201c3fdf20",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "GatingBadges.jsx",
+      "sha256": "0f0b5d02fa8336557d9992ab6d9569731022362ab660112aa5d6e25e2da3564a",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "LearningCenter.jsx",
+      "sha256": "25736b38222fb4ea4aabb28aae9017c27419ddd33ddaa05da5fae209415bc99e",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "NBCRNAAPReviewModule.jsx",
+      "sha256": "90d0f7bc1be3f60d401037af56bf750911d66eb2a6810c8d09cdf8be3f96a6fd",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "NCEPracticeTest.jsx",
+      "sha256": "5f1e74ebe7917642d47c0b77f927e446504b9dcbc87d1291c0447adf54592dc2",
+      "literalBlocks": [
+        "QUESTIONS"
+      ],
+      "questionCount": 100
+    },
+    {
+      "file": "NCEPracticeTest2.jsx",
+      "sha256": "35810cdea472e57f8f4102a082c265cf41e48644f6e5bcf7e4c394056dc69752",
+      "literalBlocks": [
+        "QUESTIONS"
+      ],
+      "questionCount": 100
+    },
+    {
+      "file": "NCEReviewGuide.jsx",
+      "sha256": "3cce81f0097c31130f56a82a23c3b961df2896ab9156bc299e0a353ce968a198",
+      "literalBlocks": [
+        "DOMAINS"
+      ],
+      "questionCount": 0
+    },
+    {
+      "file": "QuizFreePreviewGate.jsx",
+      "sha256": "cb778989be4270de20498c93806dc0edc53e9eb03b6ef301e05762a894b15641",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "StudyCoachChat.jsx",
+      "sha256": "13ba5204788135edce0a4cd2e67b0bae271162fa99eabd41764057569d42c191",
+      "literalBlocks": [],
+      "questionCount": 0
+    },
+    {
+      "file": "LumaAcademy.jsx",
+      "sha256": "19ae3c5eafa7b4b57930aa58f0a2db047dd22ab818bbf58a57c67ec4b7648ac8",
+      "literalBlocks": [
+        "FLASHCARD_DECKS"
+      ],
+      "questionCount": 0
+    }
+  ],
+  "questionCount": 601,
+  "fileCount": 33
+}

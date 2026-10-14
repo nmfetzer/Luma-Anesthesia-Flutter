@@ -7,6 +7,7 @@ import 'home_background.dart';
 import 'home_tile.dart';
 import 'home_menu_drawer.dart';
 import 'home_search.dart';
+import 'education_labels.dart';
 
 class HomeTileData {
   final String eyebrow;
@@ -54,9 +55,9 @@ const _tiles = [
   ),
   HomeTileData(
     eyebrow: 'Continuing Education',
-    titlePlain: 'CE',
-    titleAccent: 'Halo',
-    subtitle: 'Courses & learning access',
+    titlePlain: ceHaloNavigationLabel,
+    titleAccent: '',
+    subtitle: 'Browse courses & access your purchases',
     style: HomeTileStyle.darkHero,
     route: '/ce-halo',
   ),
