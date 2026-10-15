@@ -42,3 +42,5 @@ docs/quick-reference-audit/*.json
 docs/quick-reference-audit/*.jsonl
 docs/quick-reference-audit/*.txt
 docs/quick-reference-audit/reviewed-delta.sql
+# Paid Academy review bundles belong only in a separate private build copy.
+assets/academy_review/
