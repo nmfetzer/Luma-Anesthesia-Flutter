@@ -15,6 +15,8 @@ flutter build web --release --no-wasm-dry-run \
 
 Use the built `build/web` folder for Netlify. Do not deploy `tool/academy_qa_main.dart` or the local QA server. No approved paid JSON or PDF is included in the static output or public repository.
 
+The private embedded preview uses `tool/academy_preview_main.dart`: the same Academy screens, real protected backend, and a memory-only email/password sign-in. It is not the production portal entry point. Closing/reloading it clears the preview session, not saved learning progress. No credential is bundled.
+
 ## Account and progress model
 
 - Content is fetched only after a server-side Academy access check.
