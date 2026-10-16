@@ -33,6 +33,7 @@ import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
 import 'offline/offline_status_frame.dart';
 import 'offline/offline_downloads_screen.dart';
+import 'academy/academy_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -145,7 +146,11 @@ class _LumaAppState extends State<LumaApp> {
         child: OfflineStatusFrame(
           navigatorKey: _navKey,
           child: cePortal && kIsWeb
-              ? CePortalFrame(child: child ?? const SizedBox.shrink())
+              ? CePortalFrame(
+                  onAcademy: () => _navKey.currentState?.pushNamed('/academy'),
+                  onCourses: () => _navKey.currentState?.pushNamed('/ce-halo'),
+                  child: child ?? const SizedBox.shrink(),
+                )
               : child ?? const SizedBox.shrink(),
         ),
       ),
@@ -163,6 +168,12 @@ class _LumaAppState extends State<LumaApp> {
           : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (path == '/academy' || path == '/luma-academy') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const AcademyScreen(),
+          );
+        }
         if (path == '/ce-purchase') {
           return MaterialPageRoute(
             settings: settings,
