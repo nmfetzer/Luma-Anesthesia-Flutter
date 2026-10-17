@@ -1,8 +1,9 @@
 /// Public release scope. Deferred sections stay closed in every build.
 abstract final class LaunchScope {
-  /// Review builds opt in. Does not create an Academy purchase entitlement.
+  /// Connected Academy is included in new builds; server access remains required.
   static const academyConnected = bool.fromEnvironment(
     'LUMA_ACADEMY_CONNECTED_ENABLED',
+    defaultValue: true,
   );
   static const deferred = <String, String>{
     '/luma-ai': 'Luma AI',

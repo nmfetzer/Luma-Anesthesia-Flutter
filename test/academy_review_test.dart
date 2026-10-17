@@ -6,8 +6,8 @@ import 'package:luma_anesthesia/academy/academy_review_screen.dart';
 import 'package:luma_anesthesia/launch/launch_scope.dart';
 
 void main() {
-  test('Academy remains closed in production; corrections require signoff', () {
-    expect(LaunchScope.isDeferred('/luma-academy'), isTrue);
+  test('Connected Academy does not release legacy unapproved questions', () {
+    expect(LaunchScope.isDeferred('/luma-academy'), !LaunchScope.academyConnected);
     for (final q in academyReviewQuestions) {
       expect(q.reviewStatus, 'source_checked_awaiting_clinician_review');
       expect(q.sourceUrl, startsWith('https://dailymed.nlm.nih.gov/'));
