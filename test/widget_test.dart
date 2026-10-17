@@ -10,6 +10,7 @@ import 'package:luma_anesthesia/quick_references/quick_reference_screen.dart';
 import 'package:luma_anesthesia/special_considerations/special_considerations_screen.dart';
 import 'package:luma_anesthesia/diagnostics/diagnostics_access.dart';
 import 'package:luma_anesthesia/regional/regional_screen.dart';
+import 'package:luma_anesthesia/academy/academy_screen.dart';
 
 void main() {
   test('production defaults preserve clinical review and normal app entry', () {
@@ -46,6 +47,10 @@ void main() {
           screen('/quick-references', 'GLP1') as QuickReferencesScreen;
       expect(quick.initialQuery, 'GLP1');
       for (final path in LaunchScope.deferred.keys) {
+        if (path == '/luma-academy' && LaunchScope.academyConnected) {
+          expect(screen(path), isA<AcademyScreen>());
+          continue;
+        }
         final deferred = screen(path) as DeferredSectionScreen;
         expect(deferred.showComingSoon, isFalse);
         expect(

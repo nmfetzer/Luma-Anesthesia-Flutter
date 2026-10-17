@@ -37,9 +37,10 @@ void main() {
   test('surgical case prep is public; other deferred sections stay closed', () {
     expect(LaunchScope.isDeferred('/surgical-prep'), false);
     expect(LaunchScope.isDeferred('/surgical-prep/specialty/obstetric'), false);
-    for (final path in ['/luma-ai', '/ekg', '/luma-academy']) {
+    for (final path in ['/luma-ai', '/ekg']) {
       expect(LaunchScope.isDeferred(path), true);
     }
+    expect(LaunchScope.isDeferred('/luma-academy'), !LaunchScope.academyConnected);
     expect(
       File('scripts/build_surgical_testflight_review.sh').existsSync(),
       false,

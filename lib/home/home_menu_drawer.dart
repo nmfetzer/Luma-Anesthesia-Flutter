@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'education_labels.dart';
+import '../launch/launch_scope.dart';
 
 class HomeMenuDrawer extends StatelessWidget {
   const HomeMenuDrawer({super.key});
@@ -79,6 +81,8 @@ class HomeMenuDrawer extends StatelessWidget {
                   _sectionLabel('EDUCATION'),
                   _link(context, ceHaloNavigationLabel, '/ce-halo'),
                   _sub(context, 'My Courses', '/ce-halo/courses'),
+                  if (LaunchScope.academyConnected)
+                    _link(context, 'Luma Academy · NCE study', '/luma-academy'),
                   _sectionLabel('ACCOUNT'),
                   _link(context, 'Luma Premium', '/subscribe'),
                   _link(context, 'My Account', '/account'),

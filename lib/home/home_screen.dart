@@ -219,6 +219,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   HomeTile(data: _tiles[3], wide: true),
                                   const SizedBox(height: 8),
                                   pair(4, 5),
+                                  if (LaunchScope.academyConnected) ...[
+                                    const SizedBox(height: 8),
+                                    const HomeTile(
+                                      data: HomeTileData(
+                                        titlePlain: 'Luma',
+                                        titleAccent: 'Academy',
+                                        subtitle: 'NCE study · cards, questions & shared progress',
+                                        route: '/luma-academy',
+                                        style: HomeTileStyle.parchment,
+                                      ),
+                                      wide: true,
+                                    ),
+                                  ],
                                   const SizedBox(height: 8),
                                   pair(7, 8),
                                   const SizedBox(height: 8),

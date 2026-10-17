@@ -36,6 +36,7 @@ import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
 import 'offline/offline_status_frame.dart';
 import 'offline/offline_downloads_screen.dart';
+import 'academy/academy_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -149,6 +150,13 @@ class _LumaAppState extends State<LumaApp> {
           : const HomeScreen(),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (LaunchScope.academyConnected &&
+            (path == '/academy' || path == '/luma-academy')) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const AcademyScreen(),
+          );
+        }
         if (path == OrOnboardingScreen.route) {
           return MaterialPageRoute(
             settings: settings,
