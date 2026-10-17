@@ -27,11 +27,13 @@ import 'screens/password_recovery_screen.dart';
 import 'ce/ce_library_screen.dart';
 import 'ce/ce_purchase_screen.dart';
 import 'ce/web/ce_portal_frame.dart';
+import 'ce/web/ce_guest_checkout.dart';
 import 'quick_references/quick_reference_screen.dart';
 import 'quick_references/quick_reference_shortcut.dart';
 import 'offline/offline_library.dart';
 import 'offline/offline_status_frame.dart';
 import 'offline/offline_downloads_screen.dart';
+import 'academy/academy_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,6 +89,20 @@ class _LumaAppState extends State<LumaApp> {
     try {
       _recovery = Supabase.instance.client.auth.onAuthStateChange.listen(
         (state) {
+          if (cePortal &&
+              CeGuestCheckout.enabled &&
+              state.event == AuthChangeEvent.signedIn &&
+              CeGuestCheckout.freshEmailSession(state.session)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                _navKey.currentState?.push(
+                  MaterialPageRoute(
+                    builder: (_) => const CeGuestCheckout(activate: true),
+                  ),
+                );
+              }
+            });
+          }
           if (state.event != AuthChangeEvent.passwordRecovery ||
               _recoveryOpen) {
             return;
@@ -130,7 +146,11 @@ class _LumaAppState extends State<LumaApp> {
         child: OfflineStatusFrame(
           navigatorKey: _navKey,
           child: cePortal && kIsWeb
-              ? CePortalFrame(child: child ?? const SizedBox.shrink())
+              ? CePortalFrame(
+                  onAcademy: () => _navKey.currentState?.pushNamed('/academy'),
+                  onCourses: () => _navKey.currentState?.pushNamed('/ce-halo'),
+                  child: child ?? const SizedBox.shrink(),
+                )
               : child ?? const SizedBox.shrink(),
         ),
       ),
@@ -139,10 +159,21 @@ class _LumaAppState extends State<LumaApp> {
           : kIsWeb && Uri.base.queryParameters['auth_callback'] == '1'
           ? AccountScreen(allowSocialSignIn: allowSocialSignIn)
           : cePortal
-          ? const CeLibraryScreen()
+          ? CeGuestCheckout.enabled &&
+                    CeGuestCheckout.freshEmailSession(
+                      Supabase.instance.client.auth.currentSession,
+                    )
+                ? const CeGuestCheckout(activate: true)
+                : const CeLibraryScreen()
           : const WelcomeGate(child: HomeScreen()),
       onGenerateRoute: (settings) {
         final path = Uri.tryParse(settings.name ?? '')?.path ?? '';
+        if (path == '/academy' || path == '/luma-academy') {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const AcademyScreen(),
+          );
+        }
         if (path == '/ce-purchase') {
           return MaterialPageRoute(
             settings: settings,

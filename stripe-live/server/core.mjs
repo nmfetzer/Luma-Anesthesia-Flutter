@@ -123,7 +123,9 @@ export function createHandler(config, deps) {
         requireThat(request.method === 'POST', 'POST required.', 405);
         const raw = await request.text();
         requireThat(raw.length <= 262144, 'Event too large.', 413);
-        await settle(await deps.verifyEvent(raw, request.headers.get('stripe-signature'), config.webhookSecret));
+        const event = await deps.verifyEvent(raw, request.headers.get('stripe-signature'), config.webhookSecret);
+        if (deps.guest) await deps.guest.settle(event);
+        await settle(event);
         return respond(200, { received: true });
       }
       requireThat(request.headers.get('origin') === ORIGIN, 'Origin not allowed.', 403);

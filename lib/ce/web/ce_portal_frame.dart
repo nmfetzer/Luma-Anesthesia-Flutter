@@ -6,9 +6,16 @@ import '../../theme/luma_theme.dart';
 /// Website-only navigation, outside the Navigator so every portal route has it.
 /// A new tab preserves the learner's open course or unfinished form.
 class CePortalFrame extends StatelessWidget {
-  const CePortalFrame({super.key, required this.child});
+  const CePortalFrame({
+    super.key,
+    required this.child,
+    this.onAcademy,
+    this.onCourses,
+  });
 
   final Widget child;
+  final VoidCallback? onAcademy;
+  final VoidCallback? onCourses;
   static final websiteUrl = Uri.parse('https://cehalo.com/');
 
   @override
@@ -49,6 +56,28 @@ class CePortalFrame extends StatelessWidget {
             ),
           ),
         ),
+        if (onAcademy != null || onCourses != null)
+          Material(
+            color: const Color(0xFFF7F3EA),
+            child: SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  if (onCourses != null)
+                    TextButton(
+                      onPressed: onCourses,
+                      child: const Text('My CE courses'),
+                    ),
+                  if (onAcademy != null)
+                    TextButton(
+                      onPressed: onAcademy,
+                      child: const Text('Luma Academy'),
+                    ),
+                ],
+              ),
+            ),
+          ),
         Expanded(child: child),
       ],
     );
