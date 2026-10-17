@@ -26,6 +26,24 @@ List<Map<String, dynamic>> _sources(dynamic value) => value is Map
           .toList()
     : _list(value);
 String _version(Map p) => (p['version'] ?? p['contentVersion']) as String;
+String _domain(Map p) {
+  final title = p['domainTitle'] as String?;
+  if (title != null && title.isNotEmpty) return title;
+  final id = _id(p);
+  if (id.startsWith('I.A.')) return 'Anatomy & Physiology';
+  if (id.startsWith('I.B.')) return 'Pathophysiology';
+  if (id.startsWith('I.C.')) return 'Pharmacology';
+  return 'NCE Review';
+}
+
+String _topicTitle(Map p, Map deck) {
+  for (final topic in _list(p['topics'])) {
+    if (topic['id'] == deck['topicId']) {
+      return '${topic['id']}  /  ${topic['title']}';
+    }
+  }
+  return '';
+}
 
 /// A separate nested Navigator is destroyed on account changes, clearing every
 /// open card, answer, PDF and cached lesson from the previous account.
@@ -173,9 +191,9 @@ class _AcademyLearningHomeState extends State<AcademyLearningHome>
       children: [
         const Text('CE HALO  /  NCE STUDY'),
         const SizedBox(height: 12),
-        const _Heading('Your A&P learning path'),
+        const _Heading('Your NCE learning path'),
         const Text(
-          'Read. Recall. Apply. Check. Small decks, focused practice, and nine individual sections in outline order.',
+          'Read. Recall. Apply. Check. Small decks and focused practice, organized by NCE domain and section.',
         ),
         const SizedBox(height: 20),
         if (loading)
@@ -192,10 +210,22 @@ class _AcademyLearningHomeState extends State<AcademyLearningHome>
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(
-                'Owner review access. All nine sections are open; the final mastery-unlock policy is not yet enabled.',
+                'Owner access. All available sections are open; the final mastery-unlock policy is not yet enabled.',
               ),
             ),
-          for (final p in _list(catalog?['levels']))
+          for (final (index, p) in _list(catalog?['levels']).indexed) ...[
+            if (index == 0 ||
+                _domain(p) != _domain(_list(catalog?['levels'])[index - 1]))
+              Padding(
+                padding: const EdgeInsets.only(top: 24, bottom: 8),
+                child: Text(
+                  _domain(p),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -238,6 +268,7 @@ class _AcademyLearningHomeState extends State<AcademyLearningHome>
                       },
               ),
             ),
+          ],
         ],
       ],
     );
@@ -360,7 +391,7 @@ class _LevelState extends State<_Level> {
             _load();
           }),
         if (p != null) ...[
-          Text('$id  /  ANATOMY & PHYSIOLOGY'),
+          Text('$id  /  ${_domain(p!).toUpperCase()}'),
           const SizedBox(height: 12),
           _Heading(widget.summary['title'] as String),
           const Text(
@@ -398,7 +429,21 @@ class _LevelState extends State<_Level> {
                 : 'Best checkpoint: ${best['correct']}/${best['total']}. Saved to your account. Mastery unlocking is not active.',
           ),
           const SizedBox(height: 16),
-          for (final (index, deck) in _list(p!['decks']).indexed)
+          for (final (index, deck) in _list(p!['decks']).indexed) ...[
+            if (_topicTitle(p!, deck).isNotEmpty &&
+                (index == 0 ||
+                    deck['topicId'] !=
+                        _list(p!['decks'])[index - 1]['topicId']))
+              Padding(
+                padding: const EdgeInsets.only(top: 24, bottom: 8),
+                child: Text(
+                  _topicTitle(p!, deck),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ExpansionTile(
@@ -500,6 +545,7 @@ class _LevelState extends State<_Level> {
                 ],
               ),
             ),
+          ],
           if ((p!['documents'] as List? ?? []).length > 1)
             ExpansionTile(
               title: const Text('Optional PDF companions'),
